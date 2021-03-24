@@ -32,7 +32,7 @@ async function main() {
 
   console.log("Euler deployed to:", eul.address);
 
-  const Gov = await hre.ethers.getContractFactory("GovernorAlpha");
+  const Gov = await hre.ethers.getContractFactory("Governance");
   const gov = await Gov.deploy(timelock.address, eul.address, root.address);
 
   await gov.deployed();
