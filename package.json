@@ -31,6 +31,9 @@
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "@commitlint/config-lerna-scopes": "^12.0.1",
     "chai": "^4.3.4",
     "eslint": "^7.22.0",
     "eslint-config-airbnb-base": "^14.2.1",
