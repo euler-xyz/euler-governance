@@ -13,13 +13,32 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
+  // getting accounts
+  const [root, ...accounts] = await hre.ethers.getSigners();
+
   // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  const Timelock = await hre.ethers.getContractFactory("Timelock");
+  // deploying timelock with delay of 2 days in seconds, i.e., 86400 seconds per day
+  const timelock = await Timelock.deploy(root.address, 86400 * 2);
+ 
+  await timelock.deployed();
+  
+  console.log("Timelock deployed to:", timelock.address);
 
-  await greeter.deployed();
+  const Eul = await hre.ethers.getContractFactory("Eul");
+  const eul = await Eul.deploy(root.address);
 
-  console.log("Greeter deployed to:", greeter.address);
+  await eul.deployed();
+
+  console.log("Euler deployed to:", eul.address);
+
+  const Gov = await hre.ethers.getContractFactory("GovernorAlpha");
+  const gov = await Gov.deploy(timelock.address, eul.address, root.address);
+
+  await gov.deployed();
+
+  console.log("Governance deployed to:", gov.address);
+  
 }
 
 // We recommend this pattern to be able to use async/await everywhere
