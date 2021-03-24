@@ -16,27 +16,26 @@ async function main() {
   // getting accounts
   const [root, ...accounts] = await hre.ethers.getSigners();
 
-  // We get the contract to deploy
+  // Deploy Timelock contract
   const Timelock = await hre.ethers.getContractFactory("Timelock");
   // deploying timelock with delay of 2 days in seconds, i.e., 86400 seconds per day
   const timelock = await Timelock.deploy(root.address, 86400 * 2);
  
   await timelock.deployed();
-  
   console.log("Timelock deployed to:", timelock.address);
 
+  // Deploy Euler governance token contract
   const Eul = await hre.ethers.getContractFactory("Eul");
   const eul = await Eul.deploy(root.address);
 
   await eul.deployed();
+  console.log("Euler governance token deployed to:", eul.address);
 
-  console.log("Euler deployed to:", eul.address);
-
+  // Deploy Governance contract
   const Gov = await hre.ethers.getContractFactory("Governance");
   const gov = await Gov.deploy(timelock.address, eul.address, root.address);
 
   await gov.deployed();
-
   console.log("Governance deployed to:", gov.address);
   
 }
