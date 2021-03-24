@@ -4,9 +4,12 @@
 
 ### Setup
 
+```
 npm i
+```
 
 ### Test Solidity
 
-```npx hardhat test
+```
+npx hardhat test
 ```
