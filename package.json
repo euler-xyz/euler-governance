@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint",
+    "postinstall": "npx husky@4 install"
   },
   "repository": {
     "type": "git",
@@ -17,17 +19,6 @@
     "url": "https://github.com/euler-xyz/governance/issues"
   },
   "homepage": "https://github.com/euler-xyz/governance#readme",
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "**/*.js": [
-      "eslint --fix",
-      "git add"
-    ]
-  },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
@@ -35,13 +26,29 @@
     "@commitlint/config-conventional": "^8.3.4",
     "@commitlint/config-lerna-scopes": "^12.0.1",
     "chai": "^4.3.4",
-    "eslint": "^7.22.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1",
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.0.32",
     "hardhat": "^2.1.1",
-    "husky": "^5.2.0",
-    "lint-staged": "^10.5.4"
+    "babel-eslint": "^10.0.3",
+    "eslint": "^5.11.1",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-import-resolver-webpack": "^0.11.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.14.3",
+    "husky": "4.3.8",
+    "lerna": "^3.19.0",
+    "lint-staged": "^10.1.7"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "./**/*.{js,jsx}": [
+      "yarn lint"
+    ]
   }
 }
