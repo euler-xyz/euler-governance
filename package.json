@@ -50,5 +50,8 @@
     "./**/*.{js,jsx}": [
       "yarn lint"
     ]
+  },
+  "dependencies": {
+    "@openzeppelin/test-helpers": "^0.5.10"
   }
 }
