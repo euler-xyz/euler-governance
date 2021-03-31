@@ -9,7 +9,7 @@ interface Administered {
 
 contract TimelockHarness is Timelock {
     constructor(address admin_, uint delay_)
-        Timelock(admin_, delay_) public {
+        Timelock(admin_, delay_) {
     }
 
     function harnessSetPendingAdmin(address pendingAdmin_) public {

@@ -1,35 +1,10 @@
-/* const {expect} = require('chai');
+const {expect} = require('chai');
 const {
-  address,
-  minerStart,
-  minerStop,
-  unlockedAccount,
   mineBlock
 } = require('../Utils/Ethereum');
-const EIP712 = require('../Utils/EIP712');
+// const EIP712 = require('../Utils/EIP712');
 const {
-  expectVMException,
-  expectInvalidOpCode,
-  shouldFailWithMessage,
-  toHex,
-  hexToBytes,
-  hexToUtf8,
-  bytesToHex,
-  padLeft,
-  padRight,
-  soliditySha3,
-  encodeFunctionSignature,
-  encodeBytes32Param,
-  stringToBytes32,
-  bytes32ToString,
-  parseEther,
-  formatEther,
-  upgradeProxy,
-  deployProxy,
-  advanceBlockTo,
-  advanceBlock,
-  increaseTime,
-  toBN
+  shouldFailWithMessage
 } = require('../Utils/utils');
 const {expectBignumberEqual} = require('../../helpers/index');
 
@@ -77,8 +52,7 @@ describe('Eul', () => {
   describe('delegateBySig', () => {
     const Domain = eul => ({name, chainId, verifyingContract: eul.address});
     const Types = {
-      Delegation: [{name: 'delegatee', type: 'address'},
-      {name: 'nonce', type: 'uint256'}, {name: 'expiry', type: 'uint256'}]
+      Delegation: [{name: 'delegatee', type: 'address'}, {name: 'nonce', type: 'uint256'}, {name: 'expiry', type: 'uint256'}]
     };
 
     it('reverts if the signatory is invalid', async () => {
@@ -90,7 +64,7 @@ describe('Eul', () => {
       );
     });
 
-    it('reverts if the nonce is bad ', async () => {
+    /* it('reverts if the nonce is bad ', async () => {
       const delegatee = root.address; const nonce = 1; const
         expiry = 0;
       const {v, r, s} = EIP712.sign(Domain(eul), 'Delegation',
@@ -99,18 +73,18 @@ describe('Eul', () => {
         eul.delegateBySig(delegatee, nonce, expiry, v, r, s),
         'Eul::delegateBySig: invalid nonce'
       );
-    });
+    }); */
 
-    it('reverts if the signature has expired', async () => {
+    /* it('reverts if the signature has expired', async () => {
       const delegatee = root.address; const nonce = 0; const
         expiry = 0;
       const {v, r, s} = EIP712.sign(Domain(eul), 'Delegation',
       {delegatee, nonce, expiry}, Types, unlockedAccount(a1).secretKey);
       await shouldFailWithMessage(eul.delegateBySig(
         delegatee, nonce, expiry, v, r, s), 'Eul::delegateBySig: signature expired');
-    });
+    }); */
 
-    it('delegates on behalf of the signatory', async () => {
+    /* it('delegates on behalf of the signatory', async () => {
       const delegatee = root.address; const nonce = 0; const
         expiry = 10e9;
       const {v, r, s} = EIP712.sign(Domain(eul), 'Delegation',
@@ -119,7 +93,7 @@ describe('Eul', () => {
       const tx = await eul.delegateBySig(delegatee, nonce, expiry, v, r, s);
       expect(tx.gasUsed < 80000);
       expect(await eul.delegates(a1)).to.equal(root);
-    });
+    }); */
   });
 
   describe('numCheckpoints', () => {
@@ -140,17 +114,17 @@ describe('Eul', () => {
       const t4 = await eul.transfer(guy, 20, {from: root.address});
       await expectBignumberEqual(await eul.numCheckpoints(a1.address), '4');
 
-      await expect(eul.checkpoints(a1.address, 0)).to.have.members(
+      /* await expect(eul.checkpoints(a1.address, 0)).to.have.members(
         {fromBlock: t1.receipt.blockNumber.toString(), votes: '100'});
       await expect(eul.checkpoints(a1.address, 1)).to.have.members(
         {fromBlock: t2.receipt.blockNumber.toString(), votes: '90'});
       await expect(eul.checkpoints(a1.address, 2)).to.have.members(
         {fromBlock: t3.receipt.blockNumber.toString(), votes: '80'});
       await expect(eul.checkpoints(a1.address, 3)).to.have.members(
-        {fromBlock: t4.receipt.blockNumber.toString(), votes: '100'});
+        {fromBlock: t4.receipt.blockNumber.toString(), votes: '100'}); */
     });
 
-    it('does not add more than one checkpoint in a block', async () => {
+    /* it('does not add more than one checkpoint in a block', async () => {
       const guy = accounts[0].address;
 
       await eul.transfer(guy, '100'); // give an account a few tokens for readability
@@ -179,13 +153,14 @@ describe('Eul', () => {
       await expectawait(eul.numCheckpoints(a1.address)).to.be.equal('2');
       await expect(eul.checkpoints(a1.address, 1)).to.be.equal(
         expect.objectContaining({fromBlock: t4.receipt.blockNumber.toString(), votes: '100'}));
-    });
+    }); */
   });
 
   describe('getPriorVotes', () => {
     it('reverts if block number >= current block', async () => {
       await shouldFailWithMessage(eul.getPriorVotes(
-        a1.address, 5e10), 'revert Eul::getPriorVotes: not yet determined');
+        a1.address, 5e10
+      ), 'revert Eul::getPriorVotes: not yet determined');
     });
 
     it('returns 0 if there are no checkpoints', async () => {
@@ -198,9 +173,11 @@ describe('Eul', () => {
       await mineBlock();
 
       expectBignumberEqual(await eul.getPriorVotes(
-        a1.address, t1.receipt.blockNumber), '10000000000000000000000000');
+        a1.address, t1.receipt.blockNumber
+      ), '10000000000000000000000000');
       expectBignumberEqual(await eul.getPriorVotes(
-        a1.address, t1.receipt.blockNumber + 1), '10000000000000000000000000');
+        a1.address, t1.receipt.blockNumber + 1
+      ), '10000000000000000000000000');
     });
 
     it('returns zero if < first checkpoint block', async () => {
@@ -210,9 +187,11 @@ describe('Eul', () => {
       await mineBlock();
 
       expectBignumberEqual(await eul.getPriorVotes(
-        a1.address, t1.receipt.blockNumber - 1), '0');
+        a1.address, t1.receipt.blockNumber - 1
+      ), '0');
       expectBignumberEqual(await eul.getPriorVotes(
-        a1.address, t1.receipt.blockNumber + 1), '10000000000000000000000000');
+        a1.address, t1.receipt.blockNumber + 1
+      ), '10000000000000000000000000');
     });
 
     it('generally returns the voting balance at the appropriate checkpoint', async () => {
@@ -231,32 +210,40 @@ describe('Eul', () => {
 
       expectBignumberEqual(
         await eul.getPriorVotes(a1.address, t1.receipt.blockNumber - 1),
-         '0');
+        '0'
+      );
       expectBignumberEqual(
         await eul.getPriorVotes(a1.address, t1.receipt.blockNumber),
-         '10000000000000000000000000');
+        '10000000000000000000000000'
+      );
       expectBignumberEqual(
         await eul.getPriorVotes(a1.address, t1.receipt.blockNumber + 1),
-         '10000000000000000000000000');
+        '10000000000000000000000000'
+      );
       expectBignumberEqual(
         await eul.getPriorVotes(a1.address, t2.receipt.blockNumber),
-         '9999999999999999999999990');
+        '9999999999999999999999990'
+      );
       expectBignumberEqual(
         await eul.getPriorVotes(a1.address, t2.receipt.blockNumber + 1),
-         '9999999999999999999999990');
+        '9999999999999999999999990'
+      );
       expectBignumberEqual(
         await eul.getPriorVotes(a1.address, t3.receipt.blockNumber),
-         '9999999999999999999999980');
+        '9999999999999999999999980'
+      );
       expectBignumberEqual(
         await eul.getPriorVotes(a1.address, t3.receipt.blockNumber + 1),
-        '9999999999999999999999980');
+        '9999999999999999999999980'
+      );
       expectBignumberEqual(
         await eul.getPriorVotes(a1.address, t4.receipt.blockNumber),
-        '10000000000000000000000000');
+        '10000000000000000000000000'
+      );
       expectBignumberEqual(await eul.getPriorVotes(
-        a1.address, t4.receipt.blockNumber + 1),
-        '10000000000000000000000000');
+        a1.address, t4.receipt.blockNumber + 1
+      ),
+      '10000000000000000000000000');
     });
   });
 });
- */
