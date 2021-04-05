@@ -199,8 +199,8 @@ contract Governance {
     }
 
     function cancel(uint proposalId) public {
-        ProposalState state = state(proposalId);
-        require(state != ProposalState.Executed, "Governance::cancel: cannot cancel executed proposal");
+        ProposalState latestProposalState = state(proposalId);
+        require(latestProposalState != ProposalState.Executed, "Governance::cancel: cannot cancel executed proposal");
 
         Proposal storage proposal = proposals[proposalId];
         require(msg.sender == guardian || eul.getPriorVotes(proposal.proposer, sub256(block.number, 1)) < proposalThreshold(), "Governance::cancel: proposer above threshold");

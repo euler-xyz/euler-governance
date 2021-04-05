@@ -22,7 +22,7 @@ contract TimelockHarness is Timelock {
 }
 
 contract TimelockTest is Timelock {
-    constructor(address admin_, uint delay_) Timelock(admin_, 2 days) public {
+    constructor(address admin_, uint delay_) Timelock(admin_, 2 days) {
         delay = delay_;
     }
 
