@@ -1,0 +1,12 @@
+const RAFFLE_STATES = {
+  NO_REQUEST: 0,
+  REQUEST_PENDING: 1,
+  INCONCLUSIVE: 2
+};
+
+const DEFAULT_GRACE_PERIOD = '604800'; // 1 week in seconds
+
+module.exports = {
+  RAFFLE_STATES,
+  DEFAULT_GRACE_PERIOD
+};

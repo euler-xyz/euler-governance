@@ -1,11 +1,19 @@
 const {ethers} = require('ethers');
 const {expectRevert, time} = require('@openzeppelin/test-helpers');
+const {upgradeProxy, deployProxy} = require('@openzeppelin/truffle-upgrades');
 
 const expectVMException = expectRevert.unspecified;
 const expectInvalidOpCode = expectRevert.invalidOpcode;
 const shouldFailWithMessage = expectRevert;
 
-const {advanceBlockTo, advanceBlock} = time;
+const {
+  advanceBlockTo,
+  advanceBlock,
+  increase,
+  increaseTo,
+  latest,
+  duration
+} = time;
 const {parseEther, formatEther} = ethers.utils;
 const toHex = value => web3.utils.toHex(value);
 const hexToBytes = hex => web3.utils.hexToBytes(hex);
@@ -19,6 +27,7 @@ const asciiToHex = str => web3.utils.asciiToHex(str);
 const encodeBytes32Param = str => asciiToHex(str);
 const stringToBytes32 = str => web3.utils.fromAscii(str);
 const bytes32ToString = bytes => web3.utils.toAscii(bytes);
+const {toBN} = web3.utils;
 
 module.exports = {
   expectVMException,
@@ -37,6 +46,13 @@ module.exports = {
   bytes32ToString,
   parseEther,
   formatEther,
+  upgradeProxy,
+  deployProxy,
   advanceBlockTo,
-  advanceBlock
+  advanceBlock,
+  toBN,
+  increase,
+  increaseTo,
+  latest,
+  duration
 };
