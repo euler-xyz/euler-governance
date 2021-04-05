@@ -128,63 +128,91 @@ describe('Governance: proposal states', () => {
 
         expectBignumberEqual(await gov.state(trivialProposal.id), PROPOSAL_STATES["Defeated"]);
       })
-  /* 
+  
       it("Succeeded", async () => {
         await mineBlock()
-        const newProposalId = await gov.propose(targets, values,
+        const newProposal = await gov.propose(targets, values,
           signatures, callDatas, "do nothing", { from: acct })
+        const newProposalId = await gov.latestProposalIds(acct);
         await mineBlock()
         await gov.castVote(newProposalId, true)
-        await advanceBlocks(20000)
+        //await advanceBlocks(20000)
+        for (let i = 0; i<25; i++){
+          await mineBlock();
+        }
         expectBignumberEqual(await gov.state(newProposalId), PROPOSAL_STATES["Succeeded"])
       })
 
       it("Queued", async () => {
         await mineBlock()
-        const newProposalId  = await gov.propose(targets,
+        const newProposal = await gov.propose(targets,
           values, signatures, callDatas, "do nothing", { from: acct })
+        const newProposalId = await gov.latestProposalIds(acct);
         await mineBlock()
         await gov.castVote(newProposalId, true)
-        await advanceBlocks(20000)
+        //await advanceBlocks(20000)
+        for (let i = 0; i<25; i++){
+          await mineBlock();
+        }
         await gov.queue(newProposalId, { from: acct })
         expectBignumberEqual(await gov.state(newProposalId), PROPOSAL_STATES["Queued"])
       })
+
       it("Expired", async () => {
+        const now = await latest();
         await mineBlock()
-        const newProposalId = await gov.propose(targets, values,
+        const newProposal = await gov.propose(targets, values,
           signatures, callDatas, "do nothing", { from: acct })
+          const newProposalId = await gov.latestProposalIds(acct);
         await mineBlock()
         await gov.castVote(newProposalId, true)
-        await advanceBlocks(20000)
+        //await advanceBlocks(20000)
+
+        for (let i = 0; i<25; i++){
+          await mineBlock();
+        }
+
         await increaseTime(1)
         await gov.queue(newProposalId, { from: acct })
-        let gracePeriod = await call(timelock, 'GRACE_PERIOD')
+        let gracePeriod = await timelockInstance.GRACE_PERIOD()
         let p = await gov.proposals(newProposalId);
         let eta = etherUnsigned(p.eta)
         await freezeTime(eta.plus(gracePeriod).minus(1).toNumber())
         expectBignumberEqual(await gov.state(newProposalId), PROPOSAL_STATES["Queued"])
+        await increaseTo(now + duration.minutes(3));
         await freezeTime(eta.plus(gracePeriod).toNumber())
         expectBignumberEqual(await gov.state(newProposalId), PROPOSAL_STATES["Expired"])
       })
+
       it("Executed", async () => {
+        const now = await latest();
         await mineBlock()
-        const newProposalId = await gov.propose(targets, values,
+        const newProposal = await gov.propose(targets, values,
           signatures, callDatas, "do nothing", { from: acct })
+        const newProposalId = await gov.latestProposalIds(acct);
+
         await mineBlock()
         await gov.castVote(newProposalId, true)
-        await advanceBlocks(20000)
+        
+        for (let i = 0; i<25; i++){
+          await mineBlock();
+        }
         await increaseTime(1)
         await gov.queue(newProposalId, { from: acct })
-        let gracePeriod = await call(timelock, 'GRACE_PERIOD')
+        let gracePeriod = await timelockInstance.GRACE_PERIOD()
         let p = await gov.proposals(newProposalId);
         let eta = etherUnsigned(p.eta)
         await freezeTime(eta.plus(gracePeriod).minus(1).toNumber())
         expectBignumberEqual(await gov.state(newProposalId), PROPOSAL_STATES["Queued"])
+        //console.log(p.eta)
+        //console.log(now.toString())
+        //console.log((eta).toString());
+        await increaseTo(eta.toString())
         await gov.execute(newProposalId, { from: acct })
         expectBignumberEqual(await gov.state(newProposalId), PROPOSAL_STATES["Executed"])
         // still executed even though would be expired
         await freezeTime(eta.plus(gracePeriod).toNumber())
         expectBignumberEqual(await gov.state(newProposalId), PROPOSAL_STATES["Executed"])
-      }) */
+      })
   });
 });
