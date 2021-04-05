@@ -15,7 +15,7 @@ describe('Governance contracts: deployment tests', () => {
         accounts = await web3.eth.getAccounts();
     });
 
-    describe("Deployment", function () {
+    describe("Deployment", () => {
         it('should deploy timelock correctly', async () => {
             const [timelockInstance, { owner }] = await deployTimeLock(accounts);
 
@@ -54,6 +54,9 @@ describe('Governance contracts: deployment tests', () => {
             expect(timelockInstance.address).to.not.be.equal(ZERO_ADDRESS);
             expect(eulerTokenInstance.address).to.not.be.equal(undefined);
             expect(eulerTokenInstance.address).to.not.be.equal(ZERO_ADDRESS);
+            const totalSupply = await eulerTokenInstance.totalSupply();
+            const ownerBalance = await eulerTokenInstance.balanceOf(owner);
+            expectBignumberEqual(totalSupply, ownerBalance);
         });
     })
 });
