@@ -27,17 +27,15 @@ describe('Governance contracts: deployment tests', () => {
         });
 
         it('should deploy euler token correctly', async () => {
-            it('should deploy euler token correctly', async () => {
-                const [eulerTokenInstance, { owner }] = await deployEulerToken(accounts);
-                
-                expect(eulerTokenInstance.address).to.not.be.equal(undefined);
-                expect(eulerTokenInstance.address).to.not.be.equal(ZERO_ADDRESS);
-                expect(owner).to.not.be.equal(ZERO_ADDRESS);
+            const [eulerTokenInstance, { owner }] = await deployEulerToken(accounts);
+            
+            expect(eulerTokenInstance.address).to.not.be.equal(undefined);
+            expect(eulerTokenInstance.address).to.not.be.equal(ZERO_ADDRESS);
+            expect(owner).to.not.be.equal(ZERO_ADDRESS);
 
-                const totalSupply = await eulerTokenInstance.totalSupply();
-                const ownerBalance = await eulerTokenInstance.balanceOf(owner);
-                expectBignumberEqual(totalSupply, ownerBalance);
-            });
+            const totalSupply = await eulerTokenInstance.totalSupply();
+            const ownerBalance = await eulerTokenInstance.balanceOf(owner);
+            expectBignumberEqual(totalSupply, ownerBalance);
         });
 
         it('should deploy governance correctly', async () => {

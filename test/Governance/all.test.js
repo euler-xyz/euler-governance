@@ -1,5 +1,5 @@
-require('./constructor');
+//require('./constructor');
+//require('./eulerToken');
 // require('./voting');
-// require('./eulerToken');
 // require('./proposal');
 // require('./states');
