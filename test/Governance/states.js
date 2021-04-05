@@ -31,7 +31,6 @@ const {
   increaseTime,
   mineBlockNumber
 } = require('../helpers/Ethereum');
-const { web3 } = require('@openzeppelin/test-helpers/src/setup');
 
 describe('Governance: proposal states', () => {
   let eul; let gov; let root; let acct; let delay; let timelockInstance;
@@ -118,8 +117,8 @@ describe('Governance: proposal states', () => {
         //await advanceBlockTo(20000);
         //console.log(await gov.proposals(trivialProposal.id))
         //await increaseTime(toBN(now).add(duration.minutes(60)));
-        console.log('current block', await web3.eth.getBlockNumber())
-        console.log('proposal end block', (trivialProposal.endBlock).toString());
+        //console.log('current block', await web3.eth.getBlockNumber())
+        //console.log('proposal end block', (trivialProposal.endBlock).toString());
         //await advanceBlockTo(toBN(trivialProposal.endBlock));
 
         for (let i = 0; i<25; i++){
