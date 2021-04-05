@@ -1,4 +1,4 @@
-const {artifacts, ethers, web3} = require('hardhat');
+/* const {artifacts, ethers, web3} = require('hardhat');
 const {expect} = require('chai');
 const {
   address,
@@ -194,3 +194,4 @@ describe('Goverance#propose/5', () => {
     });
   });
 });
+ */

@@ -1,4 +1,4 @@
-const {expect} = require('chai');
+/* const {expect} = require('chai');
 const {
   mineBlock
 } = require('../Utils/Ethereum');
@@ -64,7 +64,7 @@ describe('Eul', () => {
       );
     });
 
-    /* it('reverts if the nonce is bad ', async () => {
+    it('reverts if the nonce is bad ', async () => {
       const delegatee = root.address; const nonce = 1; const
         expiry = 0;
       const {v, r, s} = EIP712.sign(Domain(eul), 'Delegation',
@@ -73,9 +73,9 @@ describe('Eul', () => {
         eul.delegateBySig(delegatee, nonce, expiry, v, r, s),
         'Eul::delegateBySig: invalid nonce'
       );
-    }); */
+    }); 
 
-    /* it('reverts if the signature has expired', async () => {
+     it('reverts if the signature has expired', async () => {
       const delegatee = root.address; const nonce = 0; const
         expiry = 0;
       const {v, r, s} = EIP712.sign(Domain(eul), 'Delegation',
@@ -93,7 +93,7 @@ describe('Eul', () => {
       const tx = await eul.delegateBySig(delegatee, nonce, expiry, v, r, s);
       expect(tx.gasUsed < 80000);
       expect(await eul.delegates(a1)).to.equal(root);
-    }); */
+    }); 
   });
 
   describe('numCheckpoints', () => {
@@ -114,17 +114,17 @@ describe('Eul', () => {
       const t4 = await eul.transfer(guy, 20, {from: root.address});
       await expectBignumberEqual(await eul.numCheckpoints(a1.address), '4');
 
-      /* await expect(eul.checkpoints(a1.address, 0)).to.have.members(
+      await expect(eul.checkpoints(a1.address, 0)).to.have.members(
         {fromBlock: t1.receipt.blockNumber.toString(), votes: '100'});
       await expect(eul.checkpoints(a1.address, 1)).to.have.members(
         {fromBlock: t2.receipt.blockNumber.toString(), votes: '90'});
       await expect(eul.checkpoints(a1.address, 2)).to.have.members(
         {fromBlock: t3.receipt.blockNumber.toString(), votes: '80'});
       await expect(eul.checkpoints(a1.address, 3)).to.have.members(
-        {fromBlock: t4.receipt.blockNumber.toString(), votes: '100'}); */
+        {fromBlock: t4.receipt.blockNumber.toString(), votes: '100'});
     });
 
-    /* it('does not add more than one checkpoint in a block', async () => {
+    it('does not add more than one checkpoint in a block', async () => {
       const guy = accounts[0].address;
 
       await eul.transfer(guy, '100'); // give an account a few tokens for readability
@@ -153,7 +153,7 @@ describe('Eul', () => {
       await expectawait(eul.numCheckpoints(a1.address)).to.be.equal('2');
       await expect(eul.checkpoints(a1.address, 1)).to.be.equal(
         expect.objectContaining({fromBlock: t4.receipt.blockNumber.toString(), votes: '100'}));
-    }); */
+    });
   });
 
   describe('getPriorVotes', () => {
@@ -247,3 +247,4 @@ describe('Eul', () => {
     });
   });
 });
+ */

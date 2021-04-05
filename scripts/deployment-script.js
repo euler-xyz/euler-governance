@@ -34,7 +34,6 @@ async function main() {
   const gov = await Gov.deploy(timelock.address, eul.address, root.address);
   await gov.deployed();
   console.log("Governance deployed to:", gov.address);
-  
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -2,7 +2,7 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
-contract EUL {
+contract EulerToken {
     /// @notice EIP-20 token name for this token
     string public constant name = "Euler";
 

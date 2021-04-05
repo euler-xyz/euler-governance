@@ -1,6 +1,5 @@
 const {ethers} = require('ethers');
 const {expectRevert, time} = require('@openzeppelin/test-helpers');
-const {upgradeProxy, deployProxy} = require('@openzeppelin/truffle-upgrades');
 
 const expectVMException = expectRevert.unspecified;
 const expectInvalidOpCode = expectRevert.invalidOpcode;
@@ -46,8 +45,6 @@ module.exports = {
   bytes32ToString,
   parseEther,
   formatEther,
-  upgradeProxy,
-  deployProxy,
   advanceBlockTo,
   advanceBlock,
   toBN,

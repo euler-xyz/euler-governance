@@ -1,0 +1,1 @@
+require('./Governance/all.test');

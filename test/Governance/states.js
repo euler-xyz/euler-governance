@@ -1,4 +1,4 @@
-const {artifacts} = require('hardhat');
+/* const {artifacts} = require('hardhat');
 const {
   etherUnsigned,
   mineBlock,
@@ -96,7 +96,8 @@ describe('Governance#state/1', () => {
     await gov.cancel(newProposalId);
     expectBignumberEqual(await gov.state(+newProposalId), states.Canceled);
   });
-  /* it("Defeated", async () => {
+  
+  it("Defeated", async () => {
       // travel to end block
       //await advanceBlocks(20000)
       console.log(await gov.proposals(trivialProposal.id))
@@ -158,5 +159,6 @@ describe('Governance#state/1', () => {
       // still executed even though would be expired
       await freezeTime(eta.plus(gracePeriod).toNumber())
       expectBignumberEqual(await gov.state(newProposalId), states["Executed"])
-    }) */
+    })
 });
+ */

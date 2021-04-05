@@ -1,4 +1,4 @@
-// const {artifacts, contract, web3} = require('hardhat');
+/* // const {artifacts, contract, web3} = require('hardhat');
 const {artifacts} = require('hardhat');
 const {expect} = require('chai');
 const {
@@ -119,7 +119,7 @@ describe('Goverance#castVote/2', () => {
       });
     });
 
-    /*       describe('castVoteBySig', () => {
+    describe('castVoteBySig', () => {
         const Domain = (gov) => ({
           name: 'Governance',
           chainId: 1, // await web3.eth.net.getId(); See: https://github.com/trufflesuite/ganache-core/issues/515
@@ -157,7 +157,7 @@ describe('Goverance#castVote/2', () => {
           let afterFors = (await gov.proposals(proposalId)).forVotes;
           expectBignumberEqual(afterFors, parseEther((400001*2).toString()));
         });
-      }); */
+      }); 
 
     it('receipt uses one load', async () => {
       const actor = accounts[2].address;
@@ -185,3 +185,4 @@ describe('Goverance#castVote/2', () => {
     });
   });
 });
+ */
