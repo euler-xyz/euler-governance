@@ -51,9 +51,7 @@ describe('Euler token contract: usage tests', () => {
       expectBignumberEqual(await eulerTokenInstance.balanceOf(owner), parseEther('10000000'));
     });
   });
-
-  ////// todo - DEBUG
-
+  
   describe('delegateBySig', () => {
 /* 
     const Domain = eul => ({ name, chainId, verifyingContract: eulerTokenInstance.address });
