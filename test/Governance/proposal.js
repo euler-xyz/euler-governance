@@ -9,7 +9,8 @@ const {
   shouldFailWithMessage, parseEther, toBN
 } = require('../../helpers/utils');
 const {
-  findEventInTransaction
+  findEventInTransaction,
+  findEvent
 } = require('../../helpers/events')
 const {
   mineBlock,
@@ -161,25 +162,73 @@ describe('Goverance contract: proposals', () => {
       await eulerTokenInstance.transfer(accounts[3], parseEther('400001'));
       await eulerTokenInstance.delegate(accounts[3], {from: accounts[3]});
       await mineBlock();
-      // let nextProposalId = await govInstance.propose(targets, values,
-      // signatures, callDatas, "yoot", { from: accounts[3] });
+      
+      const receipt = await govInstance.propose(targets, values, signatures, callDatas,
+        'second proposal', {from: accounts[3]});
 
-      findEventInTransaction(
-        await govInstance.propose(targets, values, signatures, callDatas,
-          'second proposal', {from: accounts[3]}),
+      const nextProposalId = await govInstance.latestProposalIds(accounts[3]);
+
+      console.log((await findEventInTransaction(
+        receipt,
         'ProposalCreated'
-      );
-      // ).toHaveLog("ProposalCreated", {
-      //   id: nextProposalId,
-      //   targets: targets,
-      //   values: values,
-      //   signatures: signatures,
-      //   calldatas: callDatas,
-      //   startBlock: 14,
-      //   endBlock: 17294,
-      //   description: "second proposal",
-      //   proposer: accounts[3]
-      // });
+      )).args);
+
+      expectBignumberEqual((await findEventInTransaction(
+        receipt,
+        'ProposalCreated'
+      )).args[0],
+        toBN(3)
+      )
+
+      expect((await findEventInTransaction(
+        receipt,
+        'ProposalCreated'
+      )).args[1]).to.be.equal(
+        accounts[3]
+      )
+
+      expect((await findEventInTransaction(
+        receipt,
+        'ProposalCreated'
+      )).args[2]).to.be.eql(
+        targets
+      )
+      
+      expect((await findEventInTransaction(
+        receipt,
+        'ProposalCreated'
+      )).args[3]).to.be.eql(
+        [toBN(0)]
+      )
+
+      expect((await findEventInTransaction(
+        receipt,
+        'ProposalCreated'
+      )).args[4]).to.be.eql(
+        signatures
+      )
+
+      expect((await findEventInTransaction(
+        receipt,
+        'ProposalCreated'
+      )).args[5]).to.be.eql(
+        callDatas
+      )
+
+      /* Expected Event Logs
+        {
+          id: toBN(nextProposalId),
+        proposer: accounts[3],
+        targets: targets,
+        values: [toBN(0)],
+        signatures: signatures,
+        calldatas: callDatas,
+        startBlock: toBN(58),
+        endBlock: toBN(78),
+        description: 'second proposal'
+        }
+      ) */
+
     });
   });
 });
