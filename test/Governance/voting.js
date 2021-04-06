@@ -14,8 +14,20 @@ const {
 const {
   mineBlock,
   minerStart,
-  minerStop
+  minerStop,
+  unlockedAccounts,
+  unlockedAccount
 } = require('../helpers/Ethereum');
+
+const {
+  encodeType,
+  typeHash,
+  encodeData,
+  domainSeparator,
+  structHash,
+  digestToSign,
+  sign
+} = require('../helpers/EIP712');
 
 describe('Goverance contract: voting', () => {
   let accounts; let acct; let a1;
@@ -137,17 +149,17 @@ describe('Goverance contract: voting', () => {
             ), "Governance::castVoteBySig: invalid signature");
         });
 
-        /* it('casts vote on behalf of the signatory', async () => {
-          let a1 = accounts[5];
+        xit('casts vote on behalf of the signatory', async () => {
+          /*let a1 = accounts[5];
           await enfranchise(eulerTokenInstance, a1, parseEther('400001'));
           await govInstance.propose(targets, values, signatures,
             callDatas, "do nothing", { from: a1 });
-          proposalId = await govInstance.latestProposalIds(a1);
-
-          const { v, r, s } = EIP712.sign(Domain(govInstance), 'Ballot',
+          let proposalId = await govInstance.latestProposalIds(a1);
+          const { v, r, s } = sign(Domain(govInstance), 'Ballot',
           { proposalId, support: true }, Types,
           unlockedAccount(a1).secretKey);
-
+ 
+          
           let beforeFors = (await govInstance.proposals(proposalId)).forVotes;
           await mineBlock();
           const tx = await govInstance.castVoteBySig(proposalId, true, v, r, s);
@@ -155,7 +167,8 @@ describe('Goverance contract: voting', () => {
 
           let afterFors = (await govInstance.proposals(proposalId)).forVotes;
           expectBignumberEqual(afterFors, parseEther((400001*2).toString()));
-        }); */
+          */
+        }); 
       }); 
 
     it('receipt uses one load', async () => {

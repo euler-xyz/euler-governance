@@ -69,6 +69,17 @@ function sign(data, account) {
   return signature;
 }
 
+function unlockedAccounts() {
+  let provider = web3.currentProvider;
+  if (provider._providers)
+    provider = provider._providers.find(p => p._ganacheProvider)._ganacheProvider;
+  return provider.manager.state.unlocked_accounts;
+}
+
+function unlockedAccount(a) {
+  return unlockedAccounts()[a.toLowerCase()];
+}
+
 module.exports = {
   sign,
   address,
@@ -76,6 +87,8 @@ module.exports = {
   etherGasCost,
   etherUnsigned,
   keccak256,
+  unlockedAccounts,
+  unlockedAccount,
   freezeTime,
   increaseTime,
   mineBlock,

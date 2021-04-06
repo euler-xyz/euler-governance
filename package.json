@@ -39,6 +39,7 @@
     "ethereumjs-abi": "^0.6.8",
     "ethereumjs-util": "^7.0.9",
     "jest": "^26.6.3",
+    "keythereum": "^1.2.0",
     "path": "^0.12.7",
     "solparse": "^2.2.8"
   }

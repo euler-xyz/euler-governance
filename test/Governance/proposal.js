@@ -168,10 +168,10 @@ describe('Goverance contract: proposals', () => {
 
       const nextProposalId = await govInstance.latestProposalIds(accounts[3]);
 
-      console.log((await findEventInTransaction(
+      /* console.log((await findEventInTransaction(
         receipt,
         'ProposalCreated'
-      )).args);
+      )).args); */
 
       expectBignumberEqual((await findEventInTransaction(
         receipt,
