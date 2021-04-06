@@ -162,7 +162,7 @@ describe('Governance: proposal states', () => {
         await mineBlock()
         const newProposal = await gov.propose(targets, values,
           signatures, callDatas, "do nothing", { from: acct })
-          const newProposalId = await gov.latestProposalIds(acct);
+        const newProposalId = await gov.latestProposalIds(acct);
         await mineBlock()
         await gov.castVote(newProposalId, true)
         //await advanceBlocks(20000)
