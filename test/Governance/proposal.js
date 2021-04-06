@@ -47,10 +47,6 @@ describe('Goverance contract: proposals', () => {
     trivialProposal = await govInstance.proposals(proposalId);
   });
 
-  xit('Given the sender\'s GetPriorVotes for the immediately previous block is above the Proposal Threshold (e.g. 2%), the given proposal is added to all proposals, given the following settings', async () => {
-    test.todo('depends on get prior votes and delegation and voting');
-  });
-
   describe('simple initialization', () => {
     it('ID is set to a globally unique identifier', async () => {
       expectBignumberEqual(trivialProposal.id, proposalId);
@@ -72,10 +68,6 @@ describe('Goverance contract: proposals', () => {
     it('ForVotes and AgainstVotes are initialized to zero', async () => {
       expectBignumberEqual(trivialProposal.forVotes, '0');
       expectBignumberEqual(trivialProposal.againstVotes, '0');
-    });
-
-    xit('Voters is initialized to the empty set', async () => {
-      test.todo('mmm probably nothing to prove here unless we add a counter or something');
     });
 
     it('Executed and Canceled flags are initialized to false', async () => {
