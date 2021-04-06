@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 contract Governance {
     /// @notice The name of this contract
-    string public constant name = "Euler Governor Alpha";
+    string public constant name = "Euler Governance";
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
     function quorumVotes() public pure returns (uint) { return 400000e18; } // 400,000 = 4% of Eul
@@ -20,7 +20,7 @@ contract Governance {
 
     /// @notice The duration of voting on a proposal, in blocks
     // function votingPeriod() public pure returns (uint) { return 17280; } // ~3 days in blocks (assuming 15s blocks)
-    function votingPeriod() public pure returns (uint) { return 20; } // todo using 2 block for testing
+    function votingPeriod() public pure returns (uint) { return 20; } // todo using 20 block for testing
 
     /// @notice The address of the Euler Protocol Timelock
     TimelockInterface public timelock;
@@ -28,7 +28,7 @@ contract Governance {
     /// @notice The address of the Euler governance token
     EulInterface public eul;
 
-    /// @notice The address of the Governor Guardian
+    /// @notice The address of the Governance Guardian
     address public guardian;
 
     /// @notice The total number of proposals

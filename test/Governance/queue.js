@@ -61,6 +61,9 @@ describe('Governance: proposal queue', () => {
         }
       ] = await deployGovernance({timelock});
 
+      // set governance smart contract as timelock admin to call key
+      // functions like cancel, queue and execute proposal
+      // governance guardian can cancel proposal or proposer
       await timelock.harnessSetAdmin(gov.address);
       await enfranchise(eulerTokenInstance, a1, parseEther('400001'));
 
