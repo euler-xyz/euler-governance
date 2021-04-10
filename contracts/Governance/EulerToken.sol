@@ -1,8 +1,8 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: Unlicensed
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
-contract Eul {
+contract EulerToken {
     /// @notice EIP-20 token name for this token
     string public constant name = "Euler";
 

@@ -24,7 +24,7 @@ async function main() {
   console.log("Timelock deployed to:", timelock.address);
 
   // Deploy Euler governance token contract
-  const Eul = await hre.ethers.getContractFactory("Eul");
+  const Eul = await hre.ethers.getContractFactory("EulerToken");
   const eul = await Eul.deploy(root.address);
   await eul.deployed();
   console.log("Euler governance token deployed to:", eul.address);
@@ -34,7 +34,6 @@ async function main() {
   const gov = await Gov.deploy(timelock.address, eul.address, root.address);
   await gov.deployed();
   console.log("Governance deployed to:", gov.address);
-  
 }
 
 // We recommend this pattern to be able to use async/await everywhere

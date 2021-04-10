@@ -1,10 +1,10 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: Unlicensed
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
 contract Governance {
     /// @notice The name of this contract
-    string public constant name = "Euler Governor Alpha";
+    string public constant name = "Euler Governance";
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
     function quorumVotes() public pure returns (uint) { return 400000e18; } // 400,000 = 4% of Eul
@@ -19,7 +19,8 @@ contract Governance {
     function votingDelay() public pure returns (uint) { return 1; } // 1 block
 
     /// @notice The duration of voting on a proposal, in blocks
-    function votingPeriod() public pure returns (uint) { return 17280; } // ~3 days in blocks (assuming 15s blocks)
+    // function votingPeriod() public pure returns (uint) { return 17280; } // ~3 days in blocks (assuming 15s blocks)
+    function votingPeriod() public pure returns (uint) { return 20; } // todo using 20 block for testing
 
     /// @notice The address of the Euler Protocol Timelock
     TimelockInterface public timelock;
@@ -27,7 +28,7 @@ contract Governance {
     /// @notice The address of the Euler governance token
     EulInterface public eul;
 
-    /// @notice The address of the Governor Guardian
+    /// @notice The address of the Governance Guardian
     address public guardian;
 
     /// @notice The total number of proposals
@@ -199,8 +200,8 @@ contract Governance {
     }
 
     function cancel(uint proposalId) public {
-        ProposalState state = state(proposalId);
-        require(state != ProposalState.Executed, "Governance::cancel: cannot cancel executed proposal");
+        ProposalState latestProposalState = state(proposalId);
+        require(latestProposalState != ProposalState.Executed, "Governance::cancel: cannot cancel executed proposal");
 
         Proposal storage proposal = proposals[proposalId];
         require(msg.sender == guardian || eul.getPriorVotes(proposal.proposer, sub256(block.number, 1)) < proposalThreshold(), "Governance::cancel: proposer above threshold");

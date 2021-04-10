@@ -9,53 +9,23 @@ const getUserAddress = (accounts, i) => {
 
 const getAccountsAsync = web3.eth.getAccounts;
 
-const getRaffleActors = (accounts, i = 0) => ({
-  owner: getOwner(accounts),
-  user: getUserAddress(accounts, i)
-});
-
-const getRaffleActorsAsync = async () => {
-  const accounts = await getAccountsAsync();
-
-  return getRaffleActors(accounts);
-};
-
-const getBurpTokenActors = accounts => ({
-  owner: getOwner(accounts),
-  saleWallet: getUserAddress(accounts, 1),
-  stakingWallet: getUserAddress(accounts, 2),
-  reserveWallet: getUserAddress(accounts, 3),
-  teamWallet: getUserAddress(accounts, 4),
-  airdorpWallet: getUserAddress(accounts, 5)
-});
-
-const getBurpTokenActorsAsync = async () => {
-  const accounts = await getAccountsAsync();
-
-  return getBurpTokenActors(accounts);
-};
-
-const getStakeActors = accounts => ({
+const getActors = accounts => ({
   owner: getOwner(accounts),
   firstUser: getUserAddress(accounts, 1),
   secondUser: getUserAddress(accounts, 2),
-  rewardsWallet: getUserAddress(accounts, 3)
+  thirdUser: getUserAddress(accounts, 3)
 });
 
-const getStakeActorsAsync = async () => {
+const getActorsAsync = async () => {
   const accounts = await getAccountsAsync();
 
-  return getStakeActors(accounts);
+  return getActors(accounts);
 };
 
 module.exports = {
   ZERO_ADDRESS,
   getUserAddress,
   getOwner,
-  getStakeActorsAsync,
-  getRaffleActors,
-  getRaffleActorsAsync,
-  getAccountsAsync,
-  getBurpTokenActors,
-  getBurpTokenActorsAsync
+  getActorsAsync,
+  getAccountsAsync
 };

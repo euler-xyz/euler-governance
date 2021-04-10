@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: Unlicensed
 pragma solidity ^0.7.0;
 
 import "./SafeMath.sol";
@@ -13,8 +13,10 @@ contract Timelock {
     event ExecuteTransaction(bytes32 indexed txHash, address indexed target, uint value, string signature,  bytes data, uint eta);
     event QueueTransaction(bytes32 indexed txHash, address indexed target, uint value, string signature, bytes data, uint eta);
 
-    uint public constant GRACE_PERIOD = 14 days;
-    uint public constant MINIMUM_DELAY = 2 days;
+    //uint public constant GRACE_PERIOD = 14 days; //todo changed for testing
+    uint public constant GRACE_PERIOD = 2 minutes; 
+    // uint public constant MINIMUM_DELAY = 2 days; //todo changed for testing
+    uint public constant MINIMUM_DELAY = 2 minutes; 
     uint public constant MAXIMUM_DELAY = 30 days;
 
     address public admin;
