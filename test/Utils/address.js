@@ -12,7 +12,7 @@ const getActors = accounts => ({
   user: getUserAddress(accounts, 1)
 });
 
-const getBurpTokenActors = accounts => ({
+const getEulTokenActors = accounts => ({
   owner: getOwner(accounts),
   saleWallet: getUserAddress(accounts, 1),
   stakingWallet: getUserAddress(accounts, 2),
@@ -26,5 +26,5 @@ module.exports = {
   getUserAddress,
   getOwner,
   getActors,
-  getBurpTokenActors
+  getEulTokenActors
 };
