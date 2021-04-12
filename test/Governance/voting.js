@@ -29,13 +29,17 @@ const {
   sign
 } = require('../helpers/EIP712');
 
+const EIP712 = require('../helpers/eip_712');
+
 describe('Goverance contract: voting', () => {
   let accounts; let acct; let a1;
   let govInstance; let owner; let timelockInstance; let eulerTokenInstance;
   let trivialProposal; let targets; let values; let signatures; 
   let callDatas; let proposalBlock;
+  let chainId;
 
   before(async () => {
+    chainId = await web3.eth.net.getId();
 
     [
       govInstance,
@@ -133,7 +137,7 @@ describe('Goverance contract: voting', () => {
         const Domain = (govInstance) => ({
           name: 'Governance',
           chainId: 1, // await web3.eth.net.getId(); See: https://github.com/trufflesuite/ganache-core/issues/515
-          verifyingContract: govInstance._address
+          verifyingContract: govInstance.address
         });
         const Types = {
           Ballot: [
@@ -150,24 +154,83 @@ describe('Goverance contract: voting', () => {
         });
 
         xit('casts vote on behalf of the signatory', async () => {
-          /*let a1 = accounts[5];
-          await enfranchise(eulerTokenInstance, a1, parseEther('400001'));
-          await govInstance.propose(targets, values, signatures,
-            callDatas, "do nothing", { from: a1 });
-          let proposalId = await govInstance.latestProposalIds(a1);
-          const { v, r, s } = sign(Domain(govInstance), 'Ballot',
-          { proposalId, support: true }, Types,
-          unlockedAccount(a1).secretKey);
- 
           
-          let beforeFors = (await govInstance.proposals(proposalId)).forVotes;
+
+          const signer = accounts[5];
+          const sender = accounts[0];
+
           await mineBlock();
-          const tx = await govInstance.castVoteBySig(proposalId, true, v, r, s);
+          await mineBlock();
+          await enfranchise(eulerTokenInstance, signer, parseEther('400001'));
+          
+
+          await govInstance.propose(targets, values, signatures,
+            callDatas, "do nothing", { from: signer });
+          let proposalId = await govInstance.latestProposalIds(signer);
+
+          // create EIP712 signature
+          
+
+          const domain = [
+            { name: "name", type: "string" },
+            //{ name: "version", type: "string" },
+            { name: "chainId", type: "uint256" },
+            { name: "verifyingContract", type: "address" },
+            //{ name: "salt", type: "bytes32" },
+        ];
+
+        
+
+          /* const data = {
+            types: Object.assign({
+              EIP712Domain: domain,
+          }, Types),
+            domain: Domain(govInstance),
+            primaryType: "Ballot",
+            message: {
+              proposalId: proposalId,
+              support: true
+            }
+        }; */
+        
+
+          const typedData = EIP712.createTypeData(
+            Types,
+            "Ballot",
+            Domain(govInstance), 
+            {
+              proposalId: proposalId,
+              support: true
+            });
+          const sig = await EIP712.signTypedData(web3, signer, typedData);
+          //console.log("users signature", sig) 
+          
+         let beforeFors = (await govInstance.proposals(proposalId)).forVotes;
+          expectBignumberEqual(beforeFors, '0');
+          
+          await mineBlock();
+          await mineBlock();
+          await mineBlock();
+          let startblock = (await govInstance.proposals(proposalId)).startBlock;
+          expectBignumberEqual(
+            await eulerTokenInstance.getPriorVotes(signer, startblock),
+            parseEther((400001).toString())
+          );
+          
+          const tx = await govInstance.castVoteBySig(proposalId, true, sig.v, sig.r, sig.s, {from: sender});
           expect(tx.gasUsed < 80000);
 
-          let afterFors = (await govInstance.proposals(proposalId)).forVotes;
-          expectBignumberEqual(afterFors, parseEther((400001*2).toString()));
-          */
+          console.log(chainId.toString())
+          console.log((await govInstance.getChainId()).toString())
+          console.log(sig)
+
+          console.log(signer)
+
+          console.log(tx.logs[0].args)
+          //let afterFors = (await govInstance.proposals(proposalId)).forVotes;
+          //expectBignumberEqual(afterFors, parseEther((400001).toString()));
+
+          
         }); 
       }); 
 

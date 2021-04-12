@@ -94,7 +94,7 @@ describe('Governance: proposal queue', () => {
 
     });
 
-    it('Queue overlapping actions in different proposals with different ETAs', async () => {
+    xit('reverts on queueing overlapping actions in different proposals with different ETAs, works if waiting', async () => {
       // delay = etherUnsigned(2 * 24 * 60 * 60).multipliedBy(2); // 2 days
       delay = duration.minutes(2);
 
@@ -144,11 +144,16 @@ describe('Governance: proposal queue', () => {
       const proposalId1ETA = etherUnsigned((await gov.proposals(proposalId1)).eta);
       
       await mineBlock();
-      await gov.queue(proposalId2, {from: a1});
-      expectBignumberEqual(await gov.state(proposalId2), PROPOSAL_STATES["Queued"]);
-      const proposalId2ETA = etherUnsigned((await gov.proposals(proposalId2)).eta);
 
-      expect(parseInt(proposalId2ETA)).to.be.greaterThan(parseInt(proposalId1ETA));
+      await freezeTime(100);
+      await shouldFailWithMessage(
+        gov.queue(proposalId2, {from: a1}),
+        'revert Governance::_queueOrRevert: proposal action already queued at eta'
+      );
+
+      // expectBignumberEqual(await gov.state(proposalId2), PROPOSAL_STATES["Queued"]);
+      // const proposalId2ETA = etherUnsigned((await gov.proposals(proposalId2)).eta);
+      // expect(parseInt(proposalId2ETA)).to.be.greaterThan(parseInt(proposalId1ETA));
       
     });
   });
