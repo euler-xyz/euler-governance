@@ -53,19 +53,19 @@ describe('Euler token contract: usage tests', () => {
   });
   
   describe('delegateBySig', () => {
-/* 
     const Domain = eul => ({ name, chainId, verifyingContract: eulerTokenInstance.address });
     const Types = {
       Delegation: [{ name: 'delegatee', type: 'address' }, { name: 'nonce', type: 'uint256' }, { name: 'expiry', type: 'uint256' }]
     };
-*/
-    xit('reverts if the signatory is invalid', async () => {
-      /* const delegatee = owner; const nonce = 0; const
-        expiry = 0;
+
+    it('reverts if the signatory is invalid', async () => {
+      const delegatee = owner; 
+      const nonce = 0; 
+      const expiry = 0;
       await shouldFailWithMessage(
         eulerTokenInstance.delegateBySig(delegatee, nonce, expiry, 0, '0xbad', '0xbad'),
         'Eul::delegateBySig: invalid signature'
-      ); */
+      );
     });
 
     xit('reverts if the nonce is bad ', async () => {
@@ -152,16 +152,16 @@ describe('Euler token contract: usage tests', () => {
       await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 0)).fromBlock.toString(), (t1.receipt.blockNumber).toString());
       await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 0)).votes.toString(), '100');
       
-      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).fromBlock.toString(), '18');
+      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).fromBlock.toString(), '20');
       await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).votes.toString(), '90');
       
-      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 0)).fromBlock.toString(), '17');
+      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 0)).fromBlock.toString(), '19');
       await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 0)).votes.toString(), '100');
 
       const t4 = await eulerTokenInstance.transfer(guy, 20, { from: owner });
       await expectBignumberEqual(await eulerTokenInstance.numCheckpoints(a1), '4');
 
-      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).fromBlock.toString(), '18');
+      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).fromBlock.toString(), '20');
       await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).votes.toString(), '90');
       
     });
