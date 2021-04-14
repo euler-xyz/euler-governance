@@ -16,7 +16,7 @@ task("Deploy", "Deploys a COMPound style governance system")
 .addParam("timelock", "The timelock administrator")
 .addParam("guardian", "The governor guardian").setAction(async taskArgs => {
     
-  const { deploy } = require("./scripts/Deploy");
+  const { deploy } = require("./scripts/deploy");
 
     await deploy({
       tokenRecipient: taskArgs.token,
