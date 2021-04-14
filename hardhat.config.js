@@ -11,6 +11,23 @@ task('accounts', 'Prints the list of accounts', async () => {
   }
 });
 
+task("Deploy", "Deploys a COMPound style governance system")
+.addParam("token", "The address to receive the initial supply")
+.addParam("timelock", "The timelock administrator")
+.addParam("guardian", "The governor guardian").setAction(async taskArgs => {
+    
+  const { deploy } = require("./scripts/Deploy");
+
+    await deploy({
+      tokenRecipient: taskArgs.token,
+      timeLockAdmin: taskArgs.timelock,
+      guardian: taskArgs.guardian
+    });
+
+    // usage:
+    // npx hardhat Deploy --token 0xAddressToReceivetokens --timelock 0xAddressTimeLockAdmin --guardian 0xAddressGovernorAlphaAdmin --network rinkeby
+})
+
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 

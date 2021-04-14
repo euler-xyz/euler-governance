@@ -36,7 +36,7 @@ describe('Goverance contract: proposals', () => {
     ] = await deployGovernance(accounts);
 
     accounts = await web3.eth.getAccounts();
-    targets = [owner];
+    targets = [eulerTokenInstance.address];
     values = ['0'];
     signatures = ['getBalanceOf(address)'];
     callDatas = [ethers.utils.defaultAbiCoder.encode(['address'], [owner])];
