@@ -217,7 +217,7 @@ describe('Governance and Timelock contracts: queueTransaction, executeTransactio
         
         // should revert
         await shouldFailWithMessage(
-            govInstance.__acceptAdmin({from: firstUser}),
+            await govInstance.__acceptAdmin({from: firstUser}),
             'Governance::__acceptAdmin: sender must be gov guardian'
         );
     });
