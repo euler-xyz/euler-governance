@@ -20,6 +20,14 @@ contract Store {
         emit NewNumber(num);
     }
 
+    function paySetNum(uint256 number) external payable {
+        require(msg.value == 1 ether, "invalid amount paid");
+        require(number > 0, "invalid number");
+        require(msg.sender == admin, "invalid caller");
+        num = number;
+        emit NewNumber(num);
+    }
+
     function getNum() public view returns (uint256) {
         return num;
     }
