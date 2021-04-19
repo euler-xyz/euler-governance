@@ -1,17 +1,9 @@
 const { expect } = require('chai');
-const { artifacts } = require('hardhat');
 const { ZERO_ADDRESS, getActorsAsync } = require('../../helpers/address');
 const {
-    deployEulerToken,
     deployGovernance,
-    deployTimeLock
 } = require('../helpers/deploy');
-const {expectBignumberEqual} = require('../../helpers/index');
 const { duration, increaseTo, latest, shouldFailWithMessage } = require('../../helpers/utils');
-const { time } = require('@openzeppelin/test-helpers');
-const { parseEther } = require('@ethersproject/units');
-
-const Store = artifacts.require('Store');
 
 describe('Timelock Admin: queueTransaction, executeTransaction and __acceptAdmin', () => {
     let accounts;
@@ -27,7 +19,6 @@ describe('Timelock Admin: queueTransaction, executeTransaction and __acceptAdmin
             {
                 owner,
                 timelockInstance,
-                eulerTokenInstance
             }
         ] = await deployGovernance(accounts);
 
@@ -74,8 +65,7 @@ describe('Timelock Admin: queueTransaction, executeTransaction and __acceptAdmin
             govInstance,
             {
                 owner,
-                timelockInstance,
-                eulerTokenInstance
+                timelockInstance            
             }
         ] = await deployGovernance(accounts);
 
@@ -104,8 +94,7 @@ describe('Timelock Admin: queueTransaction, executeTransaction and __acceptAdmin
             govInstance,
             {
                 owner,
-                timelockInstance,
-                eulerTokenInstance
+                timelockInstance
             }
         ] = await deployGovernance(accounts);
 
@@ -140,8 +129,7 @@ describe('Timelock Admin: queueTransaction, executeTransaction and __acceptAdmin
             govInstance,
             {
                 owner,
-                timelockInstance,
-                eulerTokenInstance
+                timelockInstance
             }
         ] = await deployGovernance(accounts);
 
