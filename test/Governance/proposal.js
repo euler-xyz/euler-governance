@@ -162,26 +162,18 @@ describe('Goverance contract: proposals', () => {
 
       const {args} = await findEventInTransaction(receipt, 'ProposalCreated');
       
-      //console.log(args);
       expect(args).to.have.property('description', 'second proposal');
       expect(args).to.include({proposer: accounts[3]});
-      //expect(args).to.include({0: toBN(3)});
-
-      /* console.log((await findEventInTransaction(
-        receipt,
-        'ProposalCreated'
-      )).args); */
-
-      expectBignumberEqual(args[0], toBN(3))
-      expect(args[1]).to.be.equal(accounts[3])
-      expect(args[2]).to.be.eql(targets)
-      expect(args[3]).to.be.eql([toBN(0)])
-      expect(args[4]).to.be.eql(signatures)
-      expect(args[5]).to.be.eql(callDatas)
+      expectBignumberEqual(args[0], toBN(3));
+      expect(args[1]).to.be.equal(accounts[3]);
+      expect(args[2]).to.be.eql(targets);
+      expect(args[3]).to.be.eql([toBN(0)]);
+      expect(args[4]).to.be.eql(signatures);
+      expect(args[5]).to.be.eql(callDatas);
 
       /* Expected Event Logs
         {
-          id: toBN(nextProposalId),
+          id: toBN(nextProposalId) or toBN(3),
         proposer: accounts[3],
         targets: targets,
         values: [toBN(0)],
