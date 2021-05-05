@@ -178,9 +178,7 @@ describe('Goverance contract: voting', () => {
             { name: "verifyingContract", type: "address" },
             //{ name: "salt", type: "bytes32" },
         ];
-
         
-
           /* const data = {
             types: Object.assign({
               EIP712Domain: domain,
@@ -230,7 +228,6 @@ describe('Goverance contract: voting', () => {
           //let afterFors = (await govInstance.proposals(proposalId)).forVotes;
           //expectBignumberEqual(afterFors, parseEther((400001).toString()));
 
-          
         }); 
       }); 
 

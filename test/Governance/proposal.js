@@ -164,7 +164,7 @@ describe('Goverance contract: proposals', () => {
       
       expect(args).to.have.property('description', 'second proposal');
       expect(args).to.include({proposer: accounts[3]});
-      expectBignumberEqual(args[0], toBN(3));
+      expectBignumberEqual(args[0], toBN(nextProposalId));
       expect(args[1]).to.be.equal(accounts[3]);
       expect(args[2]).to.be.eql(targets);
       expect(args[3]).to.be.eql([toBN(0)]);
