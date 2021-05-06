@@ -10,6 +10,11 @@ npm i
 
 ### Testing
 
+start ganache local ethereum network
+```
+ganache-cli
+```
+
 ```
 npm run test
 ```
