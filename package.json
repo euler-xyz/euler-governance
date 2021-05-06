@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy-staging": "npx hardhat run --network localhost scripts/staging-setup.js",
+    "test": "chmod +x tests.sh && ./tests.sh"
   },
   "repository": {
     "type": "git",

@@ -8,8 +8,8 @@
 npm i
 ```
 
-### Test Solidity
+### Testing
 
 ```
-npx hardhat test
+npm run test
 ```

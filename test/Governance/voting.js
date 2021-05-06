@@ -101,7 +101,7 @@ describe('Goverance contract: voting', () => {
       let actor; // an account that will propose,
       // receive tokens, delegate to self, and vote on own proposal
 
-      it('and we add that ForVotes', async () => {
+      it('and we add the ForVotes', async () => {
         actor = accounts[1];
         await enfranchise(eulerTokenInstance, actor, parseEther('400001'));
 
