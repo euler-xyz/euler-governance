@@ -248,16 +248,4 @@ describe('Governance (Timelock contract) and Euler Governor Admin', () => {
         expect(updatedAssetConfig.borrowIsolated).to.be.equal(AssetConfig.borrowIsolated);
         expectBignumberEqual(toBN(updatedAssetConfig.twapWindow), AssetConfig.twapWindow);
     });
-
-    /**Asset Config for DAI
-     * address eTokenAddress;
-        bool borrowIsolated;
-        uint32 collateralFactor;
-        uint32 borrowFactor;
-        uint24 twapWindow;
-     */
-
-    //    function underlyingToAssetConfig(address underlying) external view returns (AssetConfig memory) {
-    //    function setAssetConfig(address underlying, AssetConfig calldata newConfig) external nonReentrant governorOnly {
-
 })

@@ -15,6 +15,7 @@ start ganache local ethereum network
 ganache-cli
 ```
 
+run tests
 ```
 npm run test
 ```
