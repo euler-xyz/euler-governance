@@ -44,6 +44,18 @@ When a governance proposal is created, it enters a 2 day review period, after wh
 EUL (Euler Token) is an ERC-20 token that allows the owner to delegate voting rights to any address, including their own address. Changes to the owner’s token balance automatically adjust the voting rights of the delegate.
 
 
+## Delegate
+
+Delegate votes from the sender to the delegatee. Users can delegate to 1 address at a time, and the number of votes added to the delegatee’s vote count is equivalent to the balance of EUL in the user’s account. Votes are delegated from the current block and onward, until the sender delegates again, or transfers their EUL.
+
+### EUL
+
+    ```function delegate(address delegatee)```
+    delegatee: The address in which the sender wishes to delegate their votes to.
+    msg.sender: The address of the COMP token holder that is attempting to delegate their votes.
+    RETURN: No return, reverts on error.
+    
+
 ## Propose
 
 The first step is to canvas support from the wider community for making an upgrade. This will usually involve submission of a description of the general idea to the Euler Forum, here. 
