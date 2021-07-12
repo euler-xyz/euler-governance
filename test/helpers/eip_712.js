@@ -3,7 +3,7 @@ const DOMAIN_TYPE = [
         type: "string",
         name: "name"
     },
-/*     {
+    /*  {
         type: "string",
         name: "version"
     }, */

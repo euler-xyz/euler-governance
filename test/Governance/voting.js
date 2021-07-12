@@ -101,7 +101,7 @@ describe('Goverance contract: voting', () => {
       let actor; // an account that will propose,
       // receive tokens, delegate to self, and vote on own proposal
 
-      it('and we add that ForVotes', async () => {
+      it('and we add the ForVotes', async () => {
         actor = accounts[1];
         await enfranchise(eulerTokenInstance, actor, parseEther('400001'));
 
@@ -178,9 +178,7 @@ describe('Goverance contract: voting', () => {
             { name: "verifyingContract", type: "address" },
             //{ name: "salt", type: "bytes32" },
         ];
-
         
-
           /* const data = {
             types: Object.assign({
               EIP712Domain: domain,
@@ -230,7 +228,6 @@ describe('Goverance contract: voting', () => {
           //let afterFors = (await govInstance.proposals(proposalId)).forVotes;
           //expectBignumberEqual(afterFors, parseEther((400001).toString()));
 
-          
         }); 
       }); 
 

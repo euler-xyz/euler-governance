@@ -48,6 +48,7 @@ describe('Governance contracts: deployment tests', () => {
                 }
             ] = await deployGovernance(accounts);
 
+            expect(await govInstance.guardian()).to.be.equal(owner);
             expect(govInstance.address).to.not.be.equal(undefined);
             expect(govInstance.address).to.not.be.equal(ZERO_ADDRESS);
             expect(timelockInstance.address).to.not.be.equal(undefined);

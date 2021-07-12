@@ -36,7 +36,7 @@ describe('Goverance contract: proposals', () => {
     ] = await deployGovernance(accounts);
 
     accounts = await web3.eth.getAccounts();
-    targets = [owner];
+    targets = [eulerTokenInstance.address];
     values = ['0'];
     signatures = ['getBalanceOf(address)'];
     callDatas = [ethers.utils.defaultAbiCoder.encode(['address'], [owner])];
@@ -160,56 +160,20 @@ describe('Goverance contract: proposals', () => {
 
       const nextProposalId = await govInstance.latestProposalIds(accounts[3]);
 
-      /* console.log((await findEventInTransaction(
-        receipt,
-        'ProposalCreated'
-      )).args); */
-
-      expectBignumberEqual((await findEventInTransaction(
-        receipt,
-        'ProposalCreated'
-      )).args[0],
-        toBN(3)
-      )
-
-      expect((await findEventInTransaction(
-        receipt,
-        'ProposalCreated'
-      )).args[1]).to.be.equal(
-        accounts[3]
-      )
-
-      expect((await findEventInTransaction(
-        receipt,
-        'ProposalCreated'
-      )).args[2]).to.be.eql(
-        targets
-      )
+      const {args} = await findEventInTransaction(receipt, 'ProposalCreated');
       
-      expect((await findEventInTransaction(
-        receipt,
-        'ProposalCreated'
-      )).args[3]).to.be.eql(
-        [toBN(0)]
-      )
-
-      expect((await findEventInTransaction(
-        receipt,
-        'ProposalCreated'
-      )).args[4]).to.be.eql(
-        signatures
-      )
-
-      expect((await findEventInTransaction(
-        receipt,
-        'ProposalCreated'
-      )).args[5]).to.be.eql(
-        callDatas
-      )
+      expect(args).to.have.property('description', 'second proposal');
+      expect(args).to.include({proposer: accounts[3]});
+      expectBignumberEqual(args[0], toBN(nextProposalId));
+      expect(args[1]).to.be.equal(accounts[3]);
+      expect(args[2]).to.be.eql(targets);
+      expect(args[3]).to.be.eql([toBN(0)]);
+      expect(args[4]).to.be.eql(signatures);
+      expect(args[5]).to.be.eql(callDatas);
 
       /* Expected Event Logs
         {
-          id: toBN(nextProposalId),
+          id: toBN(nextProposalId) or toBN(3),
         proposer: accounts[3],
         targets: targets,
         values: [toBN(0)],
