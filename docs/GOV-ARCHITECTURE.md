@@ -55,6 +55,11 @@ Delegate votes from the sender to the delegatee. Users can delegate to 1 address
 * msg.sender: The address of the COMP token holder that is attempting to delegate their votes.
 * RETURN: No return, reverts on error.
 
+### Solidity
+
+    EUL eul = Comp(0x123...); // contract address
+    eul.delegate(delegateeAddress);
+
 
 ## Propose
 
