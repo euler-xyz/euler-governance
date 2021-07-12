@@ -233,7 +233,17 @@ Proposals will be voted on by delegated voters. If there is sufficient support b
 
 The sender must hold more EUL than the current proposal threshold (```proposalThreshold()```) as of the immediately previous block. The proposal can have up to 10 actions (based on ```proposalMaxOperations()```).
 
+The proposer cannot create another proposal if they currently have a pending or active proposal. It is not possible to queue two identical actions in the same block (due to a restriction in the Timelock), therefore actions in a single proposal must be unique, and unique proposals that share an identical action must be queued in different blocks.
 
+### Governance
+
+    function propose(address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas, string memory description) returns (uint)
+* ```targets```: The ordered list of target addresses for calls to be made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```values```: The ordered list of values (i.e. msg.value) to be passed to the calls made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```signatures```: The ordered list of function signatures to be passed during execution. This array must be the same length as all other array parameters in this function.
+* ```calldatas```: The ordered list of data to be passed to each individual function call during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```description```: A human readable description of the proposal and the changes it will enact.
+* ```RETURN```: The ID of the newly created proposal.
 
 
 ## Cast Vote
