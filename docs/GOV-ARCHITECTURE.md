@@ -188,6 +188,10 @@ The maximum number of actions that can be included in a proposal. Actions are fu
 
 ## Voting Delay
 
+The number of Ethereum blocks to wait before voting on a proposal may begin. This value is added to the current block number when a proposal is created. This can be changed through governance.
+
+
+
 
 ## Propose
 
