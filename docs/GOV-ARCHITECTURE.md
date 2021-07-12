@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Repository Overview](../README.md)
-* [Introduction](#)
+* [Introduction](#introduction)
     * [Snapshot](#)
     * [WithTally](#)
 * [Eul](#)
