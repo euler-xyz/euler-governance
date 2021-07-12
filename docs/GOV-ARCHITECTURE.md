@@ -34,9 +34,9 @@ The [Euler protocol](https://www.euler.xyz/) is governed and upgraded by EUL tok
 
 Euler will be managed by holders of a protocol native governance token called Euler Token (EUL). EUL tokens represent voting shares. A holder can vote on a governance proposal themselves or delegate their votes to a third party.
 
-EUL token-holders can delegate their voting rights to themselves, or an address of their choice. Addresses delegated at least 100,000 COMP can create governance proposals; any address can lock 100 EUL to create an Autonomous Proposal, which becomes a governance proposal after being delegated 100,000 COMP.
+EUL token-holders can delegate their voting rights to themselves, or an address of their choice. Addresses that own or have been delegated at least 0.5% of the total EUL supply can create governance proposals.
 
-When a governance proposal is created, it enters a 2 day review period, after which voting weights are recorded and voting begins. Voting lasts for 3 days; if a majority, and at least 400,000 votes are cast for the proposal, it is queued in the Timelock, and can be implemented 2 days later. In total, any change to the protocol takes at least one week.
+When a governance proposal is created, it enters a 2 day review period, after which voting weights are recorded and voting begins. Voting lasts for 7 days; if a majority, and at least 3% of the EUL supply votes are cast for the proposal, it is queued in the Timelock, and can be implemented 2 days later. In total, any change to the protocol takes at least one week.
 
 
 ## EUL
