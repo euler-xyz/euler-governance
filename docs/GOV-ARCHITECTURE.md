@@ -192,7 +192,7 @@ The number of Ethereum blocks to wait before voting on a proposal may begin. Thi
 
 ### Governance
     function votingDelay() returns (uint)
-* ```RETURN```: The maximum number of actions that can be included in a proposal.
+* ```RETURN```: Number of blocks to wait before voting on a proposal may begin.
 
 ### Solidity
     Governance gov = Governance(0x123...); // contract address
@@ -208,7 +208,7 @@ The duration of voting on a proposal, in Ethereum blocks. This can be changed th
 
 ### Governance
     function votingPeriod() returns (uint)
-* ```RETURN```: The maximum number of actions that can be included in a proposal.
+* ```RETURN```: The duration of voting on a proposal, in Ethereum blocks.
 
 ### Solidity
     Governance gov = Governance(0x123...); // contract address
@@ -216,10 +216,6 @@ The duration of voting on a proposal, in Ethereum blocks. This can be changed th
 
 ### Web3 1.2.6
     const votingPeriod = await gov.methods.votingPeriod().call();
-
-
-
-
 
 
 
