@@ -190,7 +190,16 @@ The maximum number of actions that can be included in a proposal. Actions are fu
 
 The number of Ethereum blocks to wait before voting on a proposal may begin. This value is added to the current block number when a proposal is created. This can be changed through governance.
 
+### Governance
+    function votingDelay() returns (uint)
+* ```RETURN```: The maximum number of actions that can be included in a proposal.
 
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    uint votingDelay = gov.votingDelay();
+
+### Web3 1.2.6
+    const votingDelay = await gov.methods.votingDelay().call();
 
 
 ## Propose
