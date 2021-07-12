@@ -150,8 +150,40 @@ The required minimum number of votes in support of a proposal for it to succeed.
     uint quorum = gov.quorumVotes();
 
 ### Web3 1.2.6
-const quorum = await gov.methods.quorumVotes().call();
+    const quorum = await gov.methods.quorumVotes().call();
 
+
+## Proposal Threshold
+
+The minimum number of votes required for an account to create a proposal. This can be changed through governance.
+
+### Governance
+    function proposalThreshold() returns (uint)
+* ```RETURN```: The minimum number of votes required for an account to create a proposal.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    uint threshold = gov.proposalThreshold();
+
+### Web3 1.2.6
+    const threshold = await gov.methods.proposalThreshold().call();
+
+
+## Proposal Max Operations
+
+The maximum number of actions that can be included in a proposal. Actions are functions calls that will be made when a proposal succeeds and executes.
+
+
+### Governance
+    function proposalMaxOperations() returns (uint)
+* ```RETURN```: The maximum number of actions that can be included in a proposal.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    uint operations = gov.proposalMaxOperations();
+
+### Web3 1.2.6
+    const operations = await gov.methods.proposalMaxOperations().call();
 
 
 ## Propose
