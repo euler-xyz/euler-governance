@@ -5,14 +5,14 @@
     * [Snapshot](#)
     * [WithTally](#)
 * [Eul](#eul)
-* [Delegate](#)
-* [Delegate by Signature](#)
-* [Get Current Votes](#)
-* [Get Prior Votes](#)
-* [Key Events](#)
-* [Quorum Votes](#)
-* [Proposal Threshold](#)
-* [Proposal Max Operations](#)
+* [Delegate](#delegate)
+* [Delegate by Signature](#delegate-by-signature)
+* [Get Current Votes](#get-current-votes)
+* [Get Prior Votes](#get-prior-votes)
+* [Key Events](#key-events)
+* [Quorum Votes](#quorum-votes)
+* [Proposal Threshold](#proposal-threshold)
+* [Proposal Max Operations](#proposal-max-operations)
 * [Voting Delay](#)
 * [Voting Period](#)
 * [Propose](#propose)
@@ -184,6 +184,9 @@ The maximum number of actions that can be included in a proposal. Actions are fu
 
 ### Web3 1.2.6
     const operations = await gov.methods.proposalMaxOperations().call();
+
+
+## Voting Delay
 
 
 ## Propose
