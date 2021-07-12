@@ -80,6 +80,10 @@ Delegate votes from the signatory to the delegatee. This method has the same pur
     EUL eul = EUL(0x123...); // contract address
     eul.delegateBySig(delegateeAddress, nonce, expiry, v, r, s);
 
+### Web3 1.2.6
+    const tx = await eul.methods.delegateBySig(delegateeAddress, nonce, expiry, v, r, s).send({});
+
+
 ## Propose
 
 The first step is to canvas support from the wider community for making an upgrade. This will usually involve submission of a description of the general idea to the Euler Forum, here. 
