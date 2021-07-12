@@ -253,6 +253,25 @@ The proposer cannot create another proposal if they currently have a pending or 
     const tx = gov.methods.propose(targets, values, signatures, calldatas, description).send({ from: sender });
 
 
+## Queue
+
+After a proposal has succeeded, it is moved into the Timelock waiting period using this function. The waiting period (e.g. 2 days) begins when this function is called.
+
+The queue function can be called by any Ethereum address.
+
+### Governance
+    function queue()
+* ```proposalId```: ID of a proposal that has succeeded.
+* ```RETURN```: No return, reverts on error.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    gov.queue(proposalId);
+
+### Web3 1.2.6
+    const tx = await gov.methods.queue(proposalId).send({ from: sender });
+
+
 ## Cast Vote
 
 Once an on-chain proposal has been successfully made, 3% of the EUL supply is required to vote ‘yes’ on the proposal in order for it to reach quorum. There is a 7 day period in which people can vote. If a vote passes, there is a 2 day time lock delay on execution during which Euler users can prepare for the change. 
