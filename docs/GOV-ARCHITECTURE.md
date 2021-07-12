@@ -131,6 +131,28 @@ const priorVotes = await eul.methods.getPriorVotes(account, blockNumber).call();
 | ProposalExecuted(uint id)                                                                                                                                                | An event emitted when a proposal has been executed in the Timelock.    |   |                                                                                
 
 
+## Governance
+
+Governance is the governance module of the protocol; it allows addresses with more than 0.5% of the EUL (Euler token) total supply to propose changes to the protocol. Addresses that held voting weight, at the start of the proposal, invoked through the ```getpriorvotes``` function, can submit their votes during a 7 day voting period. If a majority, and at least 3% votes are cast for the proposal, it is queued in the Timelock, and can be implemented after 2 days.
+
+
+## Quorum Votes
+
+The required minimum number of votes in support of a proposal for it to succeed.
+
+### Governance
+    function quorumVotes() public pure returns (uint)
+* ```RETURN```: The minimum number of votes required for a proposal to succeed.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    uint quorum = gov.quorumVotes();
+
+### Web3 1.2.6
+const quorum = await gov.methods.quorumVotes().call();
+
+
+
 ## Propose
 
 The first step is to canvas support from the wider community for making an upgrade. This will usually involve submission of a description of the general idea to the Euler Forum, here. 
