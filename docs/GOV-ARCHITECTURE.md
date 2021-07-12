@@ -22,4 +22,7 @@
 * [Get Actions]()
 * [Get Receipt]()
 * [State]()
-* [Cancel]()
+* [Cast Vote]()
+* [Cast Vote By Signature]()
+* [Timelock]()
+* [Guardian]()
