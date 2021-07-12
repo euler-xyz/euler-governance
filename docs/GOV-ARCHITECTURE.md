@@ -13,7 +13,7 @@
 * [Quorum Votes](#quorum-votes)
 * [Proposal Threshold](#proposal-threshold)
 * [Proposal Max Operations](#proposal-max-operations)
-* [Voting Delay](#)
+* [Voting Delay](#voting-delay)
 * [Voting Period](#)
 * [Propose](#propose)
 * [Queue](#)
