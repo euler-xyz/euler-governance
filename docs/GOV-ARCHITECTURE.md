@@ -229,6 +229,12 @@ Once the idea has been debated and refined with input from others, it can be put
 The final stage of a proposal requires a governance action to be created and submitted as a formal on-chain proposal. An on-chain proposal requires a user to have 0.5% of the total EUL supply owned or delegated to them.
 A governance action is a package of executable code that can be used to alter the state of the protocol in some way or transfer funds from the Euler Treasury. For example, it could be code that alters an interest rate parameter (see Euler Parameters), or promotes an asset from Isolation Tier to Collateral Tier (see Asset Tiers), or a much more involved proposal that adds an entirely new module to the Euler smart contracts (see Euler Smart Contracts).
 
+Proposals will be voted on by delegated voters. If there is sufficient support before the voting period ends, the proposal shall be automatically enacted. Enacted proposals are queued and executed in the Timelock contract.
+
+The sender must hold more EUL than the current proposal threshold (```proposalThreshold()```) as of the immediately previous block. The proposal can have up to 10 actions (based on ```proposalMaxOperations()```).
+
+
+
 
 ## Cast Vote
 
