@@ -6,6 +6,8 @@ timelockAddress=$(cat euler-addresses.json | grep -i timelock | awk -F ':' '{pri
 
 cd euler-contracts
 
+npm i 
+
 npm run deploy-staging
 
 awk '!/NEWGOVADDR/' .env > temp.txt && mv temp.txt .env
