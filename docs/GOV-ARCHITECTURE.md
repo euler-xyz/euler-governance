@@ -14,17 +14,17 @@
 * [Proposal Threshold](#proposal-threshold)
 * [Proposal Max Operations](#proposal-max-operations)
 * [Voting Delay](#voting-delay)
-* [Voting Period](#)
+* [Voting Period](#voting-period)
 * [Propose](#propose)
-* [Queue](#)
-* [Execute](#)
-* [Cancel](#)
-* [Get Actions](#)
-* [Get Receipt](#)
-* [State](#)
+* [Queue](#queue)
+* [Execute](#execute)
+* [Cancel](#cancel)
+* [Get Actions](#get-actions)
+* [Get Receipt](#get-receipt)
+* [State](#state)
 * [Cast Vote](#cast-vote)
-* [Cast Vote By Signature](#)
-* [Timelock](#)
+* [Cast Vote By Signature](#cast-vote-by-signature)
+* [Timelock](#timelock)
 * [Guardian](#)
 
 
@@ -312,7 +312,124 @@ The cancel function can be called by the proposal creator, or any Ethereum addre
     const tx = gov.methods.cancel(proposalId).send({ from: sender });
 
 
+## Get Actions
+Gets the actions of a selected proposal. Pass a proposal ID and get the targets, values, signatures and calldatas of that proposal.
+
+### Governance
+    function getActions(uint proposalId) returns (uint proposalId) public view returns (address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas)
+* ```proposalId```: ID of a proposal in which to get its actions.
+* ```RETURN```: Reverts if the proposal ID is invalid. If successful, the following 4 references are returned.
+    Array of addresses of contracts the proposal calls.
+    Array of unsigned integers the proposal uses as values.
+    Array of strings of the proposal’s signatures.
+    Array of calldata bytes of the proposal.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    uint proposalId = 123;
+    (address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas) = gov.getActions(proposalId);
+
+### Web3 1.2.6
+    const {0: targets, 1: values, 2: signatures, 3: calldatas} = gov.methods.getActions(proposalId).call();
+
+
+## Get Receipt
+Gets a proposal ballot receipt of the indicated voter.
+
+### Governor Bravo
+    function getReceipt(uint proposalId, address voter) returns (Receipt memory)
+* ```proposalId```: ID of the proposal in which to get a voter’s ballot receipt.
+voter: Address of the account of a proposal voter.
+* ```RETURN```: Reverts on error. If successful, returns a Receipt struct for the ballot of the voter address.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    Receipt ballot = gov.getReceipt(proposalId, voterAddress);
+
+### Web3 1.2.6
+    const proposalId = 11;
+    const voterAddress = '0x123...';
+    const result = await gov.methods.getReceipt(proposalId, voterAddress).call();
+    const { hasVoted, support, votes } = result;
+
+
+## State
+Gets the proposal state for the specified proposal. The return value, ProposalState is an enumerated type defined in the Governance contract.
+
+### Governance
+    function state(uint proposalId) returns (ProposalState)
+* ```proposalId```: ID of a proposal in which to get its state.
+* ```RETURN```: Enumerated type ProposalState. The types are Pending, Active, Canceled, Defeated, Succeeded, Queued, Expired, andExecuted.
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    Governance.ProposalState state = gov.state(123);
+### Web3 1.2.6
+    const proposalStates = ['Pending', 'Active', 'Canceled', 'Defeated', 'Succeeded', 'Queued', 'Expired', 'Executed'];
+    const proposalId = 123;
+    result = await gov.methods.state(proposalId).call();
+    const proposalState = proposalStates[result];
+
 
 ## Cast Vote
 
+Cast a vote on a proposal. The account's voting weight is determined by the number of votes the account had delegated to it at the time the proposal state became active.
+
 Once an on-chain proposal has been successfully made, 3% of the EUL supply is required to vote ‘yes’ on the proposal in order for it to reach quorum. There is a 7 day period in which people can vote. If a vote passes, there is a 2 day time lock delay on execution during which Euler users can prepare for the change. 
+
+
+### Governance
+    function castVote(uint proposalId, uint8 support)
+* ```proposalId```: ID of a proposal in which to cast a vote.
+* ```support```: An integer of 0 for against, 1 for in-favor, and 2 for abstain.
+* ```RETURN```: No return, reverts on error.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    gov.castVote(proposalId, 1);
+
+### Web3 1.2.6
+    const tx = gov.methods.castVote(proposalId, 0).send({ from: sender });
+
+## Cast Vote
+Cast a vote on a proposal with a reason attached to the vote.
+
+### Governance
+    function castVoteWithReason(uint proposalId, uint8 support, string calldata reason)
+* ```proposalId```: ID of a proposal in which to cast a vote.
+* ```support```: An integer of 0 for against, 1 for in-favor, and 2 for abstain.
+* ```reason```: A string containing the voter's reason for their vote selection.
+* ```RETURN```: No return, reverts on error.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    gov.castVoteWithReason(proposalId, 2, "I think...");
+
+### Web3 1.2.6
+    const tx = gov.methods.castVoteWithReason(proposalId, 0, "I think...").send({ from: sender });
+
+
+## Cast Vote By Signature
+Cast a vote on a proposal. The account's voting weight is determined by the number of votes the account had delegated at the time that proposal state became active. This method has the same purpose as Cast Vote but it instead enables offline signatures to participate in Compound governance voting. For more details on how to create an offline signature, review EIP-712.
+
+### Governance
+    function castVoteBySig(uint proposalId, uint8 support, uint8 v, bytes32 r, bytes32 s)
+* ```proposalId```: ID of a proposal in which to cast a vote.
+* ```support```: An integer of 0 for against, 1 for in-favor, and 2 for abstain.
+* ```v```: The recovery byte of the signature.
+* ```r```: Half of the ECDSA signature pair.
+* ```s```: Half of the ECDSA signature pair.
+* ```RETURN```: No return, reverts on error.
+
+### Solidity
+     Governance gov =  Governance(0x123...); // contract address
+    gov.castVoteBySig(proposalId, 0, v, r, s);
+### Web3 1.2.6
+    const tx = await gov.methods.castVoteBySig(proposalId, 1, v, r, s).send({});
+
+## Timelock
+Certain smart contracts within the Euler protocol allow the Timelock address to modify them. The Timelock contract can modify system parameters, logic, and contracts in a 'time-delayed, opt-out' upgrade pattern.
+
+The Timelock has a hard-coded minimum delay of 2 days, which is the least amount of notice possible for a governance action. Each proposed action will be published at a minimum of 2 days in the future from the time of announcement. Major upgrades, such as changing the risk system, may have a 14 day delay.
+
+The Timelock is controlled by the governance module; pending and completed governance actions can be monitored on the Timelock Dashboard.
+
