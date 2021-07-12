@@ -4,7 +4,7 @@
 * [Introduction](#introduction)
     * [Snapshot](#)
     * [WithTally](#)
-* [Eul](#)
+* [Eul](#eul)
 * [Delegate](#)
 * [Delegate by Signature](#)
 * [Get Current Votes](#)
@@ -45,8 +45,9 @@ When a governance proposal is created, it enters a 2 day review period, after wh
 ### WithTally
 
 
-## EUL (Euler Token)
+## EUL 
 
+EUL (Euler Token) is an ERC-20 token that allows the owner to delegate voting rights to any address, including their own address. Changes to the owner’s token balance automatically adjust the voting rights of the delegate.
 
 
 ## Propose
