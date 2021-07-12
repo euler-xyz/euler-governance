@@ -272,6 +272,47 @@ The queue function can be called by any Ethereum address.
     const tx = await gov.methods.queue(proposalId).send({ from: sender });
 
 
+## Execute
+
+After the Timelock waiting period has elapsed, a proposal can be executed using this function, which applies the proposal changes to the target contracts. This will invoke each of the actions described in the proposal.
+
+The execute function can be called by any Ethereum address.
+
+Note: this function is payable, so the Timelock contract can invoke payable functions that were selected in the proposal.
+
+### Governance
+    function execute(uint proposalId) payable
+* ```proposalId```: ID of a succeeded proposal to execute.
+* ```RETURN```: No return, reverts on error.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    gov.execute(proposalId).value(999).gas(999)();
+
+### Web3 1.2.6
+    const tx = gov.methods.execute(proposalId).send({ from: sender, value: 1 });
+
+
+## Cancel
+
+A proposal is eligible to be cancelled at any time prior to its execution, including while queued in the Timelock, using this function.
+
+The cancel function can be called by the proposal creator, or any Ethereum address, if the proposal creator fails to maintain more delegated votes than the proposal threshold.
+
+### Governance
+    function cancel(uint proposalId)
+* ```proposalId```: ID of a proposal to cancel. The proposal cannot have already been executed.
+* ```RETURN```: No return, reverts on error.
+
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    gov.cancel(proposalId);
+
+### Web3 1.2.6
+    const tx = gov.methods.cancel(proposalId).send({ from: sender });
+
+
+
 ## Cast Vote
 
 Once an on-chain proposal has been successfully made, 3% of the EUL supply is required to vote ‘yes’ on the proposal in order for it to reach quorum. There is a 7 day period in which people can vote. If a vote passes, there is a 2 day time lock delay on execution during which Euler users can prepare for the change. 
