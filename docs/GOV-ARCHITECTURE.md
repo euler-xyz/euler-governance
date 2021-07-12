@@ -245,6 +245,13 @@ The proposer cannot create another proposal if they currently have a pending or 
 * ```description```: A human readable description of the proposal and the changes it will enact.
 * ```RETURN```: The ID of the newly created proposal.
 
+### Solidity
+    Governance gov = Governance(0x123...); // contract address
+    uint proposalId = gov.propose(targets, values, signatures, calldatas, description);
+
+### Web3 1.2.6
+    const tx = gov.methods.propose(targets, values, signatures, calldatas, description).send({ from: sender });
+
 
 ## Cast Vote
 
