@@ -378,6 +378,7 @@ Once an on-chain proposal has been successfully made, 3% of the EUL supply is re
 
 
 ### Governance
+    
     function castVote(uint proposalId, uint8 support)
 * ```proposalId```: ID of a proposal in which to cast a vote.
 * ```support```: An integer of 0 for against, 1 for in-favor, and 2 for abstain.
