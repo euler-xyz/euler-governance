@@ -376,9 +376,7 @@ Cast a vote on a proposal. The account's voting weight is determined by the numb
 
 Once an on-chain proposal has been successfully made, 3% of the EUL supply is required to vote ‘yes’ on the proposal in order for it to reach quorum. There is a 7 day period in which people can vote. If a vote passes, there is a 2 day time lock delay on execution during which Euler users can prepare for the change. 
 
-
-### Governance
-    
+### Governance
     function castVote(uint proposalId, uint8 support)
 * ```proposalId```: ID of a proposal in which to cast a vote.
 * ```support```: An integer of 0 for against, 1 for in-favor, and 2 for abstain.
