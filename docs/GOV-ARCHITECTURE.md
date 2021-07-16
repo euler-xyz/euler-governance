@@ -285,11 +285,11 @@ Note: this function is payable, so the Timelock contract can invoke payable func
 * ```proposalId```: ID of a succeeded proposal to execute.
 * ```RETURN```: No return, reverts on error.
 
-### Solidity
+### Solidity
     Governance gov = Governance(0x123...); // contract address
     gov.execute(proposalId).value(999).gas(999)();
-
-### Web3 1.2.6
+    
+### Web3 1.2.6
     const tx = gov.methods.execute(proposalId).send({ from: sender, value: 1 });
 
 
