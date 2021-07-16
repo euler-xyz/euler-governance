@@ -44,9 +44,12 @@ Tally is a governance app in the form of a web-based platform focused on enablin
 Tally empowers user owned governance through a voting dashboard, governance tooling, and real time research and analysis. Users can use the app to review data on governance systems, active and prior proposals, and individual delegates or token holders. The platform also enabled direct on-chain voting and vote delegation, helping users put their governance insights into action. 
 
 For example, the image below shows active, passed and failed proposals for the Compound protocol:
+
 ![Figure 1. Active, Passed and Failed Proposals](./images/proposals.png)
 
 The image below shows the top voters on proposals created for the Compound protocol:
+
+![Figure 2. Top Voters](./images/top_voters.png)
 
 Users can also view the total percentage of votes in support or against a specific proposal as shown in the image below:
 
