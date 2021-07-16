@@ -2,7 +2,7 @@
 
 * [Repository Overview](../README.md)
 * [Introduction](#introduction)
-    * [Snapshot](#)
+    * [Snapshot](#snapshot)
     * [Tally](#tally)
 * [Eul](#eul)
 * [Delegate](#delegate)
@@ -58,6 +58,9 @@ Users can also view the total percentage of votes in support or against a specif
 ![Figure 3. Percentage of Votes in Support or Against a Proposal](./images/votes_in_support_against.png)
 
 Full Tally documentation can be accessed here: [Tally](https://docs.withtally.com). The documentation describes how to navigate the web app, voting and delegation and creating a Tally account.
+
+
+### Snapshot
 
 
 ## EUL
