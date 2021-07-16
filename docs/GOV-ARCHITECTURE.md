@@ -39,9 +39,19 @@ EUL token-holders can delegate their voting rights to themselves, or an address 
 When a governance proposal is created, it enters a 2 day review period, after which voting weights are recorded and voting begins. Voting lasts for 7 days; if a majority, and at least 3% of the EUL supply votes are cast for the proposal, it is queued in the Timelock, and can be implemented 2 days later. In total, any change to the protocol takes at least one week.
 
 ### Tally
-Tally is a platform focused on enabling on-chain governance for DeFi projects. The Tally governance web application [provides transparency around the governance of various DeFi protocols, e.g., Compound, Uniswap, etc.](https://www.coindesk.com/tally-defi-governance-funding-round) bringing all of the proposals and voting for these protocols under a shared user interface.
+Tally is a governance app in the form of a web-based platform focused on enabling on-chain governance for DeFi projects. The Tally governance web application [provides transparency around the governance of various DeFi protocols, e.g., Compound, Uniswap, etc.](https://www.coindesk.com/tally-defi-governance-funding-round) bringing all of the proposals and voting for these protocols under a shared user interface.
 
-Full Tally documentation can be accessed here: [Tally](https://docs.withtally.com)
+Tally empowers user owned governance through a voting dashboard, governance tooling, and real time research and analysis. Users can use the app to review data on governance systems, active and prior proposals, and individual delegates or token holders. The platform also enabled direct on-chain voting and vote delegation, helping users put their governance insights into action. 
+
+For example, the image below shows active, passed and failed proposals for the Compound protocol:
+![Figure 1. Active, Passed and Failed Proposals](./images/proposals.png)
+
+The image below shows the top voters on proposals created for the Compound protocol:
+
+Users can also view the total percentage of votes in support or against a specific proposal as shown in the image below:
+
+
+Full Tally documentation can be accessed here: [Tally](https://docs.withtally.com). The documentation describes how to navigate the web app, voting and delegation and creating a Tally account.
 
 
 ## EUL
