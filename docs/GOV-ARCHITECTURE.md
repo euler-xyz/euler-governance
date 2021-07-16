@@ -385,14 +385,14 @@ Once an on-chain proposal has been successfully made, 3% of the EUL supply is re
 ### Solidity
     Governance gov = Governance(0x123...); // contract address
     gov.castVote(proposalId, 1);
-
-### Web3 1.2.6
+    
+### Web3 1.2.6
     const tx = gov.methods.castVote(proposalId, 0).send({ from: sender });
 
 ## Cast Vote
 Cast a vote on a proposal with a reason attached to the vote.
 
-### Governance
+### Governance
     function castVoteWithReason(uint proposalId, uint8 support, string calldata reason)
 * ```proposalId```: ID of a proposal in which to cast a vote.
 * ```support```: An integer of 0 for against, 1 for in-favor, and 2 for abstain.
@@ -405,9 +405,8 @@ Cast a vote on a proposal with a reason attached to the vote.
 
 ### Web3 1.2.6
     const tx = gov.methods.castVoteWithReason(proposalId, 0, "I think...").send({ from: sender });
-
-
-## Cast Vote By Signature
+    
+## Cast Vote By Signature
 Cast a vote on a proposal. The account's voting weight is determined by the number of votes the account had delegated at the time that proposal state became active. This method has the same purpose as Cast Vote but it instead enables offline signatures to participate in Compound governance voting. For more details on how to create an offline signature, review EIP-712.
 
 ### Governance
