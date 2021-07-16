@@ -63,6 +63,9 @@ Full Tally documentation can be accessed here: [Tally](https://docs.withtally.co
 ### Snapshot
 Snapshot is an off-chain, gasless, multi-governance community polling dashboard.
 
+It is described by Cointelegraph as a [“governance-as-a-service” provider for a number of decentralized finance projects, including Yearn.finance, SushiSwap, Balancer, Aave, Cream and others](https://cointelegraph.com/news/gnosis-and-snapshot-create-tool-to-bind-defi-governance-votes-on-chain). It provides a simple interface to create governance proposals and lets users vote on them by connecting their wallets and the governance tokens contained within. However, the actual voting process is conducted off-chain to save on gas costs and complexity.
+
+The image below shows the Snapshot user interface:
 ![Figure 4. Snapshot User Interface](./images/snapshot_ui.png)
 
 
