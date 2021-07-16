@@ -39,7 +39,7 @@ EUL token-holders can delegate their voting rights to themselves, or an address 
 When a governance proposal is created, it enters a 2 day review period, after which voting weights are recorded and voting begins. Voting lasts for 7 days; if a majority, and at least 3% of the EUL supply votes are cast for the proposal, it is queued in the Timelock, and can be implemented 2 days later. In total, any change to the protocol takes at least one week.
 
 
-On-chain governance for the Euler protocol can be done via the [Tally](#tally) governance dashboard (described below) while off-chain governance can be done via [Snapshot](#). More information on on-chain and off-chain governance (i.e., proposals and voting) is described under the [Propose](#propose) section while both platforms are described as follows:
+On-chain governance actions (proposal, voting, etc.) for the Euler protocol can be done via the [Tally](#tally) governance dashboard (described below) while off-chain governance actions can be carried out via [Snapshot](#snapshot). More information on on-chain and off-chain governance (i.e., proposals and voting) is described under the [Propose](#propose) section while both platforms are described as follows:
 
 ### Tally
 Tally is a governance app in the form of a web-based platform focused on enabling on-chain governance for DeFi projects. The Tally governance web application [provides transparency around the governance of various DeFi protocols, e.g., Compound, Uniswap, etc.](https://www.coindesk.com/tally-defi-governance-funding-round) bringing all of the proposals and voting for these protocols under a shared user interface.
@@ -467,4 +467,4 @@ The Timelock is controlled by the governance module; pending and completed gover
 
 ## Guardian
 
-The Governance contract has a designated Guardian address capable of cancelling proposals which have not been executed or do not have a state == Executed. The Guardian will only cancel proposals in the event of an unforeseen vulnerability. The Guardian cannot execute proposals or alter any voting on proposals not can it prevent users from voting on proposals.
+The Governance contract has a designated Guardian address capable of cancelling proposals which have not been executed or do not have a ```state == Executed```. The Guardian will only cancel proposals in the event of an unforeseen vulnerability. The Guardian cannot execute proposals or alter any voting on proposals not can it prevent users from voting on proposals.
