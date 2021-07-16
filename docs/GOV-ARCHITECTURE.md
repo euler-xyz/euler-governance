@@ -3,7 +3,7 @@
 * [Repository Overview](../README.md)
 * [Introduction](#introduction)
     * [Snapshot](#)
-    * [Tally](#tally)
+    * [Tally](###tally)
 * [Eul](#eul)
 * [Delegate](#delegate)
 * [Delegate by Signature](#delegate-by-signature)
