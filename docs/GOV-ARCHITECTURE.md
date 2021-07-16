@@ -57,7 +57,7 @@ The image below shows the top voters on proposals created for the Compound proto
 Users can also view the total percentage of votes in support or against a specific proposal as shown in the image below:
 ![Figure 3. Percentage of Votes in Support or Against a Proposal](./images/votes_in_support_against.png)
 
-Full Tally documentation can be accessed here: [Tally](https://docs.withtally.com). The documentation describes how to navigate the web app, voting and delegation and creating a Tally account.
+Full Tally documentation can be accessed online at: [Tally](https://docs.withtally.com). The documentation describes how to navigate the web app, voting and delegation and creating a Tally account.
 
 
 ### Snapshot
@@ -68,7 +68,7 @@ It is described by Cointelegraph as a [“governance-as-a-service” provider fo
 The image below shows the Snapshot user interface:
 ![Figure 4. Snapshot User Interface](./images/snapshot_ui.png)
 
-Snapshot proposals are not binding. Team members and multisignature key holders for the projects are expected to execute the proposals, but the process relies entirely on their goodwill.
+Snapshot proposals are not binding. Team members and multisignature key holders for the projects are expected to execute the proposals, but the process relies entirely on their goodwill. Full Snapshot documentation can be accessed online at: [Snapshot](https://docs.snapshot.org).
 
 
 
