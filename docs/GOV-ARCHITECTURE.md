@@ -25,7 +25,7 @@
 * [Cast Vote](#cast-vote)
 * [Cast Vote By Signature](#cast-vote-by-signature)
 * [Timelock](#timelock)
-* [Guardian](#)
+* [Guardian](#guardian)
 
 
 ## Introduction
@@ -465,3 +465,6 @@ The Timelock has a hard-coded minimum delay of 2 days, which is the least amount
 
 The Timelock is controlled by the governance module; pending and completed governance actions can be monitored on the Timelock Dashboard.
 
+## Guardian
+
+The Governance contract has a designated Guardian address capable of cancelling proposals which have not been executed or do not have a state == Executed. The Guardian will only cancel proposals in the event of an unforeseen vulnerability. The Guardian cannot execute proposals or alter any voting on proposals not can it prevent users from voting on proposals.
