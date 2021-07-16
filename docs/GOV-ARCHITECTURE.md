@@ -68,6 +68,8 @@ It is described by Cointelegraph as a [“governance-as-a-service” provider fo
 The image below shows the Snapshot user interface:
 ![Figure 4. Snapshot User Interface](./images/snapshot_ui.png)
 
+Snapshot proposals are not binding. Team members and multisignature key holders for the projects are expected to execute the proposals, but the process relies entirely on their goodwill.
+
 
 
 ## EUL
