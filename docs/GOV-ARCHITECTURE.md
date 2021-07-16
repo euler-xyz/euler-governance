@@ -409,7 +409,8 @@ Cast a vote on a proposal with a reason attached to the vote.
 ## Cast Vote By Signature
 Cast a vote on a proposal. The account's voting weight is determined by the number of votes the account had delegated at the time that proposal state became active. This method has the same purpose as Cast Vote but it instead enables offline signatures to participate in Compound governance voting. For more details on how to create an offline signature, review EIP-712.
 
-### Governance
+
+### Governance
     function castVoteBySig(uint proposalId, uint8 support, uint8 v, bytes32 r, bytes32 s)
 * ```proposalId```: ID of a proposal in which to cast a vote.
 * ```support```: An integer of 0 for against, 1 for in-favor, and 2 for abstain.
