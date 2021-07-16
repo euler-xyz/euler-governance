@@ -3,7 +3,7 @@
 * [Repository Overview](../README.md)
 * [Introduction](#introduction)
     * [Snapshot](#)
-    * [WithTally](#)
+    * [Tally](#tally)
 * [Eul](#eul)
 * [Delegate](#delegate)
 * [Delegate by Signature](#delegate-by-signature)
@@ -37,6 +37,11 @@ Euler will be managed by holders of a protocol native governance token called Eu
 EUL token-holders can delegate their voting rights to themselves, or an address of their choice. Addresses that own or have been delegated at least 0.5% of the total EUL supply can create governance proposals.
 
 When a governance proposal is created, it enters a 2 day review period, after which voting weights are recorded and voting begins. Voting lasts for 7 days; if a majority, and at least 3% of the EUL supply votes are cast for the proposal, it is queued in the Timelock, and can be implemented 2 days later. In total, any change to the protocol takes at least one week.
+
+### Tally
+Tally is a platform focused on enabling on-chain governance for DeFi projects. The Tally governance web application [provides transparency around the governance of various DeFi protocols, e.g., Compound, Uniswap, etc.](https://www.coindesk.com/tally-defi-governance-funding-round) bringing all of the proposals and voting for these protocols under a shared user interface.
+
+Full Tally documentation can be accessed here: [Tally](https://docs.withtally.com)
 
 
 ## EUL
