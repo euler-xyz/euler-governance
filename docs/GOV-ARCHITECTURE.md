@@ -61,6 +61,10 @@ Full Tally documentation can be accessed here: [Tally](https://docs.withtally.co
 
 
 ### Snapshot
+Snapshot is an off-chain, gasless, multi-governance community polling dashboard.
+
+![Figure 4. Snapshot User Interface](./images/snapshot_ui.png)
+
 
 
 ## EUL
