@@ -7,7 +7,7 @@ async function main({tokenRecipient, timeLockAdmin, guardian}) {
     await hre.run('compile');
 
     // This gets the contract from 
-    const Token = await hre.ethers.getContractFactory("Comp");
+    const Token = await hre.ethers.getContractFactory("EulerToken");
     const token = await Token.deploy(tokenRecipient);
     await token.deployed();
     await token.deployTransaction.wait();
@@ -20,7 +20,7 @@ async function main({tokenRecipient, timeLockAdmin, guardian}) {
     await timelock.deployTransaction.wait();
 
     // Deploy Governance
-    const Gov = await ethers.getContractFactory("GovernorAlpha");
+    const Gov = await ethers.getContractFactory("Governance");
     const gov = await Gov.deploy(timelock.address, token.address, guardian);
     await gov.deployed();
     await gov.deployTransaction.wait();

@@ -104,6 +104,7 @@ describe('Euler token contract: usage tests', () => {
     it('returns the number of checkpoints for a delegate', async () => {
       const guy = accounts[4];
       await eulerTokenInstance.transfer(guy, '100', {from: owner}); // give an account a few tokens for readability
+      
       await expectBignumberEqual(await eulerTokenInstance.numCheckpoints(a1), '0');
 
       const t1 = await eulerTokenInstance.delegate(a1, { from: guy });
@@ -135,7 +136,9 @@ describe('Euler token contract: usage tests', () => {
       const guy = accounts[4];
 
       await eulerTokenInstance.transfer(guy, '100', {from: owner}); // give an account a few tokens for readability
+      
       await expectBignumberEqual(await eulerTokenInstance.numCheckpoints(a1), '0');
+
       await minerStop();
 
       let t1 = eulerTokenInstance.delegate(a1, { from: guy });
@@ -152,18 +155,21 @@ describe('Euler token contract: usage tests', () => {
       await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 0)).fromBlock.toString(), (t1.receipt.blockNumber).toString());
       await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 0)).votes.toString(), '100');
       
-      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).fromBlock.toString(), '20');
+      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).fromBlock.toString(), (t2.receipt.blockNumber).toString());
       await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).votes.toString(), '90');
       
-      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 0)).fromBlock.toString(), '19');
-      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 0)).votes.toString(), '100');
+      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 2)).fromBlock.toString(), (t3.receipt.blockNumber).toString());
+      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 2)).votes.toString(), '80');
 
-      const t4 = await eulerTokenInstance.transfer(guy, 20, { from: owner });
+      let t4 = await eulerTokenInstance.transfer(guy, 20, { from: owner });
       await expectBignumberEqual(await eulerTokenInstance.numCheckpoints(a1), '4');
 
-      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).fromBlock.toString(), '20');
+      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).fromBlock.toString(), (t2.receipt.blockNumber).toString());
       await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 1)).votes.toString(), '90');
       
+      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 3)).fromBlock.toString(), (t4.receipt.blockNumber).toString());
+      await expectBignumberEqual((await eulerTokenInstance.checkpoints(a1, 3)).votes.toString(), '100');
+    
     });
   });
 

@@ -32,14 +32,6 @@ describe('Governance and Timelock contracts: queueTransaction, executeTransactio
         expect(await timelockInstance.admin()).to.be.equal(owner);
         expect(await govInstance.guardian()).to.be.equal(owner);
 
-        // timelock execute proposal fails when 
-        // function signature does not exist in target contract
-        // DOES NOT WORK WITH PARAM TO ENCODE AS UINT
-        // no uint param found in proposals on 
-        // Compound timelock dashboard https://app.compound.finance/timelock
-        // timelock is the caller of target contracts in proposals
-        // governance contract with governance logic 
-        // is the admin of timelock
         const _store = await Store.new(timelockInstance.address);
 
         expectBignumberEqual(await _store.getNum(), 0);
@@ -77,14 +69,6 @@ describe('Governance and Timelock contracts: queueTransaction, executeTransactio
         expect(await timelockInstance.admin()).to.be.equal(owner);
         expect(await govInstance.guardian()).to.be.equal(owner);
 
-        // timelock execute proposal fails when 
-        // function signature does not exist in target contract
-        // DOES NOT WORK WITH PARAM TO ENCODE AS UINT
-        // no uint param found in proposals on 
-        // Compound timelock dashboard https://app.compound.finance/timelock
-        // timelock is the caller of target contracts in proposals
-        // governance contract with governance logic 
-        // is the admin of timelock
         const _store = await Store.new(timelockInstance.address);
 
         expectBignumberEqual(await _store.getNum(), 0);
@@ -96,11 +80,8 @@ describe('Governance and Timelock contracts: queueTransaction, executeTransactio
         const callDatas = ethers.utils.defaultAbiCoder.encode(['uint256'], [setNumber]);
         await timelockInstance.queueTransaction(targets, values, signatures, callDatas, executionTimeStamp, {from: owner});
         
-        // ensure the ETA (Unix time) has been reached in the queueTransaction() call
         await increaseTo(executionTimeStamp);
-        //await web3.eth.sendTransaction({to:timelockInstance.address, from:owner, value:web3.utils.toWei("10", "ether")});
-        //await timelockInstance.cancelTransaction(timelockInstance.address, txFee, signature, callData, executionTimeStamp, {from: owner});
-
+    
         await timelockInstance.executeTransaction(targets, values, signatures, callDatas, executionTimeStamp, {from: owner, value: parseEther('1')});
 
         expectBignumberEqual(await _store.getNum(), setNumber);
@@ -133,11 +114,8 @@ describe('Governance and Timelock contracts: queueTransaction, executeTransactio
         const callDatas = ethers.utils.defaultAbiCoder.encode(['uint256'], [setNumber]);
         await timelockInstance.queueTransaction(targets, values, signatures, callDatas, executionTimeStamp, {from: owner});
         
-        // ensure the ETA (Unix time) has been reached in the queueTransaction() call
         await increaseTo(executionTimeStamp);
-        //await web3.eth.sendTransaction({to:timelockInstance.address, from:owner, value:web3.utils.toWei("10", "ether")});
-        //await timelockInstance.cancelTransaction(timelockInstance.address, txFee, signature, callData, executionTimeStamp, {from: owner});
-
+ 
         await shouldFailWithMessage(
             timelockInstance.executeTransaction(targets, values, signatures, callDatas, executionTimeStamp, {from: owner}),
             'Timelock::executeTransaction: Transaction execution reverted'
@@ -173,11 +151,8 @@ describe('Governance and Timelock contracts: queueTransaction, executeTransactio
         const callDatas = ethers.utils.defaultAbiCoder.encode(['uint256'], [setNumber]);
         await timelockInstance.queueTransaction(targets, values, signatures, callDatas, executionTimeStamp, {from: owner});
         
-        // ensure the ETA (Unix time) has been reached in the queueTransaction() call
         await increaseTo(executionTimeStamp);
-        //await web3.eth.sendTransaction({to:timelockInstance.address, from:owner, value:web3.utils.toWei("10", "ether")});
-        //await timelockInstance.cancelTransaction(timelockInstance.address, txFee, signature, callData, executionTimeStamp, {from: owner});
-
+    
         await shouldFailWithMessage(
             timelockInstance.executeTransaction(targets, values, signatures, callDatas, executionTimeStamp, {from: owner, value: parseEther('0.1')}),
             'Timelock::executeTransaction: Transaction execution reverted'

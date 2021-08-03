@@ -8,8 +8,20 @@
 npm i
 ```
 
-### Test Solidity
-
 ```
-npx hardhat test
+git submodule init
+
+git submodule update
+```
+
+### Testing
+
+start ganache local ethereum network
+```
+ganache-cli
+```
+
+run tests
+```
+npm run test
 ```

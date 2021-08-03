@@ -37,7 +37,14 @@ task("Deploy", "Deploys the governance system with command line parameters")
  */
 module.exports = {
   solidity: {
-    version: '0.7.3'
+    compilers: [
+      {
+        version: "0.7.0"
+      },
+      {
+        version: "0.8.0"
+      }
+    ]
   },
   mocha: {
     timeout: 300000 // 5 minutes in milliseconds

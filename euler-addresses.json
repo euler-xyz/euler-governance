@@ -1,7 +1,5 @@
 {
-    "tokens": {},
-    "modules": {},
-    "timelock": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-    "eulerToken": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-    "governance": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+    "timelock": "0xFdc1EA531336f819526314EE0C986207Dc74Db23",
+    "eulerToken": "0x3509B37ef351476c7D0B822a5D932d912Bd57871",
+    "governance": "0xFCc606587e957485C494198A5C84b98091847eF1"
 }
