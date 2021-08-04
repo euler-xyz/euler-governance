@@ -36,8 +36,17 @@ task("Deploy", "Deploys the governance system with command line parameters")
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
+  networks: {
+    hardhat: {
+        allowUnlimitedContractSize: true
+    },
+  },
+
   solidity: {
     compilers: [
+      {
+        version: "0.5.16"
+      },
       {
         version: "0.7.0"
       },
