@@ -10,6 +10,7 @@
 * [Get Current Votes](#get-current-votes)
 * [Get Prior Votes](#get-prior-votes)
 * [Key Events](#key-events)
+* [Governor Bravo](#governor-bravo)
 * [Quorum Votes](#quorum-votes)
 * [Proposal Threshold](#proposal-threshold)
 * [Proposal Max Operations](#proposal-max-operations)
@@ -23,6 +24,7 @@
 * [Get Receipt](#get-receipt)
 * [State](#state)
 * [Cast Vote](#cast-vote)
+* [Cast Vote With Reason](#cast-vote-with-reason)
 * [Cast Vote By Signature](#cast-vote-by-signature)
 * [Timelock](#timelock)
 * [Guardian](#guardian)
@@ -30,7 +32,7 @@
 
 ## Introduction
 
-The [Euler protocol](https://www.euler.xyz/) is governed and upgraded by EUL token-holders, using three distinct components; the EUL token, governance module, and Timelock. Together, these contracts allow the community to propose, vote, and implement changes. Proposals can modify system parameters, support new markets, or add entirely new functionality to the protocol.
+The [Euler protocol](https://www.euler.xyz/) is governed and upgraded by EUL token-holders, using three distinct components; the EUL token, governance module (Governor Bravo), and Timelock. Together, these contracts allow the community to propose, vote, and implement changes. Proposals can modify system parameters, support new markets, or add entirely new functionality to the protocol.
 
 Euler will be managed by holders of a protocol native governance token called Euler Token (EUL). EUL tokens represent voting shares. A holder can vote on a governance proposal themselves or delegate their votes to a third party.
 
@@ -97,7 +99,7 @@ Delegate votes from the sender to the delegatee. Users can delegate to 1 address
 
 ## Delegate By Signature
 
-Delegate votes from the signatory to the delegatee. This method has the same purpose as Delegate but it instead enables offline signatures to participate in Compound governance vote delegation. For more details on how to create an offline signature, review [EIP-712](https://eips.ethereum.org/EIPS/eip-712).
+Delegate votes from the signatory to the delegatee. This method has the same purpose as Delegate but it instead enables offline signatures to participate in Euler governance vote delegation. For more details on how to create an offline signature, review [EIP-712](https://eips.ethereum.org/EIPS/eip-712).
 
 ### EUL
     function delegateBySig(address delegatee, uint nonce, uint expiry, uint8 v, bytes32 r, bytes32 s)
@@ -165,9 +167,9 @@ const priorVotes = await eul.methods.getPriorVotes(account, blockNumber).call();
 
 
 
-## Governance
+## Governanor Bravo
 
-Governance is the governance module of the protocol; it allows addresses with more than 0.5% of the EUL (Euler token) total supply to propose changes to the protocol. Addresses that held voting weight, at the start of the proposal, invoked through the ```getpriorvotes``` function, can submit their votes during a 7 day voting period. If a majority, and at least 3% votes are cast for the proposal, it is queued in the Timelock, and can be implemented after 2 days.
+Governanor Bravo is the governance module of the protocol; it allows addresses with more than 0.5% of the EUL (Euler token) total supply to propose changes to the protocol. Addresses that held voting weight, at the start of the proposal, invoked through the ```getpriorvotes``` function, can submit their votes during a 7 day voting period. If a majority, and at least 3% votes are cast for the proposal, it is queued in the Timelock, and can be implemented after 2 days.
 
 
 ## Quorum Votes
@@ -179,7 +181,7 @@ The required minimum number of votes in support of a proposal for it to succeed.
 * ```RETURN```: The minimum number of votes required for a proposal to succeed.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     uint quorum = gov.quorumVotes();
 
 ### Web3 1.2.6
@@ -195,7 +197,7 @@ The minimum number of votes required for an account to create a proposal. This c
 * ```RETURN```: The minimum number of votes required for an account to create a proposal.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     uint threshold = gov.proposalThreshold();
 
 ### Web3 1.2.6
@@ -212,7 +214,7 @@ The maximum number of actions that can be included in a proposal. Actions are fu
 * ```RETURN```: The maximum number of actions that can be included in a proposal.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     uint operations = gov.proposalMaxOperations();
 
 ### Web3 1.2.6
@@ -228,7 +230,7 @@ The number of Ethereum blocks to wait before voting on a proposal may begin. Thi
 * ```RETURN```: Number of blocks to wait before voting on a proposal may begin.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     uint votingDelay = gov.votingDelay();
 
 ### Web3 1.2.6
@@ -244,7 +246,7 @@ The duration of voting on a proposal, in Ethereum blocks. This can be changed th
 * ```RETURN```: The duration of voting on a proposal, in Ethereum blocks.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     uint votingPeriod = gov.votingPeriod();
 
 ### Web3 1.2.6
@@ -279,7 +281,7 @@ The proposer cannot create another proposal if they currently have a pending or 
 * ```RETURN```: The ID of the newly created proposal.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     uint proposalId = gov.propose(targets, values, signatures, calldatas, description);
 
 ### Web3 1.2.6
@@ -298,7 +300,7 @@ The queue function can be called by any Ethereum address.
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     gov.queue(proposalId);
 
 ### Web3 1.2.6
@@ -319,7 +321,7 @@ Note: this function is payable, so the Timelock contract can invoke payable func
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     gov.execute(proposalId).value(999).gas(999)();
     
 ### Web3 1.2.6
@@ -338,7 +340,7 @@ The cancel function can be called by the proposal creator, or any Ethereum addre
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     gov.cancel(proposalId);
 
 ### Web3 1.2.6
@@ -358,7 +360,7 @@ Gets the actions of a selected proposal. Pass a proposal ID and get the targets,
     Array of calldata bytes of the proposal.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     uint proposalId = 123;
     (address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas) = gov.getActions(proposalId);
 
@@ -376,7 +378,7 @@ voter: Address of the account of a proposal voter.
 * ```RETURN```: Reverts on error. If successful, returns a Receipt struct for the ballot of the voter address.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     Receipt ballot = gov.getReceipt(proposalId, voterAddress);
 
 ### Web3 1.2.6
@@ -394,7 +396,7 @@ Gets the proposal state for the specified proposal. The return value, ProposalSt
 * ```proposalId```: ID of a proposal in which to get its state.
 * ```RETURN```: Enumerated type ProposalState. The types are Pending, Active, Canceled, Defeated, Succeeded, Queued, Expired, andExecuted.
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     Governance.ProposalState state = gov.state(123);
 ### Web3 1.2.6
     const proposalStates = ['Pending', 'Active', 'Canceled', 'Defeated', 'Succeeded', 'Queued', 'Expired', 'Executed'];
@@ -416,13 +418,14 @@ Once an on-chain proposal has been successfully made, 3% of the EUL supply is re
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     gov.castVote(proposalId, 1);
     
 ### Web3 1.2.6
     const tx = gov.methods.castVote(proposalId, 0).send({ from: sender });
 
-## Cast Vote
+
+## Cast Vote With Reason
 Cast a vote on a proposal with a reason attached to the vote.
 
 ### Governance
@@ -433,14 +436,14 @@ Cast a vote on a proposal with a reason attached to the vote.
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-    Governance gov = Governance(0x123...); // contract address
+    GovernorBravo gov = Governance(0x123...); // contract address
     gov.castVoteWithReason(proposalId, 2, "I think...");
 
 ### Web3 1.2.6
     const tx = gov.methods.castVoteWithReason(proposalId, 0, "I think...").send({ from: sender });
     
 ## Cast Vote By Signature
-Cast a vote on a proposal. The account's voting weight is determined by the number of votes the account had delegated at the time that proposal state became active. This method has the same purpose as Cast Vote but it instead enables offline signatures to participate in Compound governance voting. For more details on how to create an offline signature, review EIP-712.
+Cast a vote on a proposal. The account's voting weight is determined by the number of votes the account had delegated at the time that proposal state became active. This method has the same purpose as Cast Vote but it instead enables offline signatures to participate in Euler governance voting. For more details on how to create an offline signature, review EIP-712.
 
 
 ### Governance
@@ -453,7 +456,7 @@ Cast a vote on a proposal. The account's voting weight is determined by the numb
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-     Governance gov =  Governance(0x123...); // contract address
+     GovernorBravo gov =  Governance(0x123...); // contract address
     gov.castVoteBySig(proposalId, 0, v, r, s);
 ### Web3 1.2.6
     const tx = await gov.methods.castVoteBySig(proposalId, 1, v, r, s).send({});
