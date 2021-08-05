@@ -167,7 +167,7 @@ const priorVotes = await eul.methods.getPriorVotes(account, blockNumber).call();
 
 
 
-## Governanor Bravo
+## Governor Bravo
 
 Governanor Bravo is the governance module of the protocol; it allows addresses with more than 0.5% of the EUL (Euler token) total supply to propose changes to the protocol. Addresses that held voting weight, at the start of the proposal, invoked through the ```getpriorvotes``` function, can submit their votes during a 7 day voting period. If a majority, and at least 3% votes are cast for the proposal, it is queued in the Timelock, and can be implemented after 2 days.
 
@@ -371,7 +371,7 @@ Gets the actions of a selected proposal. Pass a proposal ID and get the targets,
 ## Get Receipt
 Gets a proposal ballot receipt of the indicated voter.
 
-### Governor Bravo
+### Governance
     function getReceipt(uint proposalId, address voter) returns (Receipt memory)
 * ```proposalId```: ID of the proposal in which to get a voter’s ballot receipt.
 voter: Address of the account of a proposal voter.
