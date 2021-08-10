@@ -5,10 +5,12 @@ pragma solidity ^0.8.0;
 import "../../openzeppelin-contracts/contracts/governance/extensions/GovernorTimelockControl.sol";
 import "../../openzeppelin-contracts/contracts/governance/extensions/GovernorCountingSimple.sol";
 import "../../openzeppelin-contracts/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+import "../../openzeppelin-contracts/contracts/governance/extensions/GovernorProposalThreshold.sol";
 
-contract Governance is GovernorTimelockControl, GovernorVotesQuorumFraction, GovernorCountingSimple {
+contract Governance is GovernorTimelockControl, GovernorProposalThreshold, GovernorVotesQuorumFraction, GovernorCountingSimple {
     uint256 immutable _votingDelay;
     uint256 immutable _votingPeriod;
+    uint256 immutable _proposalThreshold;
 
     constructor(
         string memory name_,
@@ -16,7 +18,8 @@ contract Governance is GovernorTimelockControl, GovernorVotesQuorumFraction, Gov
         uint256 votingDelay_,
         uint256 votingPeriod_,
         TimelockController timelock_,
-        uint256 quorumNumerator_
+        uint256 quorumNumerator_,
+        uint256 proposalThreshold_
     )
         Governor(name_)
         GovernorTimelockControl(timelock_)
@@ -25,6 +28,7 @@ contract Governance is GovernorTimelockControl, GovernorVotesQuorumFraction, Gov
     {
         _votingDelay = votingDelay_;
         _votingPeriod = votingPeriod_;
+        _proposalThreshold = proposalThreshold_;
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -66,6 +70,19 @@ contract Governance is GovernorTimelockControl, GovernorVotesQuorumFraction, Gov
     /**
      * Overriding nightmare
      */
+    function proposalThreshold() public view virtual override returns (uint256) {
+        return _proposalThreshold;
+    }
+
+    function propose(
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        string memory description
+    ) public virtual override(IGovernor, Governor, GovernorProposalThreshold) returns (uint256) {
+        return super.propose(targets, values, calldatas, description);
+    }
+
     function state(uint256 proposalId)
         public
         view
