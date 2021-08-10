@@ -17,6 +17,7 @@ async function main() {
 
     const tokenName = 'Euler';
     const tokenSymbol = 'EUL';
+    const totalSupply = '100000000000000000000';
 
     const minDelay = 3600;
 
@@ -28,20 +29,19 @@ async function main() {
     const [root, ...accounts] = await hre.ethers.getSigners();
     
     // Deploy Timelock contract
-    const Timelock = await hre.ethers.getContractFactory("TimelockController");
+    const Timelock = await hre.ethers.getContractFactory("Timelock");
     const timelock = await Timelock.deploy(minDelay, [], []);
     await timelock.deployed();
     console.log("Timelock deployed to:", timelock.address);
 
     // Deploy Euler token contract
-    const Euler = await hre.ethers.getContractFactory("ERC20VotesMock");
-    const euler = await Euler.deploy(tokenName, tokenSymbol);
+    const Euler = await hre.ethers.getContractFactory("EulerToken");
+    const euler = await Euler.deploy(tokenName, tokenSymbol, totalSupply);
     await euler.deployed();
     console.log("Euler token deployed to:", euler.address);
-    // todo - setup total supply and allocate to msgSender
 
     // Deploy Governance contract
-    const Governance = await hre.ethers.getContractFactory("GovernorTimelockControlMock");
+    const Governance = await hre.ethers.getContractFactory("Governance");
     const governance = await Governance.deploy(
         name, euler.address, votingDelay, 
         votingPeriod, timelock.address, 
