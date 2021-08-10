@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-import "../utils/cryptography/ECDSA.sol";
-import "../utils/cryptography/draft-EIP712.sol";
-import "../utils/introspection/ERC165.sol";
-import "../utils/math/SafeCast.sol";
-import "../utils/Address.sol";
-import "../utils/Context.sol";
-import "../utils/Timers.sol";
+import "../../openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+import "../../openzeppelin-contracts/contracts/utils/cryptography/draft-EIP712.sol";
+import "../../openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import "../../openzeppelin-contracts/contracts/utils/math/SafeCast.sol";
+import "../../openzeppelin-contracts/contracts/utils/Address.sol";
+import "../../openzeppelin-contracts/contracts/utils/Context.sol";
+import "../../openzeppelin-contracts/contracts/utils/Timers.sol";
 import "./IGovernor.sol";
 
 /**
