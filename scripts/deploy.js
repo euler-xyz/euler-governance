@@ -4,6 +4,7 @@
 // When running the script with `hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 async function main() {
     // Hardhat always runs the compile task when running scripts with its command
@@ -49,10 +50,14 @@ async function main() {
     );
     await governance.deployed();
     console.log("Governance deployed to:", governance.address);
-    // todo - setup roles in timelock contract
+
     // Proposer role - governor instance 
-    // Executor role - governor instance
-    // Admin role - deployer and timelock instance <address(this)>
+    await timelock.grantRole(await timelock.PROPOSER_ROLE(), governance.address);
+    // Executor role - governor instance or zero address
+    await timelock.grantRole(await timelock.EXECUTOR_ROLE(), constants.ZERO_ADDRESS);
+    // Admin role - deployer and timelock instance itself <address(this)> 
+    // deployer can give up the role
+    // await timelock.revokeRole(await timelock.TIMELOCK_ADMIN_ROLE(), root.address);
 
 }
 
