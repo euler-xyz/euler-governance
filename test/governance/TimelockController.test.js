@@ -3,7 +3,7 @@ const { ZERO_BYTES32 } = constants;
 
 const { expect } = require('chai');
 
-const TimelockController = artifacts.require('TimelockController');
+const TimelockController = artifacts.require('contracts/governance/TimelockController.sol:TimelockController');
 const CallReceiverMock = artifacts.require('CallReceiverMock');
 const Implementation2 = artifacts.require('Implementation2');
 const MINDELAY = time.duration.days(1);
