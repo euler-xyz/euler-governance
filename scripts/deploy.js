@@ -5,6 +5,7 @@
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
 const { constants } = require('@openzeppelin/test-helpers');
+const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 
 async function main() {
     // Hardhat always runs the compile task when running scripts with its command
@@ -18,7 +19,7 @@ async function main() {
 
     const tokenName = 'Euler';
     const tokenSymbol = 'EUL';
-    const totalSupply = '100000000000000000000';
+    const totalSupply = web3.utils.toWei('100');
 
     const minDelay = 3600;
 
@@ -40,6 +41,7 @@ async function main() {
     const euler = await Euler.deploy(tokenName, tokenSymbol, totalSupply);
     await euler.deployed();
     console.log("Euler token deployed to:", euler.address);
+    console.log("Deployer Euler token balance:", web3.utils.fromWei((await euler.balanceOf(root.address)).toString()));
 
     // Deploy Governance contract
     const Governance = await hre.ethers.getContractFactory("Governance");
