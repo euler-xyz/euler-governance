@@ -25,7 +25,8 @@ async function main() {
 
     const votingDelay = 4; // blocks
     const votingPeriod = 16; // blocks
-    const quorumNumerator = 4; // 4%, denominator = 100
+    const quorumNumerator = 4; // 4% quorum, denominator = 100
+    const proposalThreshold = web3.utils.toWei('10');
 
     // getting accounts
     const [root, ...accounts] = await hre.ethers.getSigners();
@@ -48,7 +49,7 @@ async function main() {
     const governance = await Governance.deploy(
         name, euler.address, votingDelay, 
         votingPeriod, timelock.address, 
-        quorumNumerator
+        quorumNumerator, proposalThreshold
     );
     await governance.deployed();
     console.log("Governance deployed to:", governance.address);
@@ -56,11 +57,10 @@ async function main() {
     // Proposer role - governor instance 
     await timelock.grantRole(await timelock.PROPOSER_ROLE(), governance.address);
     // Executor role - governor instance or zero address
-    await timelock.grantRole(await timelock.EXECUTOR_ROLE(), constants.ZERO_ADDRESS);
+    await timelock.grantRole(await timelock.EXECUTOR_ROLE(), governance.address);
     // Admin role - deployer and timelock instance itself <address(this)> 
     // deployer can give up the role
     // await timelock.revokeRole(await timelock.TIMELOCK_ADMIN_ROLE(), root.address);
-
 }
 
 // We recommend this pattern to be able to use async/await everywhere
