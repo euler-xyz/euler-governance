@@ -23,5 +23,6 @@ ganache-cli
 
 run tests
 ```
-npm run test
+npx hardhat test 
+
 ```
