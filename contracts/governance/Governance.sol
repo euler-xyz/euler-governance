@@ -68,7 +68,7 @@ contract Governance is GovernorTimelockControl, GovernorProposalThreshold, Gover
     }
 
     /**
-     * Overriding nightmare
+     * Overriden functions
      */
     function proposalThreshold() public view virtual override returns (uint256) {
         return _proposalThreshold;

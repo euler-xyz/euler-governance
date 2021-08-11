@@ -21,11 +21,11 @@ async function main() {
     const tokenSymbol = 'EUL';
     const totalSupply = web3.utils.toWei('100');
 
-    const minDelay = 3600;
+    const minDelay = 3600; // execution delay in seconds
 
-    const votingDelay = 4; // blocks
+    const votingDelay = 4; // blocks - voting delay
     const votingPeriod = 16; // blocks
-    const quorumNumerator = 4; // 4% quorum, denominator = 100
+    const quorumNumerator = 5; // 5% quorum, denominator = 100
     const proposalThreshold = web3.utils.toWei('10');
 
     // getting accounts
