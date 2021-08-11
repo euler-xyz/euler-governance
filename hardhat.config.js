@@ -12,7 +12,7 @@ task('accounts', 'Prints the list of accounts', async () => {
   }
 });
 
-task("Deploy", "Deploys the governance system with command line parameters")
+/* task("Deploy", "Deploys the governance system with command line parameters")
 .addParam("token", "The address to receive the initial supply")
 .addParam("timelock", "The timelock administrator")
 .addParam("guardian", "The governor guardian").setAction(async taskArgs => {
@@ -27,7 +27,7 @@ task("Deploy", "Deploys the governance system with command line parameters")
 
     // usage:
     // npx hardhat Deploy --token 0xAddressToReceivetokens --timelock 0xAddressTimeLockAdmin --guardian 0xAddressGovernorAlphaAdmin --network rinkeby
-})
+}) */
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more

@@ -58,6 +58,9 @@ The image below shows the top voters on proposals created for the Compound proto
 Users can also view the total percentage of votes in support or against a specific proposal as shown in the image below:
 ![Figure 3. Percentage of Votes in Support or Against a Proposal](./images/votes_in_support_against.png)
 
+And when voting, users have the option to vote for or against a proposal or an abstain vote as shown in the image below:
+![Figure 4. For, Against and Abstain Voting Options on the Tally User Interface](./images/tally-vote.png)
+
 Full Tally documentation can be accessed online at: [Tally](https://docs.withtally.com). The documentation describes how to navigate the web app, voting and delegation and creating a Tally account.
 
 
@@ -67,7 +70,7 @@ Snapshot is an off-chain, gasless, multi-governance community polling dashboard.
 It is described by Cointelegraph as a [“governance-as-a-service” provider for a number of decentralized finance projects, including Yearn.finance, SushiSwap, Balancer, Aave, Cream and others](https://cointelegraph.com/news/gnosis-and-snapshot-create-tool-to-bind-defi-governance-votes-on-chain). It provides a simple interface to create governance proposals and lets users vote on them by connecting their wallets and the governance tokens contained within. However, the actual voting process is conducted off-chain to save on gas costs and complexity.
 
 The image below shows the Snapshot user interface:
-![Figure 4. Snapshot User Interface](./images/snapshot_ui.png)
+![Figure 5. Snapshot User Interface](./images/snapshot_ui.png)
 
 Snapshot proposals are not binding. Team members and multisignature key holders for the projects are expected to execute the proposals, but the process relies entirely on their goodwill. Full Snapshot documentation can be accessed online at: [Snapshot](https://docs.snapshot.org).
 
@@ -415,6 +418,7 @@ Once an on-chain proposal has been successfully made, 3% of the EUL supply is re
 * ```proposalId```: ID of a proposal in which to cast a vote.
 * ```support```: An integer of 0 for against, 1 for in-favor, and 2 for abstain.
 * ```RETURN```: No return, reverts on error.
+
 
 ### Solidity
     GovernorBravo gov = Governance(0x123...); // contract address
