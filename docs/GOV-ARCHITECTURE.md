@@ -8,7 +8,7 @@
     * [Delegate](#delegate)
     * [Delegate by Signature](#delegate-by-signature)
     * [Get Current Votes](#get-current-votes)
-    * [Get Prior Votes](#get-prior-votes)
+    * [Get Past Votes](#get-prior-votes)
 * [Key Events](#key-events)
 * [Governor](#governor)
     * [Quorum Votes](#quorum-votes)
@@ -125,34 +125,34 @@ Delegate votes from the signatory to the delegatee. This method has the same pur
 Gets the balance of votes for an account as of the current block.
 
 #### EUL
-    function getCurrentVotes(address account) returns (uint96)
+    function getVotes(address account) returns (uint96)
 * ```account```: Address of the account in which to retrieve the number of votes.
 * ```RETURN```: The number of votes (integer).
 
 #### Solidity
     EUL eul = EUL(0x123...); // contract address
-    uint votes = eul.getCurrentVotes(0xabc...);
+    uint votes = eul.getVotes(0xabc...);
 
 #### Web3 1.2.6
     const account = '0x123...'; // contract address
-    const votes = await eul.methods.getCurrentVotes(account).call();
+    const votes = await eul.methods.getVotes(account).call();
 
 
-### Get Prior Votes
+### Get Past Votes
 Gets the prior number of votes for an account at a specific block number. The block number passed must be a finalized block or the function will revert.
 
 #### EUL
-    function getPriorVotes(address account, uint blockNumber) returns (uint96)
+    function getPastVotes(address account, uint blockNumber) returns (uint96)
 * ```account```: Address of the account in which to retrieve the prior number of votes.
 * ```blockNumber```: The block number at which to retrieve the prior number of votes.
 * ```RETURN```: The number of prior votes.
 
 #### Solidity
     EUL eul = EUL(0x123...); // contract address
-    uint priorVotes = eul.getPriorVotes(account, blockNumber);
+    uint pastVotes = eul.getPastVotes(account, blockNumber);
 
 #### Web3 1.2.6
-const priorVotes = await eul.methods.getPriorVotes(account, blockNumber).call();
+const pastVotes = await eul.methods.getPastVotes(account, blockNumber).call();
 
 
 ### Key Events
