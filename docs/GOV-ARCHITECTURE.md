@@ -348,20 +348,19 @@ The proposer cannot create another proposal if they currently have a pending or 
 
 #### Governance
 
-    function propose(address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas, string memory description) returns (uint)
+    function propose(address[] memory targets, uint[] memory values, bytes[] memory calldatas, string memory description) returns (uint)
 * ```targets```: The ordered list of target addresses for calls to be made during proposal execution. This array must be the same length as all other array parameters in this function.
 * ```values```: The ordered list of values (i.e. msg.value) to be passed to the calls made during proposal execution. This array must be the same length as all other array parameters in this function.
-* ```signatures```: The ordered list of function signatures to be passed during execution. This array must be the same length as all other array parameters in this function.
 * ```calldatas```: The ordered list of data to be passed to each individual function call during proposal execution. This array must be the same length as all other array parameters in this function.
 * ```description```: A human readable description of the proposal and the changes it will enact.
 * ```RETURN```: The ID of the newly created proposal.
 
 #### Solidity
     Governor gov = Governor(0x123...); // contract address
-    uint proposalId = gov.propose(targets, values, signatures, calldatas, description);
+    uint proposalId = gov.propose(targets, values, calldatas, description);
 
 #### Web3 1.2.6
-    const tx = gov.methods.propose(targets, values, signatures, calldatas, description).send({ from: sender });
+    const tx = gov.methods.propose(targets, values, calldatas, description).send({ from: sender });
 
 
 ### Hash Proposal
