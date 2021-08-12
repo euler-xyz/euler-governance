@@ -235,7 +235,7 @@ NOTE: The string can be decoded by the standard [`URLSearchParams`](https://deve
 ### Quorum Votes
 
 The required minimum number of votes required for a proposal to succeed.
-Note: The `blockNumber` parameter corresponds to the snaphot used for counting vote. This allows to scale the quroum depending on values such as the totalSupply of a token at this block (see {ERC20Votes}).
+Note: The `blockNumber` parameter corresponds to the snaphot used for counting vote. This allows to scale the quroum depending on values such as the totalSupply of a token at this block (see the openzeppelin [ERC20Votes](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/extensions/ERC20Votes.sol) abstract contract).
 
 #### Governance
     function quorum(uint blockNumber) public pure returns (uint)
