@@ -9,8 +9,8 @@
 * [Delegate by Signature](#delegate-by-signature)
 * [Get Current Votes](#get-current-votes)
 * [Get Prior Votes](#get-prior-votes)
-* [Governor](#governor)
 * [Key Events](#key-events)
+* [Governor](#governor)
 * [Quorum Votes](#quorum-votes)
 * [Proposal Threshold](#proposal-threshold)
 * [Proposal Max Operations](#proposal-max-operations)
@@ -155,11 +155,6 @@ Gets the prior number of votes for an account at a specific block number. The bl
 const priorVotes = await eul.methods.getPriorVotes(account, blockNumber).call();
 
 
-## Governor
-
-Governor is the governance module of the protocol; it allows addresses with more than 0.5% of the EUL (Euler token) total supply to propose changes to the protocol. Addresses that held voting weight, at the start of the proposal, invoked through the ```getpriorvotes``` function, can submit their votes during a 7 day voting period. If a majority, and at least 3% votes are cast for the proposal, it is queued in the Timelock, and can be implemented after 2 days.
-
-
 ## Key Events
 
 | Event                                                                                                                                                                    | Description                                                            |
@@ -171,6 +166,12 @@ Governor is the governance module of the protocol; it allows addresses with more
 | ProposalCanceled(uint id)                                                                                                                                                | An event emitted when a proposal has been canceled.                    | 
 | ProposalQueued(uint id, uint eta)                                                                                                                                        | An event emitted when a proposal has been queued in the Timelock.      |  
 | ProposalExecuted(uint id)                                                                                                                                                | An event emitted when a proposal has been executed in the Timelock.    |   |
+
+
+
+## Governor
+
+Governor is the governance module of the protocol; it allows addresses with more than 0.5% of the EUL (Euler token) total supply to propose changes to the protocol. Addresses that held voting weight, at the start of the proposal, invoked through the ```getpriorvotes``` function, can submit their votes during a 7 day voting period. If a majority, and at least 3% votes are cast for the proposal, it is queued in the Timelock, and can be implemented after 2 days.
 
 
 ## Quorum Votes
