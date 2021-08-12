@@ -15,6 +15,8 @@
     * [Version](#version)
     * [Counting Mode](#counting-mode)
     * [Quorum Votes](#quorum-votes)
+    * [Timelock (Governance)](#timelock-governance)
+    * [Proposal ETA](#proposal-eta)
     * [Proposal Snapshot](#proposal-snapshot)
     * [Proposal Deadline](#proposal-deadline)
     * [Proposal Threshold](#proposal-threshold)
@@ -248,6 +250,36 @@ Note: The `blockNumber` parameter corresponds to the snaphot used for counting v
 
 #### Web3 1.2.6
     const quorum = await gov.methods.quorumVotes(blockNumber).call();
+
+
+### Timelock (Governance)
+Public accessor to check the address of the timelock.
+
+#### Governance
+    function timelock() returns (address)
+* ```RETURN```: The address of the timelock contract used by the Governance contract for proposal queueing and execution.
+
+#### Solidity
+    Governor gov = Governor(0x123...); // contract address
+    uint timelock = gov.timelock();
+
+#### Web3 1.2.6
+    const timelock = await gov.methods.timelock().call();
+
+
+### Proposal ETA
+Public accessor to check the eta of a queued proposal.
+
+#### Governance
+    function proposalEta() returns (address)
+* ```RETURN```: The eta of a queued proposal.
+
+#### Solidity
+    Governor gov = Governor(0x123...); // contract address
+    uint proposalEta = gov.proposalEta();
+
+#### Web3 1.2.6
+    const proposalEta = await gov.methods.proposalEta().call();
 
 
 ### Proposal Threshold
