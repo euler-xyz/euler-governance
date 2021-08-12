@@ -176,18 +176,20 @@ Governor is the governance module of the protocol; it allows addresses with more
 
 ### Quorum Votes
 
-The required minimum number of votes in support of a proposal for it to succeed.
+The required minimum number of votes required for a proposal to succeed.
+Note: The `blockNumber` parameter corresponds to the snaphot used for counting vote. This allows to scale the quroum depending on values such as the totalSupply of a token at this block (see {ERC20Votes}).
 
 #### Governance
-    function quorumVotes() public pure returns (uint)
+    function quorum(uint blockNumber) public pure returns (uint)
+* ```blockNumber```: The block number at which to retrieve the quorum.
 * ```RETURN```: The minimum number of votes required for a proposal to succeed.
 
 #### Solidity
     Governor gov = Governor(0x123...); // contract address
-    uint quorum = gov.quorumVotes();
+    uint quorum = gov.quorumVotes(blockNumber);
 
 #### Web3 1.2.6
-    const quorum = await gov.methods.quorumVotes().call();
+    const quorum = await gov.methods.quorumVotes(blockNumber).call();
 
 
 ### Proposal Threshold
