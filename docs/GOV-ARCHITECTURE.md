@@ -12,8 +12,9 @@
 * [Key Events](#key-events)
 * [Governor](#governor)
     * [Quorum Votes](#quorum-votes)
+    * [Proposal Snapshot](#proposal-snapshot)
+    * [Proposal Deadline](#proposal-deadline)
     * [Proposal Threshold](#proposal-threshold)
-    * [Proposal Max Operations](#proposal-max-operations)
     * [Voting Delay](#voting-delay)
     * [Voting Period](#voting-period)
     * [Propose](#propose)
@@ -213,16 +214,38 @@ The minimum number of votes required for an account to create a proposal. This c
 The maximum number of actions that can be included in a proposal. Actions are functions calls that will be made when a proposal succeeds and executes.
 
 
+### Proposal Snapshot 
+
+The block number used to retried user's votes and quorum.
+
 #### Governance
-    function proposalMaxOperations() returns (uint)
-* ```RETURN```: The maximum number of actions that can be included in a proposal.
+    function proposalSnapshot(uint256 proposalId) returns (uint)
+* ```proposalId```: The proposal ID
+* ```RETURN```: Block number.
 
 #### Solidity
     Governor gov = Governor(0x123...); // contract address
-    uint operations = gov.proposalMaxOperations();
+    uint snapshot = gov.proposalSnapshot(proposalId);
 
 #### Web3 1.2.6
-    const operations = await gov.methods.proposalMaxOperations().call();
+    const snapshot = await gov.methods.proposalSnapshot(proposalId).call();
+
+
+### Proposal Deadline 
+
+The timestamp at which votes close.
+
+#### Governance
+    function proposalDeadline(uint256 proposalId) returns (uint)
+* ```proposalId```: The proposal ID
+* ```RETURN```: Timestamp at which votes close.
+
+#### Solidity
+    Governor gov = Governor(0x123...); // contract address
+    uint deadline = gov.proposalDeadline(proposalId);
+
+#### Web3 1.2.6
+    const deadline = await gov.methods.proposalDeadline(proposalId).call();
 
 
 ### Voting Delay
