@@ -81,29 +81,29 @@ Snapshot proposals are not binding. Team members and multisignature key holders 
 EUL (Euler Token) is an ERC-20 token that allows the owner to delegate voting rights to any address, including their own address. Changes to the owner’s token balance automatically adjust the voting rights of the delegate.
 
 
-## Delegate
+### Delegate
 
 Delegate votes from the sender to the delegatee. Users can delegate to 1 address at a time, and the number of votes added to the delegatee’s vote count is equivalent to the balance of EUL in the user’s account. Votes are delegated from the current block and onward, until the sender delegates again, or transfers their EUL.
 
-### EUL
+#### EUL
     function delegate(address delegatee)
 * ```delegatee```: The address in which the sender wishes to delegate their votes to.
 * ```msg.sender```: The address of the COMP token holder that is attempting to delegate their votes.
 * ```RETURN```: No return, reverts on error.
 
-### Solidity
+#### Solidity
     EUL eul = EUL(0x123...); // contract address
     eul.delegate(delegateeAddress);
 
-### Web3 1.2.6
+#### Web3 1.2.6
     const tx = await eul.methods.delegate(delegateeAddress).send({ from: sender });
 
 
-## Delegate By Signature
+### Delegate By Signature
 
 Delegate votes from the signatory to the delegatee. This method has the same purpose as Delegate but it instead enables offline signatures to participate in Euler governance vote delegation. For more details on how to create an offline signature, review [EIP-712](https://eips.ethereum.org/EIPS/eip-712).
 
-### EUL
+#### EUL
     function delegateBySig(address delegatee, uint nonce, uint expiry, uint8 v, bytes32 r, bytes32 s)
 * ```delegatee```: The address in which the sender wishes to delegate their votes to.
 * ```nonce```: The contract state required to match the signature. This can be retrieved from the contract’s public nonces mapping.
@@ -113,49 +113,49 @@ Delegate votes from the signatory to the delegatee. This method has the same pur
 * ```s```: Half of the ECDSA signature pair.
 * ```RETURN```: No return, reverts on error.
 
-### Solidity
+#### Solidity
     EUL eul = EUL(0x123...); // contract address
     eul.delegateBySig(delegateeAddress, nonce, expiry, v, r, s);
 
-### Web3 1.2.6
+#### Web3 1.2.6
     const tx = await eul.methods.delegateBySig(delegateeAddress, nonce, expiry, v, r, s).send({});
 
 
-## Get Current Votes 
+### Get Current Votes 
 Gets the balance of votes for an account as of the current block.
 
-### EUL
+#### EUL
     function getCurrentVotes(address account) returns (uint96)
 * ```account```: Address of the account in which to retrieve the number of votes.
 * ```RETURN```: The number of votes (integer).
 
-### Solidity
+#### Solidity
     EUL eul = EUL(0x123...); // contract address
     uint votes = eul.getCurrentVotes(0xabc...);
 
-### Web3 1.2.6
+#### Web3 1.2.6
     const account = '0x123...'; // contract address
     const votes = await eul.methods.getCurrentVotes(account).call();
 
 
-## Get Prior Votes
+### Get Prior Votes
 Gets the prior number of votes for an account at a specific block number. The block number passed must be a finalized block or the function will revert.
 
-### EUL
+#### EUL
     function getPriorVotes(address account, uint blockNumber) returns (uint96)
 * ```account```: Address of the account in which to retrieve the prior number of votes.
 * ```blockNumber```: The block number at which to retrieve the prior number of votes.
 * ```RETURN```: The number of prior votes.
 
-### Solidity
+#### Solidity
     EUL eul = EUL(0x123...); // contract address
     uint priorVotes = eul.getPriorVotes(account, blockNumber);
 
-### Web3 1.2.6
+#### Web3 1.2.6
 const priorVotes = await eul.methods.getPriorVotes(account, blockNumber).call();
 
 
-## Key Events
+### Key Events
 
 | Event                                                                                                                                                                    | Description                                                            |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
