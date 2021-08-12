@@ -18,6 +18,7 @@
     * [Voting Delay](#voting-delay)
     * [Voting Period](#voting-period)
     * [Propose](#propose)
+    * [Hash Proposal](#hash-proposal)
     * [Queue](#queue)
     * [Execute](#execute)
     * [Cancel](#cancel)
@@ -174,6 +175,59 @@ const pastVotes = await eul.methods.getPastVotes(account, blockNumber).call();
 
 Governor is the governance module of the protocol; it allows addresses with more than 0.5% of the EUL (Euler token) total supply to propose changes to the protocol. Addresses that held voting weight, at the start of the proposal, invoked through the ```getpriorvotes``` function, can submit their votes during a 7 day voting period. If a majority, and at least 3% votes are cast for the proposal, it is queued in the Timelock, and can be implemented after 2 days.
 
+### Name
+
+Name of the governor instance (used in building the ERC712 domain separator).
+
+#### Governance
+    function name() returns (string)
+* ```RETURN```: Name of the governor instance (used in building the ERC712 domain separator).
+
+#### Solidity
+    Governor gov = Governor(0x123...); // contract address
+    uint name = gov.name();
+
+#### Web3 1.2.6
+    const name = await gov.methods.name().call();
+
+
+### Version
+Version of the governor instance (used in building the ERC712 domain separator). Default: "1".
+
+#### Governance
+    function version() returns (string)
+* ```RETURN```:  Version of the governor instance (used in building the ERC712 domain separator). Default: "1".
+
+#### Solidity
+    Governor gov = Governor(0x123...); // contract address
+    uint version = gov.version();
+
+#### Web3 1.2.6
+    const version = await gov.methods.version().call();
+
+
+### Counting Mode 
+
+A description of the possible `support` values for {castVote} and the way these votes are counted, meant to be consumed by UIs to show correct vote options and interpret the results. The string is a URL-encoded sequence of key-value pairs that each describe one aspect, for example `support=bravo&quorum=for,abstain`.
+
+There are 2 standard keys: `support` and `quorum`.
+* - `support=bravo` refers to the vote options 0 = For, 1 = Against, 2 = Abstain, as in `GovernorBravo`.
+* - `quorum=bravo` means that only For votes are counted towards quorum.
+* - `quorum=for,abstain` means that both For and Abstain votes are counted towards quorum.
+
+NOTE: The string can be decoded by the standard [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) JavaScript class.
+
+#### Governance
+    function COUNTING_MODE() returns (string)
+* ```RETURN```:  
+
+#### Solidity
+    Governor gov = Governor(0x123...); // contract address
+    uint counting_mode = gov.COUNTING_MODE();
+
+#### Web3 1.2.6
+    const counting_mode = await gov.methods.COUNTING_MODE().call();
+
 
 ### Quorum Votes
 
@@ -209,17 +263,12 @@ The minimum number of votes required for an account to create a proposal. This c
     const threshold = await gov.methods.proposalThreshold().call();
 
 
-### Proposal Max Operations
-
-The maximum number of actions that can be included in a proposal. Actions are functions calls that will be made when a proposal succeeds and executes.
-
-
 ### Proposal Snapshot 
 
 The block number used to retried user's votes and quorum.
 
 #### Governance
-    function proposalSnapshot(uint256 proposalId) returns (uint)
+    function proposalSnapshot(uint proposalId) returns (uint)
 * ```proposalId```: The proposal ID
 * ```RETURN```: Block number.
 
@@ -236,7 +285,7 @@ The block number used to retried user's votes and quorum.
 The timestamp at which votes close.
 
 #### Governance
-    function proposalDeadline(uint256 proposalId) returns (uint)
+    function proposalDeadline(uint proposalId) returns (uint)
 * ```proposalId```: The proposal ID
 * ```RETURN```: Timestamp at which votes close.
 
@@ -315,6 +364,30 @@ The proposer cannot create another proposal if they currently have a pending or 
     const tx = gov.methods.propose(targets, values, signatures, calldatas, description).send({ from: sender });
 
 
+### Hash Proposal
+
+Hashing function used to (re)build the proposal id from the proposal details.
+
+    function hashProposal(
+        address[] calldata targets,
+        uint256[] calldata values,
+        bytes[] calldata calldatas,
+        bytes32 descriptionHash
+    ) public pure virtual returns (uint)
+* ```targets```: The ordered list of target addresses for calls to be made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```values```: The ordered list of values (i.e. msg.value) to be passed to the calls made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```calldatas```: The ordered list of data to be passed to each individual function call during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```descriptionHash```: A hash of the human readable description of the proposal and the changes it will enact.
+* ```RETURN```: The ID of the proposal.
+
+#### Solidity
+    Governor gov = Governor(0x123...); // contract address
+    uint proposalId = gov.hashProposal(targets, values, calldatas, description);
+
+#### Web3 1.2.6
+    const proposalId = gov.methods.hashProposal(targets, values, calldatas, descriptionHash).call();
+
+
 ### Queue
 
 After a proposal has succeeded, it is moved into the Timelock waiting period using this function. The waiting period (e.g. 2 days) begins when this function is called.
@@ -377,7 +450,7 @@ The cancel function can be called by the proposal creator, or any Ethereum addre
 Returns weither an address has casted a vote on a proposal ID.
 
 #### Governance
-    function hasVoted(uint256 proposalId, address voterAddress) returns (bool)
+    function hasVoted(uint proposalId, address voterAddress) returns (bool)
 * ```proposalId```: ID of the proposal in which to get a voter’s ballot receipt.
 * ```voterAddress```: Address of the account of a proposal voter.
 * ```RETURN```: true or false.
