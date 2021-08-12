@@ -11,6 +11,9 @@
     * [Get Past Votes](#get-past-votes)
 * [Key Events](#key-events)
 * [Governor](#governor)
+    * [Name](#name)
+    * [Version](#version)
+    * [Counting Mode](#counting-mode)
     * [Quorum Votes](#quorum-votes)
     * [Proposal Snapshot](#proposal-snapshot)
     * [Proposal Deadline](#proposal-deadline)
@@ -394,16 +397,19 @@ After a proposal has succeeded, it is moved into the Timelock waiting period usi
 The queue function can be called by any Ethereum address.
 
 #### Governance
-    function queue()
-* ```proposalId```: ID of a proposal that has succeeded.
-* ```RETURN```: No return, reverts on error.
+    function queue(address[] memory targets, uint[] memory values, bytes[] memory calldatas, string memory description) returns (uint)
+* ```targets```: The ordered list of target addresses for calls to be made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```values```: The ordered list of values (i.e. msg.value) to be passed to the calls made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```calldatas```: The ordered list of data to be passed to each individual function call during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```description```: A human readable description of the proposal and the changes it will enact.
+* ```RETURN```: The ID of the newly created proposal.
 
 #### Solidity
     Governor gov = Governor(0x123...); // contract address
-    gov.queue(proposalId);
+    gov.queue(targets, values, calldatas, description);
 
 #### Web3 1.2.6
-    const tx = await gov.methods.queue(proposalId).send({ from: sender });
+    const tx = await gov.methods.queue(targets, values, calldatas, description).send({ from: sender });
 
 
 ### Execute
@@ -415,16 +421,19 @@ The execute function can be called by any Ethereum address.
 Note: this function is payable, so the Timelock contract can invoke payable functions that were selected in the proposal.
 
 #### Governance
-    function execute(uint proposalId) payable
-* ```proposalId```: ID of a succeeded proposal to execute.
-* ```RETURN```: No return, reverts on error.
+    function execute(address[] memory targets, uint[] memory values, bytes[] memory calldatas, string memory description) returns (uint)
+* ```targets```: The ordered list of target addresses for calls to be made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```values```: The ordered list of values (i.e. msg.value) to be passed to the calls made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```calldatas```: The ordered list of data to be passed to each individual function call during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```description```: A human readable description of the proposal and the changes it will enact.
+* ```RETURN```: The ID of the newly created proposal.
 
 #### Solidity
     Governor gov = Governor(0x123...); // contract address
-    gov.execute(proposalId).value(999).gas(999)();
+    gov.execute(targets, values, calldatas, description).value(999).gas(999)();
     
 #### Web3 1.2.6
-    const tx = gov.methods.execute(proposalId).send({ from: sender, value: 1 });
+    const tx = gov.methods.execute(targets, values, calldatas, description).send({ from: sender, value: 1 });
 
 
 ### Cancel
@@ -434,16 +443,19 @@ A proposal is eligible to be cancelled at any time prior to its execution, inclu
 The cancel function can be called by the proposal creator, or any Ethereum address, if the proposal creator fails to maintain more delegated votes than the proposal threshold.
 
 #### Governance
-    function cancel(uint proposalId)
-* ```proposalId```: ID of a proposal to cancel. The proposal cannot have already been executed.
-* ```RETURN```: No return, reverts on error.
+    function cancel(address[] memory targets, uint[] memory values, bytes[] memory calldatas, string memory description) returns (uint)
+* ```targets```: The ordered list of target addresses for calls to be made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```values```: The ordered list of values (i.e. msg.value) to be passed to the calls made during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```calldatas```: The ordered list of data to be passed to each individual function call during proposal execution. This array must be the same length as all other array parameters in this function.
+* ```description```: A human readable description of the proposal and the changes it will enact.
+* ```RETURN```: The ID of the newly created proposal.
 
 #### Solidity
     Governor gov = Governor(0x123...); // contract address
-    gov.cancel(proposalId);
+    gov.cancel(targets, values, calldatas, description);
 
 #### Web3 1.2.6
-    const tx = gov.methods.cancel(proposalId).send({ from: sender });
+    const tx = gov.methods.cancel(targets, values, calldatas, description).send({ from: sender });
 
 ### Has Voted
 Returns weither an address has casted a vote on a proposal ID.
