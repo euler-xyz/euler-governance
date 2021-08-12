@@ -20,8 +20,8 @@
     * [Queue](#queue)
     * [Execute](#execute)
     * [Cancel](#cancel)
-    * [Get Actions](#get-actions)
-    * [Get Receipt](#get-receipt)
+    * [Has Voted](#has-voted)
+    * [Get Votes (Governance)](#get-votes-(governance))
     * [State](#state)
     * [Cast Vote](#cast-vote)
     * [Cast Vote With Reason](#cast-vote-with-reason)
@@ -350,46 +350,41 @@ The cancel function can be called by the proposal creator, or any Ethereum addre
 #### Web3 1.2.6
     const tx = gov.methods.cancel(proposalId).send({ from: sender });
 
-
-### Get Actions
-Gets the actions of a selected proposal. Pass a proposal ID and get the targets, values, signatures and calldatas of that proposal.
-
-#### Governance
-    function getActions(uint proposalId) returns (uint proposalId) public view returns (address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas)
-* ```proposalId```: ID of a proposal in which to get its actions.
-* ```RETURN```: Reverts if the proposal ID is invalid. If successful, the following 4 references are returned.
-    Array of addresses of contracts the proposal calls.
-    Array of unsigned integers the proposal uses as values.
-    Array of strings of the proposal’s signatures.
-    Array of calldata bytes of the proposal.
-
-#### Solidity
-    Governor gov = Governor(0x123...); // contract address
-    uint proposalId = 123;
-    (address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas) = gov.getActions(proposalId);
-
-#### Web3 1.2.6
-    const {0: targets, 1: values, 2: signatures, 3: calldatas} = gov.methods.getActions(proposalId).call();
-
-
-### Get Receipt
-Gets a proposal ballot receipt of the indicated voter.
+### Has Voted
+Returns weither an address has casted a vote on a proposal ID.
 
 #### Governance
-    function getReceipt(uint proposalId, address voter) returns (Receipt memory)
+    function hasVoted(uint256 proposalId, address voterAddress) returns (bool)
 * ```proposalId```: ID of the proposal in which to get a voter’s ballot receipt.
-voter: Address of the account of a proposal voter.
-* ```RETURN```: Reverts on error. If successful, returns a Receipt struct for the ballot of the voter address.
+* ```voterAddress```: Address of the account of a proposal voter.
+* ```RETURN```: true or false.
 
 #### Solidity
     Governor gov = Governor(0x123...); // contract address
-    Receipt ballot = gov.getReceipt(proposalId, voterAddress);
+    boolean hasVoted = gov.hasVoted(proposalId, account);
 
 #### Web3 1.2.6
     const proposalId = 11;
     const voterAddress = '0x123...';
-    const result = await gov.methods.getReceipt(proposalId, voterAddress).call();
-    const { hasVoted, support, votes } = result;
+    const result = await gov.methods.hasVoted(proposalId, voterAddress).call();
+    const { hasVoted } = result;
+
+
+### Get Votes (Governance)
+Gets the prior number of votes for an account at a specific block number. The block number passed must be a finalized block or the function will revert.
+
+#### Governance
+    function getVotes(address account, uint blockNumber) returns (uint96)
+* ```account```: Address of the account in which to retrieve the prior number of votes.
+* ```blockNumber```: The block number at which to retrieve the prior number of votes.
+* ```RETURN```: The number of prior votes.
+
+#### Solidity
+    Governor gov = Governor(0x123...); // contract address
+    uint votes = gov.getVotes(account, blockNumber);
+
+#### Web3 1.2.6
+const votes = await gov.methods.getVotes(account, blockNumber).call();
 
 
 ### State
