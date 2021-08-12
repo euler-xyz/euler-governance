@@ -396,7 +396,7 @@ Gets the proposal state for the specified proposal. The return value, ProposalSt
 #### Governance
     function state(uint proposalId) returns (ProposalState)
 * ```proposalId```: ID of a proposal in which to get its state.
-* ```RETURN```: Enumerated type ProposalState. The types are Pending, Active, Canceled, Defeated, Succeeded, Queued, Expired, andExecuted.
+* ```RETURN```: Enumerated type ProposalState. The types are Pending, Active, Canceled, Defeated, Succeeded, Queued, Expired, and Executed.
 
 #### Solidity
     Governor gov = Governor(0x123...); // contract address
