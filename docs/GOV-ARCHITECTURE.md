@@ -8,7 +8,7 @@
     * [Delegate](#delegate)
     * [Delegate by Signature](#delegate-by-signature)
     * [Get Current Votes](#get-current-votes)
-    * [Get Past Votes](#get-prior-votes)
+    * [Get Past Votes](#get-past-votes)
 * [Key Events](#key-events)
 * [Governor](#governor)
     * [Quorum Votes](#quorum-votes)
