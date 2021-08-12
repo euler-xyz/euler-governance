@@ -10,7 +10,7 @@
 * [Get Current Votes](#get-current-votes)
 * [Get Prior Votes](#get-prior-votes)
 * [Key Events](#key-events)
-* [Governor Bravo](#governor-bravo)
+* [Governor](#governor)
 * [Quorum Votes](#quorum-votes)
 * [Proposal Threshold](#proposal-threshold)
 * [Proposal Max Operations](#proposal-max-operations)
@@ -169,9 +169,9 @@ const priorVotes = await eul.methods.getPriorVotes(account, blockNumber).call();
 
 
 
-## Governor Bravo
+## Governor
 
-Governanor Bravo is the governance module of the protocol; it allows addresses with more than 0.5% of the EUL (Euler token) total supply to propose changes to the protocol. Addresses that held voting weight, at the start of the proposal, invoked through the ```getpriorvotes``` function, can submit their votes during a 7 day voting period. If a majority, and at least 3% votes are cast for the proposal, it is queued in the Timelock, and can be implemented after 2 days.
+Governor is the governance module of the protocol; it allows addresses with more than 0.5% of the EUL (Euler token) total supply to propose changes to the protocol. Addresses that held voting weight, at the start of the proposal, invoked through the ```getpriorvotes``` function, can submit their votes during a 7 day voting period. If a majority, and at least 3% votes are cast for the proposal, it is queued in the Timelock, and can be implemented after 2 days.
 
 
 ## Quorum Votes
@@ -183,7 +183,7 @@ The required minimum number of votes in support of a proposal for it to succeed.
 * ```RETURN```: The minimum number of votes required for a proposal to succeed.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     uint quorum = gov.quorumVotes();
 
 ### Web3 1.2.6
@@ -199,7 +199,7 @@ The minimum number of votes required for an account to create a proposal. This c
 * ```RETURN```: The minimum number of votes required for an account to create a proposal.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     uint threshold = gov.proposalThreshold();
 
 ### Web3 1.2.6
@@ -216,7 +216,7 @@ The maximum number of actions that can be included in a proposal. Actions are fu
 * ```RETURN```: The maximum number of actions that can be included in a proposal.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     uint operations = gov.proposalMaxOperations();
 
 ### Web3 1.2.6
@@ -232,7 +232,7 @@ The number of Ethereum blocks to wait before voting on a proposal may begin. Thi
 * ```RETURN```: Number of blocks to wait before voting on a proposal may begin.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     uint votingDelay = gov.votingDelay();
 
 ### Web3 1.2.6
@@ -248,7 +248,7 @@ The duration of voting on a proposal, in Ethereum blocks. This can be changed th
 * ```RETURN```: The duration of voting on a proposal, in Ethereum blocks.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     uint votingPeriod = gov.votingPeriod();
 
 ### Web3 1.2.6
@@ -283,7 +283,7 @@ The proposer cannot create another proposal if they currently have a pending or 
 * ```RETURN```: The ID of the newly created proposal.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     uint proposalId = gov.propose(targets, values, signatures, calldatas, description);
 
 ### Web3 1.2.6
@@ -302,7 +302,7 @@ The queue function can be called by any Ethereum address.
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     gov.queue(proposalId);
 
 ### Web3 1.2.6
@@ -323,7 +323,7 @@ Note: this function is payable, so the Timelock contract can invoke payable func
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     gov.execute(proposalId).value(999).gas(999)();
     
 ### Web3 1.2.6
@@ -342,7 +342,7 @@ The cancel function can be called by the proposal creator, or any Ethereum addre
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     gov.cancel(proposalId);
 
 ### Web3 1.2.6
@@ -362,7 +362,7 @@ Gets the actions of a selected proposal. Pass a proposal ID and get the targets,
     Array of calldata bytes of the proposal.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     uint proposalId = 123;
     (address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas) = gov.getActions(proposalId);
 
@@ -380,7 +380,7 @@ voter: Address of the account of a proposal voter.
 * ```RETURN```: Reverts on error. If successful, returns a Receipt struct for the ballot of the voter address.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     Receipt ballot = gov.getReceipt(proposalId, voterAddress);
 
 ### Web3 1.2.6
@@ -398,7 +398,7 @@ Gets the proposal state for the specified proposal. The return value, ProposalSt
 * ```proposalId```: ID of a proposal in which to get its state.
 * ```RETURN```: Enumerated type ProposalState. The types are Pending, Active, Canceled, Defeated, Succeeded, Queued, Expired, andExecuted.
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     Governance.ProposalState state = gov.state(123);
 ### Web3 1.2.6
     const proposalStates = ['Pending', 'Active', 'Canceled', 'Defeated', 'Succeeded', 'Queued', 'Expired', 'Executed'];
@@ -421,7 +421,7 @@ Once an on-chain proposal has been successfully made, 3% of the EUL supply is re
 
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     gov.castVote(proposalId, 1);
     
 ### Web3 1.2.6
@@ -439,7 +439,7 @@ Cast a vote on a proposal with a reason attached to the vote.
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-    GovernorBravo gov = Governance(0x123...); // contract address
+    Governor gov = Governor(0x123...); // contract address
     gov.castVoteWithReason(proposalId, 2, "I think...");
 
 ### Web3 1.2.6
@@ -459,7 +459,7 @@ Cast a vote on a proposal. The account's voting weight is determined by the numb
 * ```RETURN```: No return, reverts on error.
 
 ### Solidity
-     GovernorBravo gov =  Governance(0x123...); // contract address
+     Governor gov =  Governor(0x123...); // contract address
     gov.castVoteBySig(proposalId, 0, v, r, s);
 ### Web3 1.2.6
     const tx = await gov.methods.castVoteBySig(proposalId, 1, v, r, s).send({});
