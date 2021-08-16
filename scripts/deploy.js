@@ -6,6 +6,8 @@
 const hre = require("hardhat");
 const { constants } = require('@openzeppelin/test-helpers');
 const { web3 } = require("@openzeppelin/test-helpers/src/setup");
+const fs = require("fs");
+
 
 async function main() {
     // Hardhat always runs the compile task when running scripts with its command
