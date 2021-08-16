@@ -1,0 +1,4 @@
+Timelock deployed to: 0xEaE6c3E1031ac58548a4d1438E5513Cfd220Bf6d
+Euler token deployed to: 0x6A46aaa25bfB3bB2Dd72f6C915fFad4339FaB168 (verified)
+Deployer Euler token balance: 100
+Governance deployed to: 0x8F665821Ac6769823027700e0dCd03b41ad5910C (verified)

@@ -17,10 +17,10 @@ async function main() {
     // manually to make sure everything is compiled
     // await hre.run('compile');
 
-    const name = 'Euler-Governor';
+    const name = 'Test-Euler-Governor';
 
-    const tokenName = 'Euler';
-    const tokenSymbol = 'EUL';
+    const tokenName = 'Test Governance Token';
+    const tokenSymbol = 'TGT';
     const totalSupply = web3.utils.toWei('100');
 
     const minDelay = 3600; // execution delay in seconds
@@ -40,7 +40,7 @@ async function main() {
     console.log("Timelock deployed to:", timelock.address);
 
     // Deploy Euler token contract
-    const Euler = await hre.ethers.getContractFactory("EulerToken");
+    const Euler = await hre.ethers.getContractFactory("TestToken");
     const euler = await Euler.deploy(tokenName, tokenSymbol, totalSupply);
     await euler.deployed();
     console.log("Euler token deployed to:", euler.address);
