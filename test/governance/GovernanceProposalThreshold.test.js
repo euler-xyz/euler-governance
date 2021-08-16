@@ -10,7 +10,7 @@ const {
   shouldSupportInterfaces,
 } = require('../utils/introspection/SupportsInterface.behavior');
 
-const Token = artifacts.require('EulerToken');
+const Token = artifacts.require('TestToken');
 const Timelock = artifacts.require('TimelockController');
 const Governor = artifacts.require('Governance');
 const CallReceiver = artifacts.require('CallReceiverMock');
