@@ -12,10 +12,10 @@ const CallReceiver = artifacts.require('CallReceiverMock');
 contract('GovernorVotesQuorumFraction', function (accounts) {
   const [ owner, voter1, voter2, voter3, voter4 ] = accounts;
 
-  const name = 'OZ-Governor';
+  const name = 'Euler-Governance';
   // const version = '1';
-  const tokenName = 'MockToken';
-  const tokenSymbol = 'MTKN';
+  const tokenName = 'Mock Eul Token';
+  const tokenSymbol = 'EUL';
   const tokenSupply = new BN(web3.utils.toWei('100'));
   const ratio = new BN(8); // percents
   const newRatio = new BN(6); // percents

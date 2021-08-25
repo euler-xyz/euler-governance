@@ -18,10 +18,10 @@ const CallReceiver = artifacts.require('CallReceiverMock');
 contract('GovernorTimelockControl', function (accounts) {
   const [ voter ] = accounts;
 
-  const name = 'OZ-Governor';
+  const name = 'Euler-Governance';
   // const version = '1';
-  const tokenName = 'MockToken';
-  const tokenSymbol = 'MTKN';
+  const tokenName = 'Mock Eul Token';
+  const tokenSymbol = 'EUL';
   const tokenSupply = web3.utils.toWei('100');
 
   beforeEach(async function () {
