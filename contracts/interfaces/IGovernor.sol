@@ -131,7 +131,7 @@ abstract contract IGovernor is IERC165 {
 
     /**
      * @notice module:user-config
-     * @dev Minimum number of casted voted requiered for a proposal to be successful.
+     * @dev Minimum number of casted votes required for a proposal to be successful.
      *
      * Note: The `blockNumber` parameter corresponds to the snaphot used for counting vote. This allows to scale the
      * quroum depending on values such as the totalSupply of a token at this block (see {ERC20Votes}).
