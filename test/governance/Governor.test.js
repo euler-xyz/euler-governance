@@ -23,7 +23,7 @@ contract('Governor', function (accounts) {
   const name = 'Euler-Governance';
   const version = '1';
   const tokenName = 'Mock Eul Token';
-  const tokenSymbol = 'EUL';
+  const tokenSymbol = 'MEUL';
   const tokenSupply = web3.utils.toWei('100');
 
   beforeEach(async function () {

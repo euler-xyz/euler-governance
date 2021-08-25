@@ -15,7 +15,7 @@ contract('GovernorVotesQuorumFraction', function (accounts) {
   const name = 'Euler-Governance';
   // const version = '1';
   const tokenName = 'Mock Eul Token';
-  const tokenSymbol = 'EUL';
+  const tokenSymbol = 'MEUL';
   const tokenSupply = new BN(web3.utils.toWei('100'));
   const ratio = new BN(8); // percents
   const newRatio = new BN(6); // percents
