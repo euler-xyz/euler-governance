@@ -19,9 +19,9 @@ async function main() {
 
     const name = 'Test-Euler-Governor';
 
-    const tokenName = 'Test Governance Token';
-    const tokenSymbol = 'TGT';
-    const totalSupply = web3.utils.toWei('100');
+    const tokenName = 'Euler';
+    const tokenSymbol = 'EUL';
+    const totalSupply = web3.utils.toWei('27182818.28');
 
     const minDelay = 3600; // execution delay in seconds
 
@@ -34,20 +34,20 @@ async function main() {
     const [root, ...accounts] = await hre.ethers.getSigners();
     
     // Deploy Timelock contract
-    const Timelock = await hre.ethers.getContractFactory("Timelock");
+    /* const Timelock = await hre.ethers.getContractFactory("Timelock");
     const timelock = await Timelock.deploy(minDelay, [], []);
     await timelock.deployed();
-    console.log("Timelock deployed to:", timelock.address);
+    console.log("Timelock deployed to:", timelock.address); */
 
     // Deploy Euler token contract
-    const Euler = await hre.ethers.getContractFactory("TestToken");
+    const Euler = await hre.ethers.getContractFactory("Euler");
     const euler = await Euler.deploy(tokenName, tokenSymbol, totalSupply);
     await euler.deployed();
     console.log("Euler token deployed to:", euler.address);
     console.log("Deployer Euler token balance:", web3.utils.fromWei((await euler.balanceOf(root.address)).toString()));
 
     // Deploy Governance contract
-    const Governance = await hre.ethers.getContractFactory("Governance");
+    /* const Governance = await hre.ethers.getContractFactory("Governance");
     const governance = await Governance.deploy(
         name, euler.address, votingDelay, 
         votingPeriod, timelock.address, 
@@ -62,7 +62,7 @@ async function main() {
     await timelock.grantRole(await timelock.EXECUTOR_ROLE(), governance.address);
     // Admin role - deployer and timelock instance itself <address(this)> 
     // deployer can give up the role
-    // await timelock.revokeRole(await timelock.TIMELOCK_ADMIN_ROLE(), root.address);
+    // await timelock.revokeRole(await timelock.TIMELOCK_ADMIN_ROLE(), root.address); */
 }
 
 // We recommend this pattern to be able to use async/await everywhere
