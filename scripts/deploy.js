@@ -21,7 +21,7 @@ async function main() {
 
     const tokenName = 'Euler';
     const tokenSymbol = 'EUL';
-    const totalSupply = web3.utils.toWei('27182818.28');
+    const totalSupply = web3.utils.toWei('27182818.284590452353602874');
 
     const minDelay = 3600; // execution delay in seconds
 
