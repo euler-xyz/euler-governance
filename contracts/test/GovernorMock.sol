@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "../../openzeppelin-contracts/contracts/governance/Governor.sol";
-import "../../openzeppelin-contracts/contracts/governance/extensions/GovernorCountingSimple.sol";
-import "../../openzeppelin-contracts/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+import "@openzeppelin/contracts/governance/Governor.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 
 contract GovernorMock is Governor, GovernorVotesQuorumFraction, GovernorCountingSimple {
     uint256 immutable _votingDelay;

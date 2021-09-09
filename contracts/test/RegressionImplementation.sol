@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 contract Implementation1 is Initializable {
     uint256 internal _value;
