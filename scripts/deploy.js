@@ -25,7 +25,7 @@ async function main() {
 
     const minDelay = 3600; // execution delay in seconds
 
-    const votingDelay = 4; // blocks - voting delay
+    const votingDelay = 4; // blocks
     const votingPeriod = 16; // blocks
     const quorumNumerator = 5; // 5% quorum, denominator = 100
     const proposalThreshold = web3.utils.toWei('10');

@@ -1,2 +1,0 @@
-Euler token deployed to: 0x1080bF875a51948D12deA06F7970eCE388683EAd
-Deployer Euler token balance: 27182818.28

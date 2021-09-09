@@ -5,18 +5,18 @@ pragma solidity ^0.8.0;
 contract CallReceiverMock {
     string public sharedAnswer;
 
-    event MockFunctionCalled();
+    event MockFunctionCalled(address caller, address callee);
 
     uint256[] private _array;
 
     function mockFunction() public payable returns (string memory) {
-        emit MockFunctionCalled();
+        emit MockFunctionCalled(msg.sender, address(this));
 
         return "0x1234";
     }
 
     function mockFunctionNonPayable() public returns (string memory) {
-        emit MockFunctionCalled();
+        emit MockFunctionCalled(msg.sender, address(this));
 
         return "0x1234";
     }

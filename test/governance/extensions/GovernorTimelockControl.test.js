@@ -9,6 +9,7 @@ const {
 const {
   shouldSupportInterfaces,
 } = require('../../utils/introspection/SupportsInterface.behavior');
+const { web3 } = require('@openzeppelin/test-helpers/src/setup');
 
 const Token = artifacts.require('ERC20VotesMock');
 const Timelock = artifacts.require('TimelockController');
@@ -100,6 +101,7 @@ contract('GovernorTimelockControl', function (accounts) {
         'ProposalExecuted',
         { proposalId: this.id },
       );
+      
       await expectEvent.inTransaction(
         this.receipts.execute.transactionHash,
         this.timelock,
@@ -110,6 +112,9 @@ contract('GovernorTimelockControl', function (accounts) {
         this.receipts.execute.transactionHash,
         this.receiver,
         'MockFunctionCalled',
+        // Note: here we check that caller is timelock and callee is the receiver address in 
+        // one of the internal transaction logs for executed proposals
+        {caller: this.timelock.address, callee: this.receiver.address}
       );
     });
     runGovernorWorkflow();
