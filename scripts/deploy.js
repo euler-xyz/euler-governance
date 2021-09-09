@@ -21,23 +21,24 @@ async function main() {
 
     const tokenName = 'Euler';
     const tokenSymbol = 'EUL';
-    const totalSupply = web3.utils.toWei('27182818.284590452353602874');
+    // const totalSupply = web3.utils.toWei('27182818.284590452353602874');
+    const totalSupply = web3.utils.toWei('1000');
 
     const minDelay = 3600; // execution delay in seconds
 
-    const votingDelay = 4; // blocks
-    const votingPeriod = 16; // blocks
-    const quorumNumerator = 5; // 5% quorum, denominator = 100
-    const proposalThreshold = web3.utils.toWei('10');
+    const votingDelay = 10; // blocks
+    const votingPeriod = 6570; // blocks, 1 day assuming 13.14 seconds per block
+    const quorumNumerator = 4; // 4% quorum, denominator = 100
+    const proposalThreshold = web3.utils.toWei('100');
 
     // getting accounts
     const [root, ...accounts] = await hre.ethers.getSigners();
     
     // Deploy Timelock contract
-    /* const Timelock = await hre.ethers.getContractFactory("Timelock");
+    const Timelock = await hre.ethers.getContractFactory("Timelock");
     const timelock = await Timelock.deploy(minDelay, [], []);
     await timelock.deployed();
-    console.log("Timelock deployed to:", timelock.address); */
+    console.log("Timelock deployed to:", timelock.address);
 
     // Deploy Euler token contract
     const Euler = await hre.ethers.getContractFactory("Euler");
@@ -47,7 +48,7 @@ async function main() {
     console.log("Deployer Euler token balance:", web3.utils.fromWei((await euler.balanceOf(root.address)).toString()));
 
     // Deploy Governance contract
-    /* const Governance = await hre.ethers.getContractFactory("Governance");
+    const Governance = await hre.ethers.getContractFactory("Governance");
     const governance = await Governance.deploy(
         name, euler.address, votingDelay, 
         votingPeriod, timelock.address, 
@@ -62,7 +63,8 @@ async function main() {
     await timelock.grantRole(await timelock.EXECUTOR_ROLE(), governance.address);
     // Admin role - deployer and timelock instance itself <address(this)> 
     // deployer can give up the role
-    // await timelock.revokeRole(await timelock.TIMELOCK_ADMIN_ROLE(), root.address); */
+    // await timelock.revokeRole(await timelock.TIMELOCK_ADMIN_ROLE(), root.address); 
+    
 }
 
 // We recommend this pattern to be able to use async/await everywhere

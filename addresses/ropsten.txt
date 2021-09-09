@@ -1,0 +1,3 @@
+Timelock deployed to: 0x5A8A6E8bDb61E49992879cbFbd070E3945Ce4463
+Euler token deployed to: 0x9064B60615447b89870f8D05F7F0a8C1edbcB4d2
+Governance deployed to: 0xD2B07E433e4F9dda20E4a523b2A60c23c7b1344C
