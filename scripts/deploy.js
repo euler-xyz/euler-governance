@@ -17,7 +17,7 @@ async function main() {
     // manually to make sure everything is compiled
     // await hre.run('compile');
 
-    const name = 'Test-Euler-Governor';
+    /* const name = 'Test-Euler-Governor';
 
     const tokenName = 'Euler';
     const tokenSymbol = 'EUL';
@@ -76,7 +76,7 @@ async function main() {
     // Admin role - deployer and timelock instance itself <address(this)> 
     // deployer can give up the role
     // await timelock.revokeRole(await timelock.TIMELOCK_ADMIN_ROLE(), root.address); 
-    
+     */
 }
 
 // We recommend this pattern to be able to use async/await everywhere

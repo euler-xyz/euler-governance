@@ -101,6 +101,9 @@ contract('GovernorTimelockControl', function (accounts) {
         'ProposalExecuted',
         { proposalId: this.id },
       );
+      // console.log('proposalId:', (this.id).toString())
+      // Note: proposal id is derived from hash of proposal info
+      // uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash)
       
       await expectEvent.inTransaction(
         this.receipts.execute.transactionHash,
