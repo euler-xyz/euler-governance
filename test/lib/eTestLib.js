@@ -57,7 +57,7 @@ async function deployGovernanceContracts(provider, wallets, tokenSetupName) {
     console.log(`Mined. Status: ${result.status}`);
     // Admin role - deployer and timelock instance itself <address(this)> 
     // deployer can give up the role
-    // await ctx.contracts.timelock.revokeRole(await timelock.TIMELOCK_ADMIN_ROLE(), root.address); 
+    // await ctx.contracts.timelock.revokeRole(await ctx.contracts.timelock.TIMELOCK_ADMIN_ROLE(), root.address); 
     
     return ctx;
 } 
