@@ -300,7 +300,7 @@ The minimum number of votes required for an account to create a proposal. This c
 
 ### Proposal Snapshot 
 
-The block number used to retried user's votes and quorum.
+The block number used to retrieve user's votes and quorum.
 
 #### Governance
     function proposalSnapshot(uint proposalId) returns (uint)
