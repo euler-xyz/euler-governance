@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract Euler is ERC20Votes, AccessControl {
+contract TestEulerInflatedToken is ERC20Votes, AccessControl {
     using SafeMath for uint256;
 
     /// @notice The role assigned to addresses allowed to call the mint function.
@@ -118,5 +118,4 @@ contract Euler is ERC20Votes, AccessControl {
     function getChainId() external view returns (uint256) {
         return block.chainid;
     }
-
 }
