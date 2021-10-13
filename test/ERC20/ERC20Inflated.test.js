@@ -62,7 +62,9 @@ contract('ERC20', function (accounts) {
         it('should emit correct event and parameters upon setting new treasury address', async function () {
             const { logs } = await this.token.updateTreasury(recipient, { from: initialHolder });
 
-            expect(await this.token.treasury()).to.be.equal(recipient);
+            expectEvent.inLogs(logs, 'TreasuryUpdated', {
+                newTreasury: recipient
+              });
         });
     });
 
@@ -124,7 +126,7 @@ contract('ERC20', function (accounts) {
             expect(now).to.be.bignumber.lessThan(await this.token._mintingRestrictedBefore())
             
             await increase(await this.token._mintingRestrictedBefore());
-            await increase(1)
+            await increase(1);
 
             await this.token.updateTreasury(recipient, {from: initialHolder});
 
@@ -143,7 +145,7 @@ contract('ERC20', function (accounts) {
              
         });
 
-        it('should update next time minting will be allowed after minting', async function () {
+        it('should increase total supply and update next time minting will be allowed after minting', async function () {
             // grant minting role
            const mintingRole = await this.token.MINTER_ROLE();
            await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
@@ -155,7 +157,7 @@ contract('ERC20', function (accounts) {
             expect(now).to.be.bignumber.lessThan(await this.token._mintingRestrictedBefore())
             
             await increase(await this.token._mintingRestrictedBefore());
-            await increase(1)
+            await increase(1);
 
             await this.token.updateTreasury(recipient, {from: initialHolder});
 
@@ -176,6 +178,55 @@ contract('ERC20', function (accounts) {
 
             expectBignumberEqual(await this.token.balanceOf(treasury), amountToMint);
              
+            expectBignumberEqual(await this.token.totalSupply(), totalSupply.add(amountToMint));
+        });
+
+        it('should mint after updating next time minting will be allowed after initial minting', async function () {
+            // grant minting role
+           const mintingRole = await this.token.MINTER_ROLE();
+           await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
+
+           let now = await latest();
+            //(console.log(now.toString()))
+            //console.log((await this.token._mintingRestrictedBefore()).toString())
+
+            expect(now).to.be.bignumber.lessThan(await this.token._mintingRestrictedBefore())
+            
+            await increase(await this.token._mintingRestrictedBefore());
+            await increase(1);
+
+            await this.token.updateTreasury(recipient, {from: initialHolder});
+
+            const treasury = await this.token.treasury();
+
+            expectBignumberEqual(await this.token.balanceOf(treasury), 0);
+
+            let totalSupply = await this.token.totalSupply();
+            let amountToMint = (totalSupply.mul(mintMaxPercent)).div(toBN(100000));
+
+            await this.token.mint({ from: initialHolder });
+
+            let nextTimeMintingAllowed = (await latest()).add(await duration.days(365));
+
+            expectBignumberEqual(await this.token._mintingRestrictedBefore(), nextTimeMintingAllowed);
+
+            expect(await this.token.MINT_MAX_PERCENT()).to.be.bignumber.equal(mintMaxPercent);
+
+            expectBignumberEqual(await this.token.balanceOf(treasury), amountToMint);
+             
+            await increase(await this.token._mintingRestrictedBefore());
+            await increase(1);
+
+            totalSupply = await this.token.totalSupply();
+            amountToMint = (totalSupply.mul(mintMaxPercent)).div(toBN(100000));
+
+            const { logs } = await this.token.mint({ from: initialHolder });
+
+            expectEvent.inLogs(logs, 'Transfer', {
+                from: ZERO_ADDRESS,
+                to: recipient,
+                value: amountToMint,
+              });
         });
 
         it('should revert if caller does not have minting permissions', async function () {
