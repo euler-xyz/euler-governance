@@ -51,10 +51,10 @@ contract Euler is ERC20Votes, AccessControl {
     /**
     * @notice Constructor.
     *
-    * @param  name          The token name, i.e., Euler.
-    * @param  symbol        The token symbol, i.e., EUL.
-    * @param  totalSupply_  Initial total token supply.
-    * @param  mintingRestrictedBefore Timestamp, before which minting is not allowed.
+    * @param  name                      The token name, i.e., Euler.
+    * @param  symbol                    The token symbol, i.e., EUL.
+    * @param  totalSupply_              Initial total token supply.
+    * @param  mintingRestrictedBefore   Timestamp, before which minting is not allowed.
     */
     constructor(
         string memory name,
