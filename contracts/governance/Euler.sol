@@ -22,7 +22,7 @@ contract Euler is ERC20Votes, AccessControl {
 
     /// @notice Cap on the percentage of the total supply that can be minted at each mint.
     /// Denominated in percentage points (units out of 100000 for division precision).
-    /// This value is set to the number e or Euler's number = 2.71828
+    /// This value is set to the number e or Euler's number = 2.71828 (%)
     uint256 public constant MINT_MAX_PERCENT = 2718;
 
     /// @notice The recipient of the minted tokens
