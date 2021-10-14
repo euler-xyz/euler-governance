@@ -14,7 +14,42 @@ const { parseEther, formatEther } = require('@ethersproject/units');
 
 const ERC20Mock = artifacts.require('TestEulerInflatedToken');
 
-contract('ERC20 token with annual inflation', function (accounts) {
+contract('ERC20 token with annual inflation: ERC20 behaviour tests', function (accounts) {
+    const [initialHolder, recipient, anotherAccount] = accounts;
+
+    const name = 'Euler';
+    const symbol = 'EUL';
+    const initialSupply = new BN(200);
+    let now, mintingRestrictedBefore;
+    const mintMaxPercent = toBN(2718);
+
+    beforeEach(async function () {
+        now = await latest();
+        mintingRestrictedBefore = now.add(duration.minutes(2));
+        this.token = await ERC20Mock.new(name, symbol, initialSupply, mintingRestrictedBefore);
+    });
+
+    it('has a name', async function () {
+        expect(await this.token.name()).to.equal(name);
+    });
+
+    it('has a symbol', async function () {
+        expect(await this.token.symbol()).to.equal(symbol);
+    });
+
+    it('has 18 decimals', async function () {
+        expect(await this.token.decimals()).to.be.bignumber.equal('18');
+    });
+
+    it('has correct minting max percent', async function () {
+        expect(await this.token.MINT_MAX_PERCENT()).to.be.bignumber.equal(mintMaxPercent);
+    });
+
+    shouldBehaveLikeERC20('ERC20', initialSupply, initialHolder, recipient, anotherAccount);
+
+})
+
+contract('ERC20 token with annual inflation: annual inflation tests', function (accounts) {
     const [initialHolder, recipient, anotherAccount] = accounts;
 
     const name = 'Euler';
