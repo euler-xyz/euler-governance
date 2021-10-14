@@ -10,15 +10,16 @@ const {
     shouldBehaveLikeERC20Transfer,
     shouldBehaveLikeERC20Approve,
 } = require('./ERC20.behavior');
+const { parseEther, formatEther } = require('@ethersproject/units');
 
 const ERC20Mock = artifacts.require('TestEulerInflatedToken');
 
-contract('ERC20', function (accounts) {
+contract('ERC20 token with annual inflation', function (accounts) {
     const [initialHolder, recipient, anotherAccount] = accounts;
 
     const name = 'Euler';
     const symbol = 'EUL';
-    const initialSupply = new BN(100);
+    const initialSupply = parseEther('200'); //new BN(200);
     let now, mintingRestrictedBefore;
     const mintMaxPercent = toBN(2718);
 
@@ -44,7 +45,7 @@ contract('ERC20', function (accounts) {
         expect(await this.token.MINT_MAX_PERCENT()).to.be.bignumber.equal(mintMaxPercent);
     });
 
-    shouldBehaveLikeERC20('ERC20', initialSupply, initialHolder, recipient, anotherAccount);
+    //shouldBehaveLikeERC20('ERC20', initialSupply, initialHolder, recipient, anotherAccount);
 
     describe('update treasury', function () {
         it('reverts if new treasury address is zero address', async function () {
@@ -136,12 +137,14 @@ contract('ERC20', function (accounts) {
 
             let totalSupply = await this.token.totalSupply();
             let amountToMint = (totalSupply.mul(mintMaxPercent)).div(toBN(100000));
-
+            
             await this.token.mint({ from: initialHolder });
 
             expect(await this.token.MINT_MAX_PERCENT()).to.be.bignumber.equal(mintMaxPercent);
 
             expectBignumberEqual(await this.token.balanceOf(treasury), amountToMint);
+
+            console.log("amount to mint", amountToMint.toString(), (await this.token.balanceOf(treasury)).toString(), formatEther(initialSupply) * 0.02718)
              
         });
 
