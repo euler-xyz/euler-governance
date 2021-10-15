@@ -4,8 +4,11 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract Euler is ERC20Votes, AccessControl {
+    using SafeMath for uint256;
+
     /// @notice The role assigned to addresses allowed to call the mint function.
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     /// @notice The role assigned to users who can call admin/restricted functions
@@ -31,7 +34,7 @@ contract Euler is ERC20Votes, AccessControl {
 
     modifier onlyMinters() {
         require(
-            hasRole(MINTER_ROLE, _msgSender()),
+            hasRole(MINTER_ROLE, msg.sender),
             "Caller does not have the MINTER_ROLE"
         );
         _;
@@ -39,7 +42,7 @@ contract Euler is ERC20Votes, AccessControl {
 
     modifier onlyAdmins() {
         require(
-            hasRole(ADMIN_ROLE, _msgSender()),
+            hasRole(ADMIN_ROLE, msg.sender),
             "Caller does not have the ADMIN_ROLE"
         );
         _;
@@ -65,12 +68,12 @@ contract Euler is ERC20Votes, AccessControl {
         );
         _mintingRestrictedBefore = mintingRestrictedBefore;
 
-        _mint(_msgSender(), totalSupply_);
+        _mint(msg.sender, totalSupply_);
 
         _setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
 
-        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        _setupRole(ADMIN_ROLE, _msgSender());
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     /**
@@ -87,11 +90,11 @@ contract Euler is ERC20Votes, AccessControl {
             'INVALID_TREASURY_ADDRESS'
         );
 
-        uint256 amount = totalSupply() * MINT_MAX_PERCENT / 100000;
+        uint256 amount = totalSupply().mul(MINT_MAX_PERCENT).div(100000);
         require(amount > 0, "CANNOT_MINT_ZERO");
 
         // Update the next allowed minting time.
-        _mintingRestrictedBefore = block.timestamp + MINT_MIN_INTERVAL;
+        _mintingRestrictedBefore = block.timestamp.add(MINT_MIN_INTERVAL);
 
         // Mint the amount.
         _mint(treasury, amount);
