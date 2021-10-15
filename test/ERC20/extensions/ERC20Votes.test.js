@@ -13,7 +13,7 @@ const queue = promisify(setImmediate);
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
 
-const { EIP712Domain, domainSeparator } = require('../../helpers/eip712');
+const { EIP712Domain, domainSeparator } = require('../../helpers/EIP712');
 
 const Delegation = [
   { name: 'delegatee', type: 'address' },
