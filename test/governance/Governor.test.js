@@ -2,7 +2,7 @@ const { BN, constants, expectEvent, expectRevert, time } = require('@openzeppeli
 const ethSigUtil = require('eth-sig-util');
 const Wallet = require('ethereumjs-wallet').default;
 const Enums = require('../helpers/enums');
-const { EIP712Domain } = require('../helpers/eip712');
+const { EIP712Domain } = require('../helpers/EIP712');
 const { fromRpcSig } = require('ethereumjs-util');
 
 const {
