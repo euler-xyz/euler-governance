@@ -112,11 +112,4 @@ contract Euler is ERC20Votes, AccessControl {
         emit TreasuryUpdated(treasury);
     }
 
-    /**
-    * @notice Returns the network chain id.
-    */
-    function getChainId() external view returns (uint256) {
-        return block.chainid;
-    }
-
 }
