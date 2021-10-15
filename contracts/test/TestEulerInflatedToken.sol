@@ -4,11 +4,8 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract TestEulerInflatedToken is ERC20Votes, AccessControl {
-    using SafeMath for uint256;
-
     /// @notice The role assigned to addresses allowed to call the mint function.
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     /// @notice The role assigned to users who can call admin/restricted functions
@@ -90,11 +87,11 @@ contract TestEulerInflatedToken is ERC20Votes, AccessControl {
             'INVALID_TREASURY_ADDRESS'
         );
 
-        uint256 amount = totalSupply().mul(MINT_MAX_PERCENT).div(100000);
+        uint256 amount = totalSupply() * MINT_MAX_PERCENT / 100000;
         require(amount > 0, "CANNOT_MINT_ZERO");
 
         // Update the next allowed minting time.
-        _mintingRestrictedBefore = block.timestamp.add(MINT_MIN_INTERVAL);
+        _mintingRestrictedBefore = block.timestamp + MINT_MIN_INTERVAL;
 
         // Mint the amount.
         _mint(treasury, amount);
