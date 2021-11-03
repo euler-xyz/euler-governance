@@ -2,7 +2,7 @@ const { BN, constants, expectEvent, expectRevert, time } = require('@openzeppeli
 const { duration } = require('@openzeppelin/test-helpers/src/time');
 const { expect } = require('chai');
 const { expectBignumberEqual } = require('../../helpers');
-const { toBN, latest } = require('../../helpers/utils');
+const { toBN, latest, shouldFailWithMessage } = require('../../helpers/utils');
 const { MAX_UINT256, ZERO_ADDRESS, ZERO_BYTES32 } = constants;
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
@@ -20,7 +20,6 @@ contract('TreasuryVester: constructor', function (accounts) {
     describe('deploy correctly and assign field variables', function () {
       beforeEach(async function () {
           this.token = await ERC20VotesMock.new(name, symbol);
-          await this.token.mint(owner, initialSupply)
           now = await latest();
           vestingBegin = now.add(await duration.minutes(5));
           vestingCliff = now.add(await duration.minutes(15));
@@ -68,7 +67,47 @@ contract('TreasuryVester: constructor', function (accounts) {
           expectBignumberEqual(await this.vesting.vestingEnd(), vestingEnd);
         })
 
+      });
+
+      describe('reverts', function () {
+          it('reverts if zero address is used as token address', async function () {
+            now = await latest();
+            vestingBegin = now.add(await duration.minutes(5));
+            vestingCliff = now.add(await duration.minutes(15));
+            vestingEnd = now.add(await duration.minutes(25))
+            await shouldFailWithMessage(
+              Vesting.new(
+                ZERO_ADDRESS, 
+                recipient, 
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd
+              ),
+              "TreasuryVester::constructor: invalid EUL token contract address"
+            );
+          });
+
+          it('reverts if vesting begins earlier than deployment block.timestamp', async function () {
+            this.token = await ERC20VotesMock.new(name, symbol);
+            now = await latest();
+            vestingBegin = now;
+            vestingCliff = now.add(await duration.minutes(15));
+            vestingEnd = now.add(await duration.minutes(25))
+            await shouldFailWithMessage(
+              Vesting.new(
+                this.token.address, 
+                recipient, 
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd
+              ),
+              "TreasuryVester::constructor: vesting begin too early"
+            );
+          });
 
       });
+
 
 });
