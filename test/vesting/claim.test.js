@@ -34,4 +34,22 @@ contract('TreasuryVester: claim', function (accounts) {
         );
     });
 
+    it('revert if vesting cliff timestamp is not reached', async function () {
+        await shouldFailWithMessage(
+            this.vesting.claim({ from: owner }),
+            "TreasuryVester::delegate: unauthorized"
+        );
+    });
+
+    // anyone can call claim() but definitely only recipient receives vested tokens
+    // receive 0 if no funds in vesting contract
+    // receive total amount vested if block.timestamp >= vestingEnd
+    // amount > 0, based on amount = vestingAmount.mul(block.timestamp - lastUpdate).div(vestingEnd - vestingBegin); 
+    // check transfer event - IERC20Votes(eul).transfer(recipient, amount);
+
+
+    // governance 
+    // can create proposal using delegation (if vested amount meets proposal threshold)
+    // reverts upon create proposal using delegation (if vested amount does not meet proposal threshold)
+    // can vote on proposal using delegation
 });
