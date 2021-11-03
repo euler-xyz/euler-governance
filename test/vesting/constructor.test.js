@@ -107,7 +107,25 @@ contract('TreasuryVester: constructor', function (accounts) {
             );
           });
 
-      });
+          it('reverts if vesting clif is greater than or equals vesting start timestamp', async function () {
+            this.token = await ERC20VotesMock.new(name, symbol);
+            now = await latest();
+            vestingBegin = now.add(await duration.minutes(15));
+            vestingCliff = now;
+            vestingEnd = now.add(await duration.minutes(25))
+            await shouldFailWithMessage(
+              Vesting.new(
+                this.token.address, 
+                recipient, 
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd
+              ),
+              "TreasuryVester::constructor: cliff is too early"
+            );
+          });
 
+      });
 
 });
