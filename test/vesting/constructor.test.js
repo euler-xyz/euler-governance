@@ -23,7 +23,7 @@ contract('TreasuryVester: constructor', function (accounts) {
           now = await latest();
           vestingBegin = now.add(await duration.minutes(5));
           vestingCliff = now.add(await duration.minutes(15));
-          vestingEnd = now.add(await duration.minutes(25))
+          vestingEnd = now.add(await duration.minutes(25));
           this.vesting = await Vesting.new(
             this.token.address, 
             recipient, 
@@ -74,7 +74,7 @@ contract('TreasuryVester: constructor', function (accounts) {
             now = await latest();
             vestingBegin = now.add(await duration.minutes(5));
             vestingCliff = now.add(await duration.minutes(15));
-            vestingEnd = now.add(await duration.minutes(25))
+            vestingEnd = now.add(await duration.minutes(25));
             await shouldFailWithMessage(
               Vesting.new(
                 ZERO_ADDRESS, 
@@ -93,7 +93,7 @@ contract('TreasuryVester: constructor', function (accounts) {
             now = await latest();
             vestingBegin = now;
             vestingCliff = now.add(await duration.minutes(15));
-            vestingEnd = now.add(await duration.minutes(25))
+            vestingEnd = now.add(await duration.minutes(25));
             await shouldFailWithMessage(
               Vesting.new(
                 this.token.address, 
@@ -107,12 +107,12 @@ contract('TreasuryVester: constructor', function (accounts) {
             );
           });
 
-          it('reverts if vesting clif is greater than or equals vesting start timestamp', async function () {
+          it('reverts if vesting clif is not greater than vesting start timestamp', async function () {
             this.token = await ERC20VotesMock.new(name, symbol);
             now = await latest();
             vestingBegin = now.add(await duration.minutes(15));
             vestingCliff = now;
-            vestingEnd = now.add(await duration.minutes(25))
+            vestingEnd = now.add(await duration.minutes(25));
             await shouldFailWithMessage(
               Vesting.new(
                 this.token.address, 
@@ -123,6 +123,25 @@ contract('TreasuryVester: constructor', function (accounts) {
                 vestingEnd
               ),
               "TreasuryVester::constructor: cliff is too early"
+            );
+          });
+
+          it('reverts if vesting end is before vesting cliff timestamp', async function () {
+            this.token = await ERC20VotesMock.new(name, symbol);
+            now = await latest();
+            vestingBegin = now.add(await duration.minutes(15));
+            vestingCliff = vestingBegin;
+            vestingEnd = now;
+            await shouldFailWithMessage(
+              Vesting.new(
+                this.token.address, 
+                recipient, 
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd
+              ),
+              "TreasuryVester::constructor: end is too early"
             );
           });
 
