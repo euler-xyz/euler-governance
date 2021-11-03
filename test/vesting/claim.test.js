@@ -1,5 +1,5 @@
 const { BN, constants, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
-const { duration } = require('@openzeppelin/test-helpers/src/time');
+const { duration, increase, increaseTo } = require('@openzeppelin/test-helpers/src/time');
 const { expect } = require('chai');
 const { expectBignumberEqual } = require('../../helpers');
 const { toBN, latest, shouldFailWithMessage } = require('../../helpers/utils');
@@ -45,8 +45,27 @@ contract('TreasuryVester: claim', function (accounts) {
         );
     });
 
+    it('revert if no funds in vesting contract', async function () {
+        let now = await latest();
+        
+        expect(now).to.be.bignumber.lessThan(vestingCliff);
+
+        await increaseTo(vestingCliff);
+        await increase(1);
+
+        now = await latest();
+
+        // vesting cliff timestamp has passed at this point
+        expect(now).to.be.bignumber.greaterThan(vestingCliff);
+
+        await shouldFailWithMessage(
+            this.vesting.claim({ from: recipient }),
+            "ERC20: transfer amount exceeds balance"
+        );
+    });
+
     // anyone can call claim() but definitely only recipient receives vested tokens
-    // receive 0 if no funds in vesting contract
+    // 
     // receive total amount vested if block.timestamp >= vestingEnd
     // amount > 0, based on amount = vestingAmount.mul(block.timestamp - lastUpdate).div(vestingEnd - vestingBegin); 
     // check transfer event - IERC20Votes(eul).transfer(recipient, amount);
