@@ -35,9 +35,13 @@ contract('TreasuryVester: claim', function (accounts) {
     });
 
     it('revert if vesting cliff timestamp is not reached', async function () {
+        let now = await latest();
+        
+        expect(now).to.be.bignumber.lessThan(vestingCliff);
+
         await shouldFailWithMessage(
             this.vesting.claim({ from: owner }),
-            "TreasuryVester::delegate: unauthorized"
+            "TreasuryVester::claim: not time yet"
         );
     });
 
