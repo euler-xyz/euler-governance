@@ -9,7 +9,7 @@ const { MAX_UINT256, ZERO_ADDRESS, ZERO_BYTES32 } = constants;
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
 const Vesting = artifacts.require('TreasuryVester');
 
-contract('TreasuryVester: delegate', function (accounts) {
+contract('TreasuryVester: claim', function (accounts) {
     const [owner, recipient, otherAccount] = accounts;
 
     const name = 'Euler';
@@ -32,35 +32,6 @@ contract('TreasuryVester: delegate', function (accounts) {
             vestingCliff,
             vestingEnd
         );
-    });
-
-    it('revert if non recipent is function caller', async function () {
-        await shouldFailWithMessage(
-            this.vesting.delegate(otherAccount, { from: owner }),
-            "TreasuryVester::delegate: unauthorized"
-        );
-    });
-
-    it('allow current recipent to execute delegate function with zero funds', async function () {
-        expect(await this.token.delegates(this.vesting.address)).to.equal(ZERO_ADDRESS);
-
-        await this.vesting.delegate(otherAccount, { from: recipient });
-
-        expect(await this.token.delegates(this.vesting.address)).to.equal(otherAccount);
-
-        expectBignumberEqual(await this.token.getVotes(otherAccount), 0);
-    });
-
-    it('allow current recipent to execute delegate function with funds', async function () {
-        expect(await this.token.delegates(this.vesting.address)).to.equal(ZERO_ADDRESS);
-
-        await this.token.mint(this.vesting.address, vestingAmount);
-
-        await this.vesting.delegate(otherAccount, { from: recipient });
-
-        expect(await this.token.delegates(this.vesting.address)).to.equal(otherAccount);
-
-        expectBignumberEqual(await this.token.getVotes(otherAccount), vestingAmount);
     });
 
 });
