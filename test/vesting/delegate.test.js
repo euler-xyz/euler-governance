@@ -41,12 +41,26 @@ contract('TreasuryVester: setRecipient', function (accounts) {
         );
     });
 
-    it('allow current recipent to execute delegate function', async function () {
+    it('allow current recipent to execute delegate function with zero funds', async function () {
         expect(await this.token.delegates(this.vesting.address)).to.equal(ZERO_ADDRESS);
 
         await this.vesting.delegate(otherAccount, { from: recipient });
 
         expect(await this.token.delegates(this.vesting.address)).to.equal(otherAccount);
+
+        expectBignumberEqual(await this.token.getVotes(otherAccount), 0);
+    });
+
+    it('allow current recipent to execute delegate function with funds', async function () {
+        expect(await this.token.delegates(this.vesting.address)).to.equal(ZERO_ADDRESS);
+
+        await this.token.mint(this.vesting.address, vestingAmount);
+
+        await this.vesting.delegate(otherAccount, { from: recipient });
+
+        expect(await this.token.delegates(this.vesting.address)).to.equal(otherAccount);
+
+        expectBignumberEqual(await this.token.getVotes(otherAccount), vestingAmount);
     });
 
 });
