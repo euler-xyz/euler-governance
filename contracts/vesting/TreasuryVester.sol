@@ -2,11 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
 contract TreasuryVester {
-    using SafeMath for uint;
-
     address public immutable eul;
     address public recipient;
 
@@ -52,7 +48,7 @@ contract TreasuryVester {
         if (block.timestamp >= vestingEnd) {
             amount = IERC20Votes(eul).balanceOf(address(this));
         } else {
-            amount = vestingAmount.mul(block.timestamp - lastUpdate).div(vestingEnd - vestingBegin);
+            amount = vestingAmount * (block.timestamp - lastUpdate) / (vestingEnd - vestingBegin);
             lastUpdate = block.timestamp;
         }
         IERC20Votes(eul).transfer(recipient, amount);
