@@ -19,6 +19,11 @@ contract('TreasuryVester: governance', function (accounts) {
     const vestingAmount = new BN(15);
     let now, vestingBegin, vestingCliff, vestingEnd;
 
+    // const Token = artifacts.require('TestToken');
+    const Timelock = artifacts.require('TimelockController');
+    const Governor = artifacts.require('Governance');
+    const CallReceiver = artifacts.require('CallReceiverMock');
+
     beforeEach(async function () {
         this.token = await ERC20VotesMock.new(name, symbol);
         now = await latest();
@@ -33,13 +38,45 @@ contract('TreasuryVester: governance', function (accounts) {
             vestingCliff,
             vestingEnd
         );
+
+        await this.token.mint(this.vesting.address, vestingAmount);
+        await this.vesting.delegate(recipient, {from: recipient});
+
+        this.timelock = await Timelock.new(3600, [], []);
+        let proposalThreshold = vestingAmount;
+        this.mock = await Governor.new("Euler-Governance", this.token.address, 4, 16, this.timelock.address, 4, proposalThreshold);
+        this.receiver = await CallReceiver.new();
+        // normal setup: governor is proposer, everyone is executor, timelock is its own admin
+        await this.timelock.grantRole(await this.timelock.PROPOSER_ROLE(), this.mock.address);
+        await this.timelock.grantRole(await this.timelock.EXECUTOR_ROLE(), constants.ZERO_ADDRESS);
+        // await this.timelock.revokeRole(await this.timelock.TIMELOCK_ADMIN_ROLE(), deployer);
+        // await this.token.mint(voter, tokenSupply);
+        // await this.token.delegate(voter, { from: voter });
     });
 
     describe('create proposal', function () {
-        /* it('allow delegatee create a proposal if the amount of tokens vested meets proposal threshold', async function () {
+        it('allow vesting delegatee create a proposal if the amount of tokens vested meets proposal threshold', async function () {
             
-        });
+            const proposal = [
+                [ this.receiver.address ],
+                [ web3.utils.toWei('0') ],
+                [ this.receiver.contract.methods.mockFunction().encodeABI() ],
+                '<proposal description>',
+            ]
+            
+            const descriptionHash = web3.utils.keccak256(proposal.slice(-1).find(Boolean));
+            const id = await this.mock.hashProposal(...proposal.slice(0, -1), descriptionHash);
 
+            const tx = await this.mock.methods['propose(address[],uint256[],bytes[],string)'](
+                ...proposal,
+                { from: recipient },
+            );
+
+            const {args} = await findEventInTransaction(tx, 'ProposalCreated');
+            expectBignumberEqual(args.proposalId, id);
+
+        });
+/** 
         it('revert if the amount of tokens vested is below the proposal threshold', async function () {
             
         }); */
