@@ -39,9 +39,6 @@ contract('TreasuryVester: governance', function (accounts) {
             vestingEnd
         );
 
-        await this.token.mint(this.vesting.address, vestingAmount);
-        await this.vesting.delegate(recipient, {from: recipient});
-
         this.timelock = await Timelock.new(3600, [], []);
         let proposalThreshold = vestingAmount;
         this.mock = await Governor.new("Euler-Governance", this.token.address, 4, 16, this.timelock.address, 4, proposalThreshold);
@@ -56,7 +53,9 @@ contract('TreasuryVester: governance', function (accounts) {
 
     describe('create proposal', function () {
         it('allow vesting delegatee create a proposal if the amount of tokens vested meets proposal threshold', async function () {
-            
+            await this.token.mint(this.vesting.address, vestingAmount);
+        await this.vesting.delegate(recipient, {from: recipient});
+
             const proposal = [
                 [ this.receiver.address ],
                 [ web3.utils.toWei('0') ],
@@ -76,10 +75,30 @@ contract('TreasuryVester: governance', function (accounts) {
             expectBignumberEqual(args.proposalId, id);
 
         });
-/** 
-        it('revert if the amount of tokens vested is below the proposal threshold', async function () {
+
+        it('revert if delegatee tries to create proposal and the amount of tokens vested is below the proposal threshold', async function () {
+            await this.token.mint(this.vesting.address, vestingAmount.sub(toBN(1)));
+        await this.vesting.delegate(recipient, {from: recipient});
+        
+            const proposal = [
+                [ this.receiver.address ],
+                [ web3.utils.toWei('0') ],
+                [ this.receiver.contract.methods.mockFunction().encodeABI() ],
+                '<proposal description>',
+            ]
             
-        }); */
+            const descriptionHash = web3.utils.keccak256(proposal.slice(-1).find(Boolean));
+            const id = await this.mock.hashProposal(...proposal.slice(0, -1), descriptionHash);
+
+            await shouldFailWithMessage(
+                this.mock.methods['propose(address[],uint256[],bytes[],string)'](
+                ...proposal,
+                { from: recipient }),
+                'GovernorCompatibilityBravo: proposer votes below proposal threshold'
+            );
+
+            
+        });
     });
 
     describe('cast vote', function () {
