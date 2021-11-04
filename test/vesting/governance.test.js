@@ -197,7 +197,6 @@ contract('TreasuryVester: governance', function (accounts) {
 
             const {args} = await findEventInTransaction(tx, 'ProposalCreated');
             expectBignumberEqual(args.proposalId, id);
-
         });
 
         it('revert if delegatee tries to create proposal and the amount of tokens vested is below the proposal threshold', async function () {
@@ -224,7 +223,5 @@ contract('TreasuryVester: governance', function (accounts) {
             );
         });
     });
-
-    
 
 });
