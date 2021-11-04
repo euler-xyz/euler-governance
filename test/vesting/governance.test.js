@@ -19,7 +19,6 @@ contract('TreasuryVester: governance', function (accounts) {
     const vestingAmount = new BN(15);
     let now, vestingBegin, vestingCliff, vestingEnd;
 
-    // const Token = artifacts.require('TestToken');
     const Timelock = artifacts.require('TimelockController');
     const Governor = artifacts.require('Governance');
     const CallReceiver = artifacts.require('CallReceiverMock');
@@ -46,15 +45,140 @@ contract('TreasuryVester: governance', function (accounts) {
         // normal setup: governor is proposer, everyone is executor, timelock is its own admin
         await this.timelock.grantRole(await this.timelock.PROPOSER_ROLE(), this.mock.address);
         await this.timelock.grantRole(await this.timelock.EXECUTOR_ROLE(), constants.ZERO_ADDRESS);
-        // await this.timelock.revokeRole(await this.timelock.TIMELOCK_ADMIN_ROLE(), deployer);
-        // await this.token.mint(voter, tokenSupply);
-        // await this.token.delegate(voter, { from: voter });
+        
     });
+
+    describe('cast vote', function () {
+        it('allow delegatee cast a vote on a proposal and if amount vested is greater than zero, should increment votes', async function () {
+            await this.vesting.delegate(recipient, {from: recipient});
+            await this.token.mint(owner, vestingAmount);
+            await this.token.mint(this.vesting.address, vestingAmount);
+            
+            expectBignumberEqual(
+                await this.mock.proposalThreshold(),
+                await this.token.balanceOf(owner)
+            );
+
+            const proposal = [
+                [ this.receiver.address ],
+                [ web3.utils.toWei('0') ],
+                [ this.receiver.contract.methods.mockFunction().encodeABI() ],
+                '<proposal description>',
+            ]
+            
+            const descriptionHash = web3.utils.keccak256(proposal.slice(-1).find(Boolean));
+            const id = await this.mock.hashProposal(...proposal.slice(0, -1), descriptionHash);
+
+            // this will fail if owner has no self delegated
+            await shouldFailWithMessage(
+                this.mock.methods['propose(address[],uint256[],bytes[],string)'](
+                ...proposal,
+                { from: owner }),
+                'GovernorCompatibilityBravo: proposer votes below proposal threshold'
+            );
+            
+            await this.token.delegate(owner, {from: owner});
+
+            await this.mock.methods['propose(address[],uint256[],bytes[],string)'](
+                ...proposal,
+                { from: owner },
+            );
+
+            // 0 for against, 1 for in-favor, and 2 for abstain
+            await shouldFailWithMessage(
+                this.mock.castVote(id, 1, { from: recipient }),
+                'Governor: vote not currently active'
+            );
+
+            // 0 = pending
+            expectBignumberEqual(await this.mock.state(id), 0);
+            let snapshot = await this.mock.proposalSnapshot(id);
+            // move to active state
+            await time.advanceBlockTo(snapshot);
+            // 1 = active
+            expectBignumberEqual(await this.mock.state(id), 1);
+
+            await this.mock.castVote(id, 1, { from: recipient });
+
+            expectBignumberEqual(await this.mock.getVotes(recipient, snapshot, { from: recipient }), vestingAmount);
+
+            expect(await this.mock.hasVoted(id, recipient)).to.be.equal(true);
+
+            expectBignumberEqual((await this.mock.proposalVotes(id)).againstVotes, 0);
+            expectBignumberEqual((await this.mock.proposalVotes(id)).forVotes, vestingAmount);
+            expectBignumberEqual((await this.mock.proposalVotes(id)).abstainVotes, 0);
+        });
+
+        it('should not increment proposal votes if amount vested is not greater than zero', async function () {
+            await this.vesting.delegate(recipient, {from: recipient});
+            await this.token.mint(owner, vestingAmount);
+            
+            expectBignumberEqual(
+                await this.mock.proposalThreshold(),
+                await this.token.balanceOf(owner)
+            );
+
+            const proposal = [
+                [ this.receiver.address ],
+                [ web3.utils.toWei('0') ],
+                [ this.receiver.contract.methods.mockFunction().encodeABI() ],
+                '<proposal description>',
+            ]
+            
+            const descriptionHash = web3.utils.keccak256(proposal.slice(-1).find(Boolean));
+            const id = await this.mock.hashProposal(...proposal.slice(0, -1), descriptionHash);
+
+            // this will fail if owner has no self delegated
+            await shouldFailWithMessage(
+                this.mock.methods['propose(address[],uint256[],bytes[],string)'](
+                ...proposal,
+                { from: owner }),
+                'GovernorCompatibilityBravo: proposer votes below proposal threshold'
+            );
+            
+            await this.token.delegate(owner, {from: owner});
+
+            await this.mock.methods['propose(address[],uint256[],bytes[],string)'](
+                ...proposal,
+                { from: owner },
+            );
+
+            // 0 for against, 1 for in-favor, and 2 for abstain
+            await shouldFailWithMessage(
+                this.mock.castVote(id, 1, { from: recipient }),
+                'Governor: vote not currently active'
+            );
+
+            // 0 = pending
+            expectBignumberEqual(await this.mock.state(id), 0);
+            let snapshot = await this.mock.proposalSnapshot(id);
+            // move to active state
+            await time.advanceBlockTo(snapshot);
+            // 1 = active
+            expectBignumberEqual(await this.mock.state(id), 1);
+
+            await this.mock.castVote(id, 1, { from: recipient });
+
+            expectBignumberEqual(await this.mock.getVotes(recipient, snapshot, { from: recipient }), 0);
+
+            expect(await this.mock.hasVoted(id, recipient)).to.be.equal(true);
+
+            expectBignumberEqual((await this.mock.proposalVotes(id)).againstVotes, 0);
+            expectBignumberEqual((await this.mock.proposalVotes(id)).forVotes, 0);
+            expectBignumberEqual((await this.mock.proposalVotes(id)).abstainVotes, 0); 
+        });
+    });
+
 
     describe('create proposal', function () {
         it('allow vesting delegatee create a proposal if the amount of tokens vested meets proposal threshold', async function () {
             await this.token.mint(this.vesting.address, vestingAmount);
-        await this.vesting.delegate(recipient, {from: recipient});
+            await this.vesting.delegate(recipient, {from: recipient});
+
+            expectBignumberEqual(
+                await this.mock.proposalThreshold(),
+                vestingAmount
+            );
 
             const proposal = [
                 [ this.receiver.address ],
@@ -78,8 +202,10 @@ contract('TreasuryVester: governance', function (accounts) {
 
         it('revert if delegatee tries to create proposal and the amount of tokens vested is below the proposal threshold', async function () {
             await this.token.mint(this.vesting.address, vestingAmount.sub(toBN(1)));
-        await this.vesting.delegate(recipient, {from: recipient});
+            await this.vesting.delegate(recipient, {from: recipient});
         
+            expect(await this.mock.proposalThreshold()).to.be.bignumber.greaterThan(await this.token.balanceOf(this.vesting.address));
+
             const proposal = [
                 [ this.receiver.address ],
                 [ web3.utils.toWei('0') ],
@@ -96,24 +222,9 @@ contract('TreasuryVester: governance', function (accounts) {
                 { from: recipient }),
                 'GovernorCompatibilityBravo: proposer votes below proposal threshold'
             );
-
-            
         });
     });
 
-    describe('cast vote', function () {
-        /* it('allow delegatee cast a vote on a proposal if amount vested is greater than zero', async function () {
-            
-        });
-
-        it('should attach/set correct voting power on the proposal after delegatee casts vote', async function () {
-            
-        });
-
-        it('revert if amount vested is not greater than zero', async function () {
-            
-        }); */
-    });
-
+    
 
 });
