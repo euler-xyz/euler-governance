@@ -4,18 +4,13 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract Euler is ERC20Votes, AccessControl {
-    using SafeMath for uint256;
-
-    /// @notice The role assigned to addresses allowed to call the mint function.
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     /// @notice The role assigned to users who can call admin/restricted functions
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
     /// @notice The timestamp on and after which minting may occur.
-    uint256 public _mintingRestrictedBefore;
+    uint256 public mintingRestrictedBefore;
 
     /// @notice Minimum time between mints.
     uint256 public constant MINT_MIN_INTERVAL = 365 days;
@@ -31,15 +26,6 @@ contract Euler is ERC20Votes, AccessControl {
     /// EVENTS
     event TreasuryUpdated(address newTreasury);
 
-
-    modifier onlyMinters() {
-        require(
-            hasRole(MINTER_ROLE, msg.sender),
-            "Caller does not have the MINTER_ROLE"
-        );
-        _;
-    }
-
     modifier onlyAdmins() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
@@ -54,23 +40,21 @@ contract Euler is ERC20Votes, AccessControl {
     * @param  name                      The token name, i.e., Euler.
     * @param  symbol                    The token symbol, i.e., EUL.
     * @param  totalSupply_              Initial total token supply.
-    * @param  mintingRestrictedBefore   Timestamp, before which minting is not allowed.
+    * @param  mintingRestrictedBefore_   Timestamp, before which minting is not allowed.
     */
     constructor(
         string memory name,
         string memory symbol,
         uint256 totalSupply_,
-        uint256 mintingRestrictedBefore
+        uint256 mintingRestrictedBefore_
     ) ERC20(name, symbol) ERC20Permit(name) {
         require(
-            mintingRestrictedBefore > block.timestamp,
+            mintingRestrictedBefore_ > block.timestamp,
             "MINTING_RESTRICTED_BEFORE_TOO_EARLY"
         );
-        _mintingRestrictedBefore = mintingRestrictedBefore;
+        mintingRestrictedBefore = mintingRestrictedBefore_;
 
         _mint(msg.sender, totalSupply_);
-
-        _setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
 
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -80,9 +64,9 @@ contract Euler is ERC20Votes, AccessControl {
     * @notice Mint new tokens. Only callable by governance after the required time period has elapsed.
     * It will mint to the treasury address set by owner
     */
-    function mint() external onlyMinters {
+    function mint() external {
         require(
-            block.timestamp >= _mintingRestrictedBefore,
+            block.timestamp >= mintingRestrictedBefore,
             'MINT_TOO_EARLY'
         );
         require(
@@ -90,11 +74,11 @@ contract Euler is ERC20Votes, AccessControl {
             'INVALID_TREASURY_ADDRESS'
         );
 
-        uint256 amount = totalSupply().mul(MINT_MAX_PERCENT).div(100000);
+        uint256 amount = totalSupply() * MINT_MAX_PERCENT / 100000;
         require(amount > 0, "CANNOT_MINT_ZERO");
 
         // Update the next allowed minting time.
-        _mintingRestrictedBefore = block.timestamp.add(MINT_MIN_INTERVAL);
+        mintingRestrictedBefore = block.timestamp + MINT_MIN_INTERVAL;
 
         // Mint the amount.
         _mint(treasury, amount);
