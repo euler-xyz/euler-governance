@@ -268,8 +268,6 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
         });
 
         it('should revert if caller does not have minting permissions', async function () {
-           let now = await latest();
-
             await expectRevert(
                 this.token.mint({ from: initialHolder }),
                 "Caller does not have the MINTER_ROLE"
