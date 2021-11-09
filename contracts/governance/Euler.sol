@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Euler is ERC20Votes, AccessControl {
-    /// @notice The role assigned to addresses allowed to call the mint function.
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     /// @notice The role assigned to users who can call admin/restricted functions
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
@@ -27,15 +25,6 @@ contract Euler is ERC20Votes, AccessControl {
 
     /// EVENTS
     event TreasuryUpdated(address newTreasury);
-
-
-    modifier onlyMinters() {
-        require(
-            hasRole(MINTER_ROLE, msg.sender),
-            "Caller does not have the MINTER_ROLE"
-        );
-        _;
-    }
 
     modifier onlyAdmins() {
         require(
@@ -60,14 +49,12 @@ contract Euler is ERC20Votes, AccessControl {
         uint256 mintingRestrictedBefore_
     ) ERC20(name, symbol) ERC20Permit(name) {
         require(
-            mintingRestrictedBefore > block.timestamp,
+            mintingRestrictedBefore_ > block.timestamp,
             "MINTING_RESTRICTED_BEFORE_TOO_EARLY"
         );
         mintingRestrictedBefore = mintingRestrictedBefore_;
 
         _mint(msg.sender, totalSupply_);
-
-        _setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
 
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -77,7 +64,7 @@ contract Euler is ERC20Votes, AccessControl {
     * @notice Mint new tokens. Only callable by governance after the required time period has elapsed.
     * It will mint to the treasury address set by owner
     */
-    function mint() external onlyMinters {
+    function mint() external {
         require(
             block.timestamp >= mintingRestrictedBefore,
             'MINT_TOO_EARLY'

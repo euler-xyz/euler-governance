@@ -7,8 +7,8 @@ const { ZERO_ADDRESS } = constants;
 
 const {
     shouldBehaveLikeERC20,
-    shouldBehaveLikeERC20Transfer,
-    shouldBehaveLikeERC20Approve,
+    //shouldBehaveLikeERC20Transfer,
+    //shouldBehaveLikeERC20Approve,
 } = require('./ERC20.behavior');
 const { parseEther, formatEther } = require('@ethersproject/units');
 
@@ -115,14 +115,14 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
 
         it('should revert if minting time not reached', async function () {
             // grant minting role
-           const mintingRole = await this.token.MINTER_ROLE();
-           await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
+           //const mintingRole = await this.token.MINTER_ROLE();
+           //await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
 
            let now = await latest();
             //(console.log(now.toString()))
-            //console.log((await this.token._mintingRestrictedBefore()).toString())
+            //console.log((await this.token.mintingRestrictedBefore()).toString())
 
-            expect(now).to.be.bignumber.lessThan(await this.token._mintingRestrictedBefore())
+            expect(now).to.be.bignumber.lessThan(await this.token.mintingRestrictedBefore())
             
             await expectRevert(
                 this.token.mint({ from: initialHolder }),
@@ -132,16 +132,16 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
 
         it('should revert if treasury address is 0', async function () {
             // grant minting role
-           const mintingRole = await this.token.MINTER_ROLE();
-           await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
+           // const mintingRole = await this.token.MINTER_ROLE();
+           // await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
 
            let now = await latest();
-            //(console.log(now.toString()))
-            //console.log((await this.token._mintingRestrictedBefore()).toString())
+            // (console.log(now.toString()))
+            // console.log((await this.token.mintingRestrictedBefore()).toString())
 
-            expect(now).to.be.bignumber.lessThan(await this.token._mintingRestrictedBefore())
+            expect(now).to.be.bignumber.lessThan(await this.token.mintingRestrictedBefore())
             
-            await increase(await this.token._mintingRestrictedBefore());
+            await increase(await this.token.mintingRestrictedBefore());
             await increase(1);
 
             await expectRevert(
@@ -152,16 +152,16 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
 
         it('should mint correct amount successfully to treasury and increase treasury balance', async function () {
             // grant minting role
-           const mintingRole = await this.token.MINTER_ROLE();
-           await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
+           // const mintingRole = await this.token.MINTER_ROLE();
+           // await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
 
            let now = await latest();
             //(console.log(now.toString()))
-            //console.log((await this.token._mintingRestrictedBefore()).toString())
+            //console.log((await this.token.mintingRestrictedBefore()).toString())
 
-            expect(now).to.be.bignumber.lessThan(await this.token._mintingRestrictedBefore())
+            expect(now).to.be.bignumber.lessThan(await this.token.mintingRestrictedBefore())
             
-            await increase(await this.token._mintingRestrictedBefore());
+            await increase(await this.token.mintingRestrictedBefore());
             await increase(1);
 
             await this.token.updateTreasury(recipient, {from: initialHolder});
@@ -185,16 +185,16 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
 
         it('should increase total supply and update next time minting will be allowed after minting', async function () {
             // grant minting role
-           const mintingRole = await this.token.MINTER_ROLE();
-           await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
+           //const mintingRole = await this.token.MINTER_ROLE();
+           //await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
 
            let now = await latest();
             //(console.log(now.toString()))
-            //console.log((await this.token._mintingRestrictedBefore()).toString())
+            //console.log((await this.token.mintingRestrictedBefore()).toString())
 
-            expect(now).to.be.bignumber.lessThan(await this.token._mintingRestrictedBefore())
+            expect(now).to.be.bignumber.lessThan(await this.token.mintingRestrictedBefore())
             
-            await increase(await this.token._mintingRestrictedBefore());
+            await increase(await this.token.mintingRestrictedBefore());
             await increase(1);
 
             await this.token.updateTreasury(recipient, {from: initialHolder});
@@ -210,7 +210,7 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
 
             let nextTimeMintingAllowed = (await latest()).add(await duration.days(365));
 
-            expectBignumberEqual(await this.token._mintingRestrictedBefore(), nextTimeMintingAllowed);
+            expectBignumberEqual(await this.token.mintingRestrictedBefore(), nextTimeMintingAllowed);
 
             expect(await this.token.MINT_MAX_PERCENT()).to.be.bignumber.equal(mintMaxPercent);
 
@@ -221,16 +221,16 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
 
         it('should mint after updating next time minting will be allowed after initial minting', async function () {
             // grant minting role
-           const mintingRole = await this.token.MINTER_ROLE();
-           await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
+           //const mintingRole = await this.token.MINTER_ROLE();
+           //await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
 
            let now = await latest();
             //(console.log(now.toString()))
-            //console.log((await this.token._mintingRestrictedBefore()).toString())
+            //console.log((await this.token.mintingRestrictedBefore()).toString())
 
-            expect(now).to.be.bignumber.lessThan(await this.token._mintingRestrictedBefore())
+            expect(now).to.be.bignumber.lessThan(await this.token.mintingRestrictedBefore())
             
-            await increase(await this.token._mintingRestrictedBefore());
+            await increase(await this.token.mintingRestrictedBefore());
             await increase(1);
 
             await this.token.updateTreasury(recipient, {from: initialHolder});
@@ -246,13 +246,13 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
 
             let nextTimeMintingAllowed = (await latest()).add(await duration.days(365));
 
-            expectBignumberEqual(await this.token._mintingRestrictedBefore(), nextTimeMintingAllowed);
+            expectBignumberEqual(await this.token.mintingRestrictedBefore(), nextTimeMintingAllowed);
 
             expect(await this.token.MINT_MAX_PERCENT()).to.be.bignumber.equal(mintMaxPercent);
 
             expectBignumberEqual(await this.token.balanceOf(treasury), amountToMint);
              
-            await increase(await this.token._mintingRestrictedBefore());
+            await increase(await this.token.mintingRestrictedBefore());
             await increase(1);
 
             totalSupply = await this.token.totalSupply();
@@ -267,12 +267,12 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
               });
         });
 
-        it('should revert if caller does not have minting permissions', async function () {
+        /* it('should revert if caller does not have minting permissions', async function () {
             await expectRevert(
                 this.token.mint({ from: initialHolder }),
-                "Caller does not have the MINTER_ROLE"
+                "Caller A does not have the MINTER_ROLE"
             );
-        });
+        }); */
     });
 
 });
