@@ -12,7 +12,7 @@ contract Euler is ERC20Votes, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
     /// @notice The timestamp on and after which minting may occur.
-    uint256 public _mintingRestrictedBefore;
+    uint256 public mintingRestrictedBefore;
 
     /// @notice Minimum time between mints.
     uint256 public constant MINT_MIN_INTERVAL = 365 days;
@@ -51,19 +51,19 @@ contract Euler is ERC20Votes, AccessControl {
     * @param  name                      The token name, i.e., Euler.
     * @param  symbol                    The token symbol, i.e., EUL.
     * @param  totalSupply_              Initial total token supply.
-    * @param  mintingRestrictedBefore   Timestamp, before which minting is not allowed.
+    * @param  mintingRestrictedBefore_   Timestamp, before which minting is not allowed.
     */
     constructor(
         string memory name,
         string memory symbol,
         uint256 totalSupply_,
-        uint256 mintingRestrictedBefore
+        uint256 mintingRestrictedBefore_
     ) ERC20(name, symbol) ERC20Permit(name) {
         require(
             mintingRestrictedBefore > block.timestamp,
             "MINTING_RESTRICTED_BEFORE_TOO_EARLY"
         );
-        _mintingRestrictedBefore = mintingRestrictedBefore;
+        mintingRestrictedBefore = mintingRestrictedBefore_;
 
         _mint(msg.sender, totalSupply_);
 
@@ -79,7 +79,7 @@ contract Euler is ERC20Votes, AccessControl {
     */
     function mint() external onlyMinters {
         require(
-            block.timestamp >= _mintingRestrictedBefore,
+            block.timestamp >= mintingRestrictedBefore,
             'MINT_TOO_EARLY'
         );
         require(
@@ -91,7 +91,7 @@ contract Euler is ERC20Votes, AccessControl {
         require(amount > 0, "CANNOT_MINT_ZERO");
 
         // Update the next allowed minting time.
-        _mintingRestrictedBefore = block.timestamp + MINT_MIN_INTERVAL;
+        mintingRestrictedBefore = block.timestamp + MINT_MIN_INTERVAL;
 
         // Mint the amount.
         _mint(treasury, amount);
