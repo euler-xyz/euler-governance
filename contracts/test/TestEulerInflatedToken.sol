@@ -62,7 +62,7 @@ contract TestEulerInflatedToken is ERC20Votes, AccessControl {
     }
 
     /**
-    * @notice Mint new tokens. Only callable by governance after the required time period has elapsed.
+    * @notice Mint new tokens only after the required time period has elapsed.
     * It will mint to the treasury address set by owner
     */
     function mint() external {
