@@ -5,15 +5,26 @@ require("solidity-coverage");
 require("dotenv").config();
 require("@nomiclabs/hardhat-etherscan");
 
+// Load tasks
+
+const files = fs.readdirSync('./tasks');
+
+for (let file of files) {
+    if (!file.endsWith('.js')) continue;
+    require(`./tasks/${file}`);
+}
+
+
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
-task('accounts', 'Prints the list of accounts', async () => {
+/* task('accounts', 'Prints the list of accounts', async () => {
   const accounts = await ethers.getSigners();
 
   for (const account of accounts) {
     console.log(account.address);
   }
-});
+}); */
+
 
 /* task("Deploy", "Deploys the governance system with command line parameters")
 .addParam("token", "The address to receive the initial supply")
@@ -76,7 +87,6 @@ module.exports = {
 if (process.env.PRIVATE_KEY && process.env.ALCHEMY_API_KEY) {
   module.exports.networks = {
       ...module.exports.networks,
-
       kovan: {
           url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
           accounts: [`0x${process.env.PRIVATE_KEY}`],
