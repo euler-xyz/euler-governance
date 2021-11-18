@@ -10,8 +10,10 @@ async function main() {
     
     const ctx = await eTestLib.deployGovernanceContracts(ethers.provider, await ethers.getSigners(), networkName);
 
-    eTestLib.writeAddressManifestToFile(ctx, `./euler-addresses-${networkName}.json`);
+    eTestLib.writeAddressManifestToFile(ctx, `./addresses/euler-addresses-${networkName}.json`);
 
 }
+
+// sample usage: NETWORK_NAME=hardhat npx hardhat run scripts/setup.js 
 
 main();

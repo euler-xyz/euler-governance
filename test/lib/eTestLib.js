@@ -11,6 +11,7 @@ const contractNames = [
     'Governance',
     'Timelock',
     'Euler',
+    'TreasuryVester'
 ]
 
 function writeAddressManifestToFile(ctx, filename) {
@@ -37,7 +38,7 @@ async function deployGovernanceContracts(provider, wallets, tokenSetupName) {
     const proposalThreshold = web3.utils.toWei('100');
 
     ctx.contracts.timelock = await (await ctx.factories.Timelock.deploy(minDelay, [], [])).deployed();
-    ctx.contracts.euler = await (await ctx.factories.Euler.deploy(tokenName, tokenSymbol, totalSupply)).deployed();
+    ctx.contracts.euler = await (await ctx.factories.Euler.deploy(tokenName, tokenSymbol, totalSupply, Date.now() + 1000)).deployed();
     ctx.contracts.governance = await (await ctx.factories.Governance.deploy(
         name, ctx.contracts.euler.address, votingDelay, 
         votingPeriod, ctx.contracts.timelock.address, 
