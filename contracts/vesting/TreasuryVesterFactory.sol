@@ -54,7 +54,7 @@ contract TreasuryVesterFactory is AccessControl {
 
         require(treasury_ != address(0));
         treasury = treasury_;
-        
+
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
@@ -94,8 +94,6 @@ contract TreasuryVesterFactory is AccessControl {
     * @param amount The amount to withdraw to treasury
     */
     function withdraw(uint256 amount) external onlyAdmins {
-        require(euler.balanceOf(address(this)) >= amount);
-        require(treasury != address(0), "invalid treasury address");
         euler.transfer(treasury, amount);
     }
 
