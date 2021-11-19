@@ -24,10 +24,13 @@ contract TreasuryVesterFactory is AccessControl {
 
     /// @notice The role assigned to users who can call admin/restricted functions
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+
     /// @notice The Euler token
     IERC20 public euler;
+    
     /// @notice The Euler treasury contract
     address public treasury;
+    
     /// @notice mapping vested token recipients to their vesting contracts
     mapping(address => address[]) public vestingContracts;
 
@@ -44,11 +47,14 @@ contract TreasuryVesterFactory is AccessControl {
     event TreasuryUpdated(address newTreasury);
     event NewVestingContract(address indexed recipient, address vestingContract);
 
-    constructor(address euler_) {
+    constructor(address euler_, address treasury_) {
         require(euler_ != address(0));
         require(euler_.isContract());
         euler = IERC20(euler_);
 
+        require(treasury_ != address(0));
+        treasury = treasury_;
+        
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
