@@ -45,7 +45,7 @@ contract TreasuryVesterFactory is AccessControl {
 
     /// EVENTS
     event TreasuryUpdated(address newTreasury);
-    event NewVestingContract(address indexed recipient, address vestingContract);
+    event NewVestingContract(address indexed recipient, address vestingContract, uint256 index);
 
     constructor(address euler_, address treasury_) {
         require(euler_ != address(0));
@@ -74,7 +74,7 @@ contract TreasuryVesterFactory is AccessControl {
         uint vestingBegin,
         uint vestingCliff,
         uint vestingEnd
-    ) external onlyAdmins {
+    ) external onlyAdmins returns (address recipient_, address vestingContract_, uint256 index_) {
         require(euler.balanceOf(address(this)) >= vestingAmount);
         TreasuryVester tv = new TreasuryVester(
             address(euler),
@@ -84,8 +84,11 @@ contract TreasuryVesterFactory is AccessControl {
             vestingCliff,
             vestingEnd
         );
-        vestingContracts[recipient].push(address(tv));
-        emit NewVestingContract(recipient, address(tv));
+        recipient_ = recipient;
+        index_ = vestingContracts[recipient].length;
+        vestingContract_ = address(tv);
+        vestingContracts[recipient_].push(vestingContract_);
+        emit NewVestingContract(recipient_, vestingContract_, index_);
     }
 
     /**

@@ -13,7 +13,6 @@ contract('TreasuryVester: constructor', function (accounts) {
 
     const name = 'Euler';
     const symbol = 'EUL';
-    const initialSupply = new BN(200);
     const vestingAmount = new BN(15);
     let now, vestingBegin, vestingCliff, vestingEnd;
 
