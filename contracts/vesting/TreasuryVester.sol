@@ -22,6 +22,7 @@ contract TreasuryVester {
         uint vestingEnd_
     ) {
         require(eul_ != address(0), 'TreasuryVester::constructor: invalid EUL token contract address');
+        require(recipient_ != address(0), 'TreasuryVester::constructor: invalid recipient address');
         require(vestingBegin_ >= block.timestamp, 'TreasuryVester::constructor: vesting begin too early');
         require(vestingCliff_ >= vestingBegin_, 'TreasuryVester::constructor: cliff is too early');
         require(vestingEnd_ > vestingCliff_, 'TreasuryVester::constructor: end is too early');

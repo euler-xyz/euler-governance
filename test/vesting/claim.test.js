@@ -177,9 +177,5 @@ contract('TreasuryVester: claim', function (accounts) {
         ) 
         */
     })
-
-    // governance 
-    // can create proposal using delegation (if vested amount meets proposal threshold)
-    // reverts upon create proposal using delegation (if vested amount does not meet proposal threshold)
-    // can vote on proposal using delegation
+    
 });
