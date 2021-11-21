@@ -1,18 +1,6 @@
-// function to 
-//* deploy vesting contract using supplied params and 
-//* transfer amount from self to new child contract
-// map recipients to vesting contracts
-// balanceOf vesting contract
-// remove funds to treasury
-// an address can have multiple vesting contracts tho
-// so mapping(address => address[]) probably
-
 // SPDX-License-Identifier: MIT
 
-
-// todo revert messages
-
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "./TreasuryVester.sol";
 
@@ -20,7 +8,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
-// todo admin roles
 
 contract TreasuryVesterFactory is AccessControl {
     using Address for address;
@@ -48,14 +35,14 @@ contract TreasuryVesterFactory is AccessControl {
 
     /// EVENTS
     event TreasuryUpdated(address newTreasury);
-    event NewVestingContract(address indexed recipient, address vestingContract, uint256 index);
+    event VestingContract(address indexed recipient, address vestingContract, uint256 index);
 
     constructor(address euler_, address treasury_) {
-        require(euler_ != address(0));
-        require(euler_.isContract());
+        require(euler_ != address(0), "cannot set zero address as euler token");
+        require(euler_.isContract(), "euler must be a smart contract");
         euler = IERC20(euler_);
 
-        require(treasury_ != address(0));
+        require(treasury_ != address(0), "cannot set zero address as treasuty");
         treasury = treasury_;
 
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -78,7 +65,7 @@ contract TreasuryVesterFactory is AccessControl {
         uint vestingCliff,
         uint vestingEnd
     ) external onlyAdmins returns (address recipient_, address vestingContract_, uint256 index_) {
-        require(euler.balanceOf(address(this)) >= vestingAmount);
+        require(euler.balanceOf(address(this)) >= vestingAmount, "insufficient balance for vestingAmount");
         TreasuryVester tv = new TreasuryVester(
             address(euler),
             recipient,
@@ -90,8 +77,9 @@ contract TreasuryVesterFactory is AccessControl {
         recipient_ = recipient;
         index_ = vestingContracts[recipient].length;
         vestingContract_ = address(tv);
+        euler.transfer(vestingContract_, vestingAmount);
         vestingContracts[recipient_].push(vestingContract_);
-        emit NewVestingContract(recipient_, vestingContract_, index_);
+        emit VestingContract(recipient_, vestingContract_, index_);
     }
 
     /**
@@ -113,4 +101,13 @@ contract TreasuryVesterFactory is AccessControl {
         treasury = newTreasury;
         emit TreasuryUpdated(treasury);
     }
+
+    function getVestingContract(address recipient, uint256 index) external view returns (address) {
+        return vestingContracts[recipient][index];
+    }
+
+    function getVestingContracts(address recipient) external view returns (address[] memory) {
+        return vestingContracts[recipient];
+    }
+
 }

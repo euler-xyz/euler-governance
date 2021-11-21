@@ -54,7 +54,7 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
                     ZERO_ADDRESS,
                     accounts[0]
                 ),
-                'revert'
+                "cannot set zero address as euler token"
               );
           });
 
@@ -64,7 +64,7 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
                   this.token.address,
                   ZERO_ADDRESS
               ),
-              'revert'
+              "cannot set zero address as treasuty"
             );
         });
 
@@ -74,7 +74,7 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
                   accounts[0],
                   accounts[1]
               ),
-              'revert'
+              "euler must be a smart contract"
             );
         });
     });
