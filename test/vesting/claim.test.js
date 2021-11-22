@@ -95,7 +95,7 @@ contract('TreasuryVester: claim', function (accounts) {
         expectBignumberEqual(await this.token.balanceOf(this.vesting.address), vestingAmount.sub(amount_to_receive));
     })
 
-    it('anyone can call claim() but only recipient should receive vested tokens', async function () {
+    it('anyone can call claim() after vestingCliff elapses but only recipient should receive vested tokens', async function () {
         // amount to receive = vestingAmount.mul(block.timestamp - lastUpdate).div(vestingEnd - vestingBegin); 
         
         let now = await latest();
@@ -177,9 +177,5 @@ contract('TreasuryVester: claim', function (accounts) {
         ) 
         */
     })
-
-    // governance 
-    // can create proposal using delegation (if vested amount meets proposal threshold)
-    // reverts upon create proposal using delegation (if vested amount does not meet proposal threshold)
-    // can vote on proposal using delegation
+    
 });
