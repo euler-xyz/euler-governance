@@ -28,7 +28,7 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
         });
 
         it('token address is valid', async function () {
-          expect(await this.vestingFactory.euler()).to.not.equal(ZERO_ADDRESS);
+          expect(await this.vestingFactory.EUL()).to.not.equal(ZERO_ADDRESS);
         });
 
         it('treasury address is valid', async function () {
@@ -74,7 +74,7 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
                   accounts[0],
                   accounts[1]
               ),
-              "euler must be a smart contract"
+              "euler token must be a smart contract"
             );
         });
     });

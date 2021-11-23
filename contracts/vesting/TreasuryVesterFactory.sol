@@ -16,7 +16,7 @@ contract TreasuryVesterFactory is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
     /// @notice The Euler token
-    IERC20 public euler;
+    IERC20 public EUL;
     
     /// @notice The Euler treasury contract
     address public treasury;
@@ -37,10 +37,10 @@ contract TreasuryVesterFactory is AccessControl {
     event TreasuryUpdated(address newTreasury);
     event VestingContract(address indexed recipient, address vestingContract, uint256 index);
 
-    constructor(address euler_, address treasury_) {
-        require(euler_ != address(0), "cannot set zero address as euler token");
-        require(euler_.isContract(), "euler must be a smart contract");
-        euler = IERC20(euler_);
+    constructor(address eul_, address treasury_) {
+        require(eul_ != address(0), "cannot set zero address as euler token");
+        require(eul_.isContract(), "euler token must be a smart contract");
+        EUL = IERC20(eul_);
 
         require(treasury_ != address(0), "cannot set zero address as treasuty");
         treasury = treasury_;
@@ -65,9 +65,9 @@ contract TreasuryVesterFactory is AccessControl {
         uint vestingCliff,
         uint vestingEnd
     ) external onlyAdmins returns (address recipient_, address vestingContract_, uint256 index_) {
-        require(euler.balanceOf(address(this)) >= vestingAmount, "insufficient balance for vestingAmount");
+        require(EUL.balanceOf(address(this)) >= vestingAmount, "insufficient balance for vestingAmount");
         TreasuryVester tv = new TreasuryVester(
-            address(euler),
+            address(EUL),
             recipient,
             vestingAmount,
             vestingBegin,
@@ -77,7 +77,7 @@ contract TreasuryVesterFactory is AccessControl {
         recipient_ = recipient;
         index_ = vestingContracts[recipient].length;
         vestingContract_ = address(tv);
-        euler.transfer(vestingContract_, vestingAmount);
+        EUL.transfer(vestingContract_, vestingAmount);
         vestingContracts[recipient_].push(vestingContract_);
         emit VestingContract(recipient_, vestingContract_, index_);
     }
@@ -88,7 +88,7 @@ contract TreasuryVesterFactory is AccessControl {
     * @param amount The amount to withdraw to treasury
     */
     function withdraw(uint256 amount) external onlyAdmins {
-        euler.transfer(treasury, amount);
+        EUL.transfer(treasury, amount);
     }
 
     /**
