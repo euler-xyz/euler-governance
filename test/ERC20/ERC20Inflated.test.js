@@ -267,12 +267,12 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
               });
         });
 
-        /* it('should revert if caller does not have minting permissions', async function () {
+        it('should revert if caller does not have minting permissions', async function () {
             await expectRevert(
-                this.token.mint({ from: initialHolder }),
-                "Caller A does not have the MINTER_ROLE"
+                this.token.mint({ from: recipient }),
+                "Caller does not have the ADMIN_ROLE"
             );
-        }); */
+        });
     });
 
 });

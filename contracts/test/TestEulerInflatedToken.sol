@@ -65,7 +65,7 @@ contract TestEulerInflatedToken is ERC20Votes, AccessControl {
     * @notice Mint new tokens only after the required time period has elapsed.
     * It will mint to the treasury address set by owner
     */
-    function mint() external {
+    function mint() external onlyAdmins {
         require(
             block.timestamp >= mintingRestrictedBefore,
             'MINT_TOO_EARLY'
