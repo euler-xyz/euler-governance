@@ -78,3 +78,35 @@ task("vesting:createVesting")
             return false;
         }
     });
+
+
+
+    task("vesting:withdraw")
+    .addPositionalParam("vestingFactory")
+    .addPositionalParam("amount")
+    .setAction(async (args) => {
+            const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
+            const vestingFactory = await VestingFactory.attach(args.vestingFactory);
+            const tx = await vestingFactory.withdraw(
+                ethers.utils.parseUnits(args.amount, 18)
+            );
+            console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+            let result = await tx.wait();
+            console.log(`Mined. Status: ${result.status}`);
+    });
+
+    task("vesting:updateTreasury")
+    .addPositionalParam("vestingFactory")
+    .addPositionalParam("treasury")
+    .setAction(async (args) => {
+            const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
+            const vestingFactory = await VestingFactory.attach(args.vestingFactory);
+            const tx = await vestingFactory.updateTreasury(
+                args.treasury
+            );
+            console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+            let result = await tx.wait();
+            console.log(`Mined. Status: ${result.status}`);
+    });
+
+    
