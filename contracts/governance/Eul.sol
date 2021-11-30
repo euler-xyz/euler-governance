@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract Euler is ERC20Votes, AccessControl {
+contract Eul is ERC20Votes, AccessControl {
     /// @notice The role assigned to users who can call admin/restricted functions
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
