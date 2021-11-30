@@ -28,6 +28,18 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
         await this.token.mint(owner, initialSupply);
     });
 
+    /**
+        address recipient - is the EOA / wallet address of the recipient of the vested tokens 
+        uint vestingAmount - is the amount to be vested (in Wei as EUL token is also 18 decimals like ETH, e.g., 1 EUL will be 10 * (10 ** 18))
+
+        uint vestingBegin - this is the unix timestamp for when vesting period will start which should be after latest block timestamp. e.g., 1638262715 (this web app converts date and time to unix timestamp https://www.unixtimestamp.com)
+
+        uint vestingCliff - this is the timestamp at which the recipient can begin collecting vested funds from the vesting contract. The amount that can be collected at any point in time between vestingCliff and vestingEnd is calculated on this line in the Vesting Contract - https://github.com/euler-xyz/euler-governance/blob/d2d66e40984e0e04f96d770993a436396a4cde32/contracts/vesting/TreasuryVester.sol#L52 
+        amount vested * (timestamp of latest block - timestamp of the last time funds were collected) / (vestingEnd - vestingBegin)
+
+        uint vestingEnd - this is the unix timestamp of when the vesting period will end. After this timestamp, the recipient can withdraw or collect all of the remaining vested amount
+     */
+
     it('reverts if not called by owner', async function () {
         vestingBegin = now.add(await duration.minutes(5));
         vestingCliff = now.add(await duration.minutes(15));
