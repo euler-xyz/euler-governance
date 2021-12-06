@@ -87,22 +87,19 @@ contract('TreasuryVester: constructor', function (accounts) {
             );
           });
 
-          it('reverts if vesting begins earlier than deployment block.timestamp', async function () {
+          it('should not revert if vesting begins earlier than deployment block.timestamp', async function () {
             this.token = await ERC20VotesMock.new(name, symbol);
             now = await latest();
             vestingBegin = now;
             vestingCliff = now.add(await duration.minutes(15));
             vestingEnd = now.add(await duration.minutes(25));
-            await shouldFailWithMessage(
-              Vesting.new(
-                this.token.address, 
-                recipient, 
-                vestingAmount,
-                vestingBegin,
-                vestingCliff,
-                vestingEnd
-              ),
-              "TreasuryVester::constructor: vesting begin too early"
+            await Vesting.new(
+              this.token.address, 
+              recipient, 
+              vestingAmount,
+              vestingBegin,
+              vestingCliff,
+              vestingEnd
             );
           });
 

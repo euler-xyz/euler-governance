@@ -223,7 +223,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
             "TreasuryVester::constructor: invalid recipient address"
         );
 
-        await shouldFailWithMessage(
+        /* await shouldFailWithMessage(
             this.vestingFactory.createVestingContract(
                 recipient,
                 vestingAmount,
@@ -232,7 +232,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
                 vestingEnd
             ),
             "TreasuryVester::constructor: vesting begin too early"
-        );
+        ); */
 
         await shouldFailWithMessage(
             this.vestingFactory.createVestingContract(
