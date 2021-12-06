@@ -48,7 +48,7 @@ task("vesting:createVesting")
     .setAction(async (args) => {
         const userInput = prompt(
             "The following data will be used to deploy the vesting contract.\n" +
-            "Ensure vestingBegin is >= latest block timestamp, vestingCliff >= vestingBegin and vestingEnd > vestingCliff\n" +
+            "Ensure that vestingCliff >= vestingBegin and vestingEnd > vestingCliff\n" +
             `Recipient: ${args.recipient}\n` +
             `Vesting Amount: ${args.vestingAmount}\n` +
             `Vesting Begin: ${args.vestingBegin}\n` +
