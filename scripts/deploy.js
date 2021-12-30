@@ -17,6 +17,8 @@ async function main() {
     // await hre.run('compile');
 
     // getting accounts
+
+    // Note: replace mutisig with mainnet multisig address    
     const [root, multiSig] = await hre.ethers.getSigners();
 
     const tokenName = 'Euler';
