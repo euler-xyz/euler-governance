@@ -26,7 +26,7 @@ contract Eul is ERC20Votes, AccessControl {
     /// EVENTS
     event TreasuryUpdated(address newTreasury);
 
-    modifier onlyAdmins() {
+    modifier onlyAdmin() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
             "Caller does not have the ADMIN_ROLE"
@@ -41,30 +41,35 @@ contract Eul is ERC20Votes, AccessControl {
     * @param  symbol                    The token symbol, i.e., EUL.
     * @param  totalSupply_              Initial total token supply.
     * @param  mintingRestrictedBefore_   Timestamp, before which minting is not allowed.
+    * @param  treasury_   Treasury address.
     */
     constructor(
         string memory name,
         string memory symbol,
         uint256 totalSupply_,
-        uint256 mintingRestrictedBefore_
+        uint256 mintingRestrictedBefore_,
+        address treasury_
     ) ERC20(name, symbol) ERC20Permit(name) {
         require(
             mintingRestrictedBefore_ > block.timestamp,
             "MINTING_RESTRICTED_BEFORE_TOO_EARLY"
         );
+        require(treasury_ != address(0), "cannot set or mint to zero treasury address");
+        
         mintingRestrictedBefore = mintingRestrictedBefore_;
+        treasury = treasury_;
 
-        _mint(msg.sender, totalSupply_);
+        _mint(treasury_, totalSupply_);
 
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(ADMIN_ROLE, msg.sender);
+        _setupRole(DEFAULT_ADMIN_ROLE, treasury_);
+        _setupRole(ADMIN_ROLE, treasury_);
     }
 
     /**
     * @notice Mint new tokens only after the required time period has elapsed.
     * It will mint to the treasury address set by owner
     */
-    function mint() external onlyAdmins {
+    function mint() external onlyAdmin {
         require(
             block.timestamp >= mintingRestrictedBefore,
             'MINT_TOO_EARLY'
@@ -90,7 +95,7 @@ contract Eul is ERC20Votes, AccessControl {
     * Only callable by admins.
     * @param newTreasury The address to set as the new Treasury
     */
-    function updateTreasury(address newTreasury) external onlyAdmins {
+    function updateTreasury(address newTreasury) external onlyAdmin {
         require(newTreasury != address(0), "cannot set or mint to zero treasury address");
         treasury = newTreasury;
         emit TreasuryUpdated(treasury);
