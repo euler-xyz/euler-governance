@@ -15,7 +15,7 @@ const { parseEther, formatEther } = require('@ethersproject/units');
 const ERC20Mock = artifacts.require('TestEulerInflatedToken');
 
 contract('ERC20 token with annual inflation: ERC20 behaviour tests', function (accounts) {
-    const [initialHolder, recipient, anotherAccount] = accounts;
+    const [deployer, initialHolder, recipient, anotherAccount] = accounts;
 
     const name = 'Euler';
     const symbol = 'EUL';
@@ -23,10 +23,11 @@ contract('ERC20 token with annual inflation: ERC20 behaviour tests', function (a
     let now, mintingRestrictedBefore;
     const mintMaxPercent = toBN(2718);
 
+
     beforeEach(async function () {
         now = await latest();
         mintingRestrictedBefore = now.add(duration.minutes(2));
-        this.token = await ERC20Mock.new(name, symbol, initialSupply, mintingRestrictedBefore);
+        this.token = await ERC20Mock.new(name, symbol, initialSupply, mintingRestrictedBefore, initialHolder);
     });
 
     it('has a name', async function () {
@@ -45,12 +46,16 @@ contract('ERC20 token with annual inflation: ERC20 behaviour tests', function (a
         expect(await this.token.MINT_MAX_PERCENT()).to.be.bignumber.equal(mintMaxPercent);
     });
 
+    it('has treasury set', async function () {
+        expect(await this.token.treasury()).to.be.equal(initialHolder);
+    });
+
     shouldBehaveLikeERC20('ERC20', initialSupply, initialHolder, recipient, anotherAccount);
 
 })
 
 contract('ERC20 token with annual inflation: annual inflation tests', function (accounts) {
-    const [initialHolder, recipient, anotherAccount] = accounts;
+    const [deployer, initialHolder, recipient, anotherAccount, treasury] = accounts;
 
     const name = 'Euler';
     const symbol = 'EUL';
@@ -61,7 +66,7 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
     beforeEach(async function () {
         now = await latest();
         mintingRestrictedBefore = now.add(duration.minutes(2));
-        this.token = await ERC20Mock.new(name, symbol, initialSupply, mintingRestrictedBefore);
+        this.token = await ERC20Mock.new(name, symbol, initialSupply, mintingRestrictedBefore, initialHolder);
     });
 
     it('has a name', async function () {
@@ -90,7 +95,7 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
         });
 
         it('should set new treasury address', async function () {
-            expect(await this.token.treasury()).to.be.equal(ZERO_ADDRESS);
+            expect(await this.token.treasury()).to.be.equal(initialHolder);
             await this.token.updateTreasury(recipient, { from: initialHolder });
             expect(await this.token.treasury()).to.be.equal(recipient);
         });
@@ -105,7 +110,7 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
     });
 
     describe('mint inflated amount to treasury', function () {
-/* 
+        /* 
         beforeEach(async function () {
            // grant minting role
            const mintingRole = await this.token.MINTER_ROLE();
@@ -130,7 +135,7 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
             );
         });
 
-        it('should revert if treasury address is 0', async function () {
+        /* it('should revert if treasury address is 0', async function () {
             // grant minting role
            // const mintingRole = await this.token.MINTER_ROLE();
            // await this.token.grantRole(mintingRole, initialHolder, { from: initialHolder });
@@ -148,7 +153,7 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
                 this.token.mint({ from: initialHolder }),
                 "INVALID_TREASURY_ADDRESS"
             );
-        });
+        }); */
 
         it('should mint correct amount successfully to treasury and increase treasury balance', async function () {
             // grant minting role
@@ -273,6 +278,54 @@ contract('ERC20 token with annual inflation: annual inflation tests', function (
                 "Caller does not have the ADMIN_ROLE"
             );
         });
+    });
+
+});
+
+
+
+contract('ERC20 token constructor tests', function (accounts) {
+    const [deployer, initialHolder, recipient, anotherAccount] = accounts;
+
+    const name = 'Euler';
+    const symbol = 'EUL';
+    const initialSupply = new BN(200);
+
+    it('should revert if treasury address is zero', async function () {
+        let now = await latest();
+        let mintingRestrictedBefore = now.add(duration.minutes(2));
+        await expectRevert(
+            ERC20Mock.new(name, symbol, initialSupply, mintingRestrictedBefore, ZERO_ADDRESS),
+            "cannot set or mint to zero treasury address"
+        );
+    });
+
+    it('should revert if minting restricted before is not after current timestamp', async function () {
+        let now = await latest();
+        let mintingRestrictedBefore = now;
+        await expectRevert(
+            ERC20Mock.new(name, symbol, initialSupply, mintingRestrictedBefore, initialHolder),
+            "MINTING_RESTRICTED_BEFORE_TOO_EARLY"
+        );
+    });
+
+    it('should assign default admin role to initial holder', async function () {
+        let now = await latest();
+        let mintingRestrictedBefore = now.add(duration.minutes(2));;
+
+        const token = await ERC20Mock.new(name, symbol, initialSupply, mintingRestrictedBefore, initialHolder);
+        const defaultAdminRole = await token.DEFAULT_ADMIN_ROLE(); 
+        expect(await token.hasRole(defaultAdminRole, initialHolder)).to.be.equal(true);
+    });
+
+    it('should assign admin role to initial holder', async function () {
+        let now = await latest();
+        let mintingRestrictedBefore = now.add(duration.minutes(2));;
+
+        const token = await ERC20Mock.new(name, symbol, initialSupply, mintingRestrictedBefore, initialHolder);
+        const adminRole = await token.ADMIN_ROLE(); 
+        expect(await token.hasRole(adminRole, initialHolder)).to.be.equal(true);
+        
     });
 
 });
