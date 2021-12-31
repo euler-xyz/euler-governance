@@ -125,6 +125,7 @@ module.exports = {
     // default fixtures
     deployGovernanceContracts,
     writeAddressManifestToFile,
+    getContracts,
 
     // re-exports for convenience
     loadFixture,
