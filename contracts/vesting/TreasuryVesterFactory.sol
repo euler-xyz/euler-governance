@@ -25,7 +25,7 @@ contract TreasuryVesterFactory is AccessControl {
     mapping(address => address[]) public vestingContracts;
 
     /// MODIFIERS
-    modifier onlyAdmins() {
+    modifier onlyAdmin() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
             "Caller does not have the ADMIN_ROLE"
@@ -45,7 +45,7 @@ contract TreasuryVesterFactory is AccessControl {
         require(treasury_ != address(0), "cannot set zero address as treasuty");
         treasury = treasury_;
 
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(DEFAULT_ADMIN_ROLE, treasury);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
@@ -64,7 +64,7 @@ contract TreasuryVesterFactory is AccessControl {
         uint vestingBegin,
         uint vestingCliff,
         uint vestingEnd
-    ) external onlyAdmins returns (address recipient_, address vestingContract_, uint256 index_) {
+    ) external onlyAdmin returns (address recipient_, address vestingContract_, uint256 index_) {
         require(EUL.balanceOf(address(this)) >= vestingAmount, "insufficient balance for vestingAmount");
         TreasuryVester tv = new TreasuryVester(
             address(EUL),
@@ -87,7 +87,7 @@ contract TreasuryVesterFactory is AccessControl {
     * Only callable by admins.
     * @param amount The amount to withdraw to treasury
     */
-    function withdraw(uint256 amount) external onlyAdmins {
+    function withdraw(uint256 amount) external onlyAdmin {
         EUL.transfer(treasury, amount);
     }
 
@@ -96,7 +96,7 @@ contract TreasuryVesterFactory is AccessControl {
     * Only callable by admins.
     * @param newTreasury The address to set as the new Treasury
     */
-    function updateTreasury(address newTreasury) external onlyAdmins {
+    function updateTreasury(address newTreasury) external onlyAdmin {
         require(newTreasury != address(0), "cannot set zero treasury address");
         treasury = newTreasury;
         emit TreasuryUpdated(treasury);

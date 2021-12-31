@@ -7,7 +7,7 @@ const ERC20VotesMock = artifacts.require('ERC20VotesMock');
 const VestingFactory = artifacts.require('TreasuryVesterFactory');
 
 contract('TreasuryVesterFactory: constructor', function (accounts) {
-  const [owner] = accounts;
+  const [owner, treasury] = accounts;
 
     const name = 'Euler';
     const symbol = 'EUL';
@@ -19,7 +19,7 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
           
           this.vestingFactory = await VestingFactory.new(
             this.token.address,
-            accounts[0]
+            treasury
           );
         });
 
@@ -40,6 +40,11 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
             let role = await this.vestingFactory.ADMIN_ROLE();
             expect(await this.vestingFactory.hasRole(role, owner)).to.equal(true);
         });
+
+        it('should assign treasury with overall/default admin role', async function () {
+          let role = await this.vestingFactory.DEFAULT_ADMIN_ROLE();
+          expect(await this.vestingFactory.hasRole(role, treasury)).to.equal(true);
+      });
 
       });
 

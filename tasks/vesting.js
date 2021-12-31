@@ -46,6 +46,11 @@ task("vesting:createVesting")
     .addPositionalParam("vestingCliff")
     .addPositionalParam("vestingEnd")
     .setAction(async (args) => {
+        if (parseInt(args.vestingBegin) < 1640995200) {
+            console.log("Vesting begin must be equal to or greater than 1st of January, 2022. ie., 1640995200 in unix timestamp ");
+            return false;
+        }
+        
         const userInput = prompt(
             "The following data will be used to deploy the vesting contract.\n" +
             "Ensure that vestingCliff >= vestingBegin and vestingEnd > vestingCliff\n" +
@@ -81,32 +86,31 @@ task("vesting:createVesting")
 
 
 
-    task("vesting:withdraw")
+task("vesting:withdraw")
     .addPositionalParam("vestingFactory")
     .addPositionalParam("amount")
     .setAction(async (args) => {
-            const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
-            const vestingFactory = await VestingFactory.attach(args.vestingFactory);
-            const tx = await vestingFactory.withdraw(
-                ethers.utils.parseUnits(args.amount, 18)
-            );
-            console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
-            let result = await tx.wait();
-            console.log(`Mined. Status: ${result.status}`);
+        const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
+        const vestingFactory = await VestingFactory.attach(args.vestingFactory);
+        const tx = await vestingFactory.withdraw(
+            ethers.utils.parseUnits(args.amount, 18)
+        );
+        console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+        let result = await tx.wait();
+        console.log(`Mined. Status: ${result.status}`);
     });
 
-    task("vesting:updateTreasury")
+task("vesting:updateTreasury")
     .addPositionalParam("vestingFactory")
     .addPositionalParam("treasury")
     .setAction(async (args) => {
-            const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
-            const vestingFactory = await VestingFactory.attach(args.vestingFactory);
-            const tx = await vestingFactory.updateTreasury(
-                args.treasury
-            );
-            console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
-            let result = await tx.wait();
-            console.log(`Mined. Status: ${result.status}`);
+        const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
+        const vestingFactory = await VestingFactory.attach(args.vestingFactory);
+        const tx = await vestingFactory.updateTreasury(
+            args.treasury
+        );
+        console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+        let result = await tx.wait();
+        console.log(`Mined. Status: ${result.status}`);
     });
 
-    
