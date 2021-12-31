@@ -50,7 +50,7 @@ task("vesting:createVesting")
             console.log("Vesting begin must be equal to or greater than 1st of January, 2022. ie., 1640995200 in unix timestamp ");
             return false;
         }
-        
+
         const userInput = prompt(
             "The following data will be used to deploy the vesting contract.\n" +
             "Ensure that vestingCliff >= vestingBegin and vestingEnd > vestingCliff\n" +
@@ -114,3 +114,14 @@ task("vesting:updateTreasury")
         console.log(`Mined. Status: ${result.status}`);
     });
 
+task("vesting:getVestingContracts")
+    .addPositionalParam("vestingFactory")
+    .addPositionalParam("recipient")
+    .setAction(async (args) => {
+        const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
+        const vestingFactory = await VestingFactory.attach(args.vestingFactory);
+        const vestingContractCount = await vestingFactory.getVestingContracts(
+            args.recipient
+        );
+        console.log(`Vesting Contract Count for recipient ${args.recipient}: ${vestingContractCount}`);
+    });
