@@ -3,6 +3,8 @@ require('@nomiclabs/hardhat-truffle5');
 require("@nomiclabs/hardhat-waffle");
 require("solidity-coverage");
 require("@nomiclabs/hardhat-etherscan");
+require("hardhat-gas-reporter");
+
 
 // Load tasks
 
@@ -78,6 +80,10 @@ module.exports = {
   },
   mocha: {
     timeout: 300000 // 5 minutes in milliseconds
+  },
+
+  gasReporter: {
+    enabled: false
   }
 };
 
