@@ -29,6 +29,22 @@ task("testtoken:mint")
         console.log(`Mined. Status: ${result.status}`);
     });
 
+task("testtoken:transfer")
+    .addPositionalParam("token")
+    .addPositionalParam("to")
+    .addPositionalParam("amount")
+    .setAction(async (args) => {
+        const Token = await hre.ethers.getContractFactory("ERC20VotesMock");
+        const token = await Token.attach(args.token);
+        const decimals = await token.decimals();
+
+        const tx = await token.transfer(args.to, ethers.utils.parseUnits(args.amount, decimals));
+
+        console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+        let result = await tx.wait();
+        console.log(`Mined. Status: ${result.status}`);
+    });
+
 task("testtoken:balanceOf")
     .addPositionalParam("token")
     .addPositionalParam("who")

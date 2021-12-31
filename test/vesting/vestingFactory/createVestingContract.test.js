@@ -3,13 +3,14 @@ const { expectBignumberEqual, expect } = require('../../../helpers/index');
 const { findEventInTransaction } = require('../../../helpers/events');
 const { parseEther } = require('@ethersproject/units');
 const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants');
+const { ethers } = require('ethers');
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
 const VestingFactory = artifacts.require('TreasuryVesterFactory');
 const Vesting = artifacts.require('TreasuryVester');
 
 contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
-    const [owner, recipient] = accounts;
+    const [owner, treasury, recipient, otherAddress] = accounts;
 
     const name = 'Euler';
     const symbol = 'EUL';
@@ -21,7 +22,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
         this.token = await ERC20VotesMock.new(name, symbol);
         this.vestingFactory = await VestingFactory.new(
             this.token.address, // token
-            accounts[1] // treasury
+            treasury // treasury
         );
 
         now = await latest();
@@ -40,7 +41,122 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
         uint vestingEnd - this is the unix timestamp of when the vesting period will end. After this timestamp, the recipient can withdraw or collect all of the remaining vested amount
      */
 
-    it('reverts if not called by owner', async function () {
+    it('create vesting contract and revoke admin role afterwards', async function () {
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount);
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
+        );
+
+        expect(await this.vestingFactory.getVestingContract(recipient, 0)).to.not.be.equal(ZERO_ADDRESS);
+
+        const adminRole = await this.vestingFactory.ADMIN_ROLE();
+        const defaultAdminRole = await this.vestingFactory.DEFAULT_ADMIN_ROLE();
+
+        // should revert with AccessControl: account 0x90f79bf6eb2c4f870365e785982e1f101e93b906 is missing role 0x0000000000000000000000000000000000000000000000000000000000000000
+        await shouldFailWithMessage(
+            this.vestingFactory.revokeRole(adminRole, owner, {from: otherAddress}),
+            // convert to non checksum address to prevent test failing
+            `AccessControl: account ${otherAddress.toString().toLowerCase()} is missing role ${defaultAdminRole}`
+        );
+
+        await this.vestingFactory.revokeRole(adminRole, owner, {from: treasury});
+
+        await shouldFailWithMessage(
+            this.vestingFactory.createVestingContract(
+                recipient,
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd,
+                {from: owner}
+            ), 
+            'Caller does not have the ADMIN_ROLE'
+        );
+    });
+
+    it('revoke admin role and reassign to another address and perform admin action', async function () {
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount);
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
+        );
+
+        expect(await this.vestingFactory.getVestingContract(recipient, 0)).to.not.be.equal(ZERO_ADDRESS);
+
+        const adminRole = await this.vestingFactory.ADMIN_ROLE();
+        const defaultAdminRole = await this.vestingFactory.DEFAULT_ADMIN_ROLE();
+
+        // should revert with AccessControl: account 0x90f79bf6eb2c4f870365e785982e1f101e93b906 is missing role 0x0000000000000000000000000000000000000000000000000000000000000000
+        await shouldFailWithMessage(
+            this.vestingFactory.revokeRole(adminRole, owner, {from: otherAddress}),
+            // convert to non checksum address to prevent test failing
+            `AccessControl: account ${otherAddress.toString().toLowerCase()} is missing role ${defaultAdminRole}`
+        );
+
+        await this.vestingFactory.revokeRole(adminRole, owner, {from: treasury});
+
+        await shouldFailWithMessage(
+            this.vestingFactory.createVestingContract(
+                recipient,
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd,
+                {from: owner}
+            ), 
+            'Caller does not have the ADMIN_ROLE'
+        );
+
+        await this.vestingFactory.grantRole(adminRole, otherAddress, {from: treasury});
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount);
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd,
+            {from: otherAddress}
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            2
+        );
+
+        expect(await this.vestingFactory.getVestingContract(recipient, 1)).to.not.be.equal(ZERO_ADDRESS);
+
+    });
+
+    it('reverts if not called by admin', async function () {
         vestingBegin = now.add(await duration.minutes(5));
         vestingCliff = now.add(await duration.minutes(15));
         vestingEnd = now.add(await duration.minutes(25));
