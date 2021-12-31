@@ -31,6 +31,7 @@ npx hardhat test
 
 ## Smart Contract addresses
 
+
 ### Mainnet 
 
 EUL token - `0xd9Fcd98c322942075A5C3860693e9f4f03AAE07b`
