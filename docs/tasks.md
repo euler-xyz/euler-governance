@@ -13,6 +13,7 @@ The following parameters are required: EUL token address followed by treasury ad
 `NODE_ENV=rivet npx hardhat --network ropsten vesting:deployFactory 0x2FEe9F774f8d963bF253D41111d03ae990B0834D 0x13214af5a958e47d0fa1366fc3d36dc3fa46e80f`
  -> add address to README file
 
+
 ## Create new vesting schedule / deploy new vesting contract for a recipient 
 
 Only current vesting factory admin can use this task.

@@ -2,6 +2,7 @@ const { parseEther } = require("@ethersproject/units");
 const { ethers } = require("ethers");
 const prompt = require("prompt-sync")({ sigint: true });
 
+
 task("vesting:latestBlock")
     .setAction(async () => {
         const latestBlock = await hre.ethers.provider.getBlockNumber();
@@ -11,6 +12,8 @@ task("vesting:latestBlock")
         console.log(`Latest block number: ${latestBlock}`);
         console.log(`Latest block timestamp: ${latestBlockTimestamp}`);
     });
+
+
 
 task("vesting:deployFactory")
     .addPositionalParam("eul")
@@ -37,6 +40,8 @@ task("vesting:deployFactory")
             return false;
         }
     });
+
+
 
 task("vesting:createVesting")
     .addPositionalParam("vestingFactory")
@@ -100,6 +105,8 @@ task("vesting:withdraw")
         console.log(`Mined. Status: ${result.status}`);
     });
 
+
+
 task("vesting:updateTreasury")
     .addPositionalParam("vestingFactory")
     .addPositionalParam("treasury")
@@ -113,6 +120,8 @@ task("vesting:updateTreasury")
         let result = await tx.wait();
         console.log(`Mined. Status: ${result.status}`);
     });
+
+
 
 task("vesting:getVestingContracts")
     .addPositionalParam("vestingFactory")
