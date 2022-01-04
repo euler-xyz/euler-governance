@@ -7,7 +7,7 @@ const { findEventInTransaction } = require('../../helpers/events');
 const { MAX_UINT256, ZERO_ADDRESS, ZERO_BYTES32 } = constants;
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const Vesting = artifacts.require('TreasuryVester');
+const Vesting = artifacts.require('MockTreasuryVester');
 
 contract('TreasuryVester: delegate', function (accounts) {
     const [owner, recipient, otherAccount] = accounts;

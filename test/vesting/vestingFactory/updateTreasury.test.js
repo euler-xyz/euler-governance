@@ -5,7 +5,7 @@ const { ZERO_ADDRESS } = constants;
 const { findEventInTransaction } = require('../../../helpers/events');
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const VestingFactory = artifacts.require('TreasuryVesterFactory');
+const VestingFactory = artifacts.require('TreasuryVesterFactory'); // artifacts.require('TreasuryVesterFactory');
 
 contract('TreasuryVesterFactory: updateTreasury()', function (accounts) {
   const [owner] = accounts;

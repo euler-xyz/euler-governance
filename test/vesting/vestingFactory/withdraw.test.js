@@ -3,7 +3,7 @@ const { expectBignumberEqual } = require('../../../helpers/index');
 const { parseEther } = require('@ethersproject/units');
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const VestingFactory = artifacts.require('TreasuryVesterFactory');
+const VestingFactory = artifacts.require('TreasuryVesterFactory'); // artifacts.require('TreasuryVesterFactory');
 
 contract('TreasuryVesterFactory: withdraw()', function (accounts) {
     const [owner] = accounts;

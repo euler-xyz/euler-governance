@@ -8,7 +8,7 @@ const { web3 } = require('@openzeppelin/test-helpers/src/setup');
 const { MAX_UINT256, ZERO_ADDRESS, ZERO_BYTES32 } = constants;
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const Vesting = artifacts.require('TreasuryVester');
+const Vesting = artifacts.require('MockTreasuryVester');
 
 contract('TreasuryVester: governance', function (accounts) {
     const [owner, recipient, otherAccount] = accounts;

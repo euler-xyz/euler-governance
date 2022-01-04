@@ -8,9 +8,13 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
+// proxy
+import "@openzeppelin/contracts/proxy/Clones.sol";
+
 
 contract TreasuryVesterFactory is AccessControl {
     using Address for address;
+    using Clones for address;
 
     /// @notice The role assigned to users who can call admin/restricted functions
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
@@ -20,6 +24,8 @@ contract TreasuryVesterFactory is AccessControl {
     
     /// @notice The Euler treasury contract
     address public treasury;
+
+    TreasuryVester public immutable vestingLogic;
     
     /// @notice mapping vested token recipients to their vesting contracts
     mapping(address => address[]) public vestingContracts;
@@ -45,6 +51,8 @@ contract TreasuryVesterFactory is AccessControl {
         require(treasury_ != address(0), "cannot set zero address as treasuty");
         treasury = treasury_;
 
+        vestingLogic = new TreasuryVester();
+
         _setupRole(DEFAULT_ADMIN_ROLE, treasury);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
@@ -66,7 +74,8 @@ contract TreasuryVesterFactory is AccessControl {
         uint vestingEnd
     ) external onlyAdmin returns (address recipient_, address vestingContract_, uint256 index_) {
         require(EUL.balanceOf(address(this)) >= vestingAmount, "insufficient balance for vestingAmount");
-        TreasuryVester tv = new TreasuryVester(
+        bytes memory data = abi.encodeWithSelector(
+            vestingLogic.initialize.selector, 
             address(EUL),
             recipient,
             vestingAmount,
@@ -74,12 +83,18 @@ contract TreasuryVesterFactory is AccessControl {
             vestingCliff,
             vestingEnd
         );
+        
         recipient_ = recipient;
         index_ = vestingContracts[recipient].length;
-        vestingContract_ = address(tv);
+        vestingContract_ = _initAndEmit(address(vestingLogic).clone(), data);
         EUL.transfer(vestingContract_, vestingAmount);
         vestingContracts[recipient_].push(vestingContract_);
         emit VestingContract(recipient_, vestingContract_, index_);
+    }
+
+    function _initAndEmit(address instance, bytes memory initdata) internal returns (address) {
+        instance.functionCallWithValue(initdata, msg.value);
+        return instance;
     }
 
     /**
