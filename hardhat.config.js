@@ -75,12 +75,12 @@ module.exports = {
       },
       {
         version: "0.8.4",
-        /* settings: {
+        settings: {
           optimizer: {
               enabled: true,
               runs: 1,
           },
-        } */
+        }
       }
     ]
   },

@@ -39,6 +39,7 @@
     "@openzeppelin/test-helpers": "^0.5.12",
     "bignumber": "^1.1.0",
     "bignumber.js": "^9.0.1",
+    "csv-parse": "^5.0.4",
     "dotenv": "^10.0.0",
     "eth-sig-util": "^3.0.1",
     "ethereumjs-abi": "^0.6.8",

@@ -32,12 +32,13 @@ async function deployGovernanceContracts(provider, wallets, tokenSetupName) {
     const minDelay = 120; // 3600; // execution delay in seconds
 
     const votingDelay = 1; // 10; // blocks
-    const votingPeriod = 10; // 6570; // blocks, 1 day assuming 13.14 seconds per block
+    // voting period 10 blocks on ropsten and 50 on rinkeby
+    const votingPeriod = 50; // 6570; // blocks, 1 day assuming 13.14 seconds per block
     const quorumNumerator = 4; // 4% quorum, denominator = 100
     const proposalThreshold = web3.utils.toWei('100');
 
     ctx.contracts.timelock = await (await ctx.factories.Timelock.deploy(minDelay, [], [])).deployed();
-    ctx.contracts.eul = await (await ctx.factories.Eul.deploy(tokenName, tokenSymbol, totalSupply, Date.now() + 1000)).deployed();
+    ctx.contracts.eul = await (await ctx.factories.Eul.deploy(tokenName, tokenSymbol, totalSupply, Date.now() + 1000, wallets[0].address)).deployed();
     ctx.contracts.governance = await (await ctx.factories.Governance.deploy(
         name, ctx.contracts.eul.address, votingDelay, 
         votingPeriod, ctx.contracts.timelock.address, 

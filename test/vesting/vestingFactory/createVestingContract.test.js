@@ -138,11 +138,14 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
 
         await this.token.transfer(this.vestingFactory.address, vestingAmount);
         
+        // console.log(vestingCliff + 2) appends 2 to BN
+        // console.log(vestingCliff.add(toBN(1)).toString()) adds 1 to BN
+
         await this.vestingFactory.createVestingContract(
             recipient,
             vestingAmount,
             vestingBegin,
-            vestingCliff,
+            vestingCliff.add(toBN(1)),
             vestingEnd,
             {from: otherAddress}
         );
@@ -249,7 +252,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
             vestingAmount,
             vestingBegin,
             vestingCliff,
-            vestingEnd
+            vestingEnd.add(toBN(1))
         );
 
         expectBignumberEqual(
@@ -283,7 +286,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
             vestingAmount,
             vestingBegin,
             vestingCliff,
-            vestingEnd
+            vestingEnd.add(toBN(1))
         );
 
         expectBignumberEqual(
@@ -307,7 +310,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
         await this.vestingFactory.createVestingContract(
             recipient2,
             vestingAmount,
-            vestingBegin,
+            vestingBegin.add(toBN(1)),
             vestingCliff,
             vestingEnd
         );
@@ -315,6 +318,43 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
         expectBignumberEqual(
             (await this.vestingFactory.getVestingContracts(recipient2)).length,
             2
+        );
+    });
+
+    it('reverts if the same data is used to create duplicate vesting contract', async function () {
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount.mul(4));
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+        
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
+        );
+
+        await shouldFailWithMessage(
+            this.vestingFactory.createVestingContract(
+                recipient,
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd
+            ),
+            'vesting contract already exists'
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
         );
     });
 
