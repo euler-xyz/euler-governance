@@ -1,5 +1,7 @@
 notes.txt
+*.txt
 .DS_Store
+*.csv 
 
 # Logs
 logs
