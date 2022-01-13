@@ -61,3 +61,13 @@ The following parameters are required: vestingFactory address, and treasury addr
 Requires the address of the vesting factory contract and recipient address
 
 `NODE_ENV=rivet npx hardhat --network ropsten vesting:getVestingContracts vestingFactory recipient`
+
+
+## Create vesting contracts from csv file. 
+
+The csv file should have the following headings: 
+`recipientAddress,vestingAmount,vestingCliff,vestingEnd`
+
+and sample data:
+
+`0x5a45ede034c66766ACb2590F96C5bC6D1D922520,200,1643673600,1767225600`
