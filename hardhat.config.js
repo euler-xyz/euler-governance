@@ -2,8 +2,9 @@ const fs = require("fs");
 require('@nomiclabs/hardhat-truffle5');
 require("@nomiclabs/hardhat-waffle");
 require("solidity-coverage");
-require("dotenv").config();
 require("@nomiclabs/hardhat-etherscan");
+require("hardhat-gas-reporter");
+
 
 // Load tasks
 
@@ -52,10 +53,6 @@ for (let file of files) {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  etherscan: {
-    apiKey: 'YWGA9IG8T37IZ5JX4UKKNNF8E3W8XKGCD1'
-  },
-
   networks: {
     hardhat: {
         allowUnlimitedContractSize: true
@@ -83,28 +80,37 @@ module.exports = {
   },
   mocha: {
     timeout: 300000 // 5 minutes in milliseconds
+  },
+
+  gasReporter: {
+    enabled: false
   }
 };
 
 
-if (process.env.PRIVATE_KEY && process.env.ALCHEMY_API_KEY) {
-  module.exports.networks = {
-      ...module.exports.networks,
-      kovan: {
-          url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-          accounts: [`0x${process.env.PRIVATE_KEY}`],
-      },
-      ropsten: {
-          url: `https://${process.env.RIVET_API_KEY}.ropsten.rpc.rivet.cloud/`,
-          accounts: [`0x${process.env.PRIVATE_KEY}`],
-      },
-      goerli: {
-          url: `https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-          accounts: [`0x${process.env.PRIVATE_KEY}`],
-      },
-      rinkeby: {
-        url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-        accounts: [`0x${process.env.PRIVATE_KEY}`],
-    },
-  };
+if (process.env.NODE_ENV) {
+  let path = `.env.${process.env.NODE_ENV}`;
+  if (!fs.existsSync(path)) throw(`unable to open env file: ${path}`);
+  require("dotenv").config({ path, });
+} else if (fs.existsSync('./.env')) {
+  require("dotenv").config();
+}
+
+for (let k in process.env) {
+  if (k.startsWith("RPC_URL_")) {
+      let networkName = k.slice(8).toLowerCase();
+
+      module.exports.networks = {
+          [networkName]: {
+              url: `${process.env[k]}`,
+              accounts: [`0x${process.env.PRIVATE_KEY}`],
+          }
+      }
+  }
+
+  if (k == "ETHERSCAN_API_KEY") {
+    module.exports.etherscan = {
+      apiKey: process.env[k]
+    }
+  }
 }
