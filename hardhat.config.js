@@ -4,7 +4,7 @@ require("@nomiclabs/hardhat-waffle");
 require("solidity-coverage");
 require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
-
+require('@openzeppelin/hardhat-upgrades');
 
 // Load tasks
 
@@ -74,7 +74,13 @@ module.exports = {
         version: "0.8.3"
       },
       {
-        version: "0.8.4"
+        version: "0.8.4",
+        settings: {
+          optimizer: {
+              enabled: true,
+              runs: 1,
+          },
+        }
       }
     ]
   },
@@ -83,7 +89,7 @@ module.exports = {
   },
 
   gasReporter: {
-    enabled: false
+    enabled: true
   }
 };
 

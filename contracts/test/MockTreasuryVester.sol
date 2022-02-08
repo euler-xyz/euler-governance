@@ -2,9 +2,7 @@
 
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-
-contract TreasuryVester is Initializable {
+contract MockTreasuryVester {
     address public eul;
     address public recipient;
 
@@ -15,14 +13,14 @@ contract TreasuryVester is Initializable {
 
     uint public lastUpdate;
 
-    function initialize(
+    constructor(
         address eul_,
         address recipient_,
         uint vestingAmount_,
         uint vestingBegin_,
         uint vestingCliff_,
         uint vestingEnd_
-    ) public initializer {
+    ) {
         require(eul_ != address(0), 'TreasuryVester::constructor: invalid EUL token contract address');
         require(recipient_ != address(0), 'TreasuryVester::constructor: invalid recipient address');
         require(vestingCliff_ >= vestingBegin_, 'TreasuryVester::constructor: cliff is too early');

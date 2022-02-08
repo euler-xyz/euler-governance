@@ -6,11 +6,11 @@ const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants');
 const { ethers } = require('ethers');
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const VestingFactory = artifacts.require('TreasuryVesterFactory');
+const VestingFactory = artifacts.require('TreasuryVesterFactory'); // artifacts.require('TreasuryVesterFactory');
 const Vesting = artifacts.require('TreasuryVester');
 
 contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
-    const [owner, treasury, recipient, otherAddress] = accounts;
+    const [owner, treasury, recipient, otherAddress, recipient2] = accounts;
 
     const name = 'Euler';
     const symbol = 'EUL';
@@ -138,11 +138,14 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
 
         await this.token.transfer(this.vestingFactory.address, vestingAmount);
         
+        // console.log(vestingCliff + 2) appends 2 to BN
+        // console.log(vestingCliff.add(toBN(1)).toString()) adds 1 to BN
+
         await this.vestingFactory.createVestingContract(
             recipient,
             vestingAmount,
             vestingBegin,
-            vestingCliff,
+            vestingCliff.add(toBN(1)),
             vestingEnd,
             {from: otherAddress}
         );
@@ -224,7 +227,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
         expect(await this.vestingFactory.getVestingContract(recipient, 0)).to.not.be.equal(ZERO_ADDRESS);
     });
 
-    it('can create multiple vesting contracts for recipient', async function () {
+    it('can create multiple vesting contracts for single recipient', async function () {
         vestingBegin = now.add(await duration.minutes(5));
         vestingCliff = now.add(await duration.minutes(15));
         vestingEnd = now.add(await duration.minutes(25));
@@ -249,12 +252,109 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
             vestingAmount,
             vestingBegin,
             vestingCliff,
-            vestingEnd
+            vestingEnd.add(toBN(1))
         );
 
         expectBignumberEqual(
             (await this.vestingFactory.getVestingContracts(recipient)).length,
             2
+        );
+    });
+
+    it('can create multiple vesting contracts for multiple recipients', async function () {
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount.mul(4));
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+        
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
+        );
+
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd.add(toBN(1))
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            2
+        );
+
+        await this.vestingFactory.createVestingContract(
+            recipient2,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient2)).length,
+            1
+        );
+
+        await this.vestingFactory.createVestingContract(
+            recipient2,
+            vestingAmount,
+            vestingBegin.add(toBN(1)),
+            vestingCliff,
+            vestingEnd
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient2)).length,
+            2
+        );
+    });
+
+    it('reverts if the same data is used to create duplicate vesting contract', async function () {
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount.mul(4));
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+        
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
+        );
+
+        await shouldFailWithMessage(
+            this.vestingFactory.createVestingContract(
+                recipient,
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd
+            ),
+            'vesting contract already exists'
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
         );
     });
 
@@ -428,10 +528,10 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
             vestingEnd
         );
 
-        let lastUpdate = vestingBegin;
+        // let lastUpdate = vestingBegin;
 
         const vestingContractAddress = await this.vestingFactory.getVestingContract(recipient, 0);
-        const vestingContractInstance = await Vesting.at(vestingContractAddress);
+        // const vestingContractInstance = await Vesting.at(vestingContractAddress);
         // created contract should receive vested tokens
         expectBignumberEqual(await this.token.balanceOf(vestingContractAddress), vestingAmount);
     });
@@ -451,7 +551,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
             vestingEnd
         );
 
-        let lastUpdate = vestingBegin;
+        // let lastUpdate = vestingBegin;
 
         const vestingContractAddress = await this.vestingFactory.getVestingContract(recipient, 0);
         const vestingContractInstance = await Vesting.at(vestingContractAddress);

@@ -4,7 +4,7 @@ const { shouldFailWithMessage } = require('../../../helpers/utils');
 const { ZERO_ADDRESS } = constants;
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const VestingFactory = artifacts.require('TreasuryVesterFactory');
+const VestingFactory = artifacts.require('TreasuryVesterFactory'); // artifacts.require('TreasuryVesterFactory');
 
 contract('TreasuryVesterFactory: constructor', function (accounts) {
   const [owner, treasury] = accounts;
@@ -34,6 +34,10 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
         it('treasury address is valid', async function () {
             expect(await this.vestingFactory.treasury()).to.not.equal(ZERO_ADDRESS);
         });
+
+        it('vesting contract implementation address is valid', async function () {
+          expect(await this.vestingFactory.vestingLogic()).to.not.equal(ZERO_ADDRESS);
+      });
 
         // role check for owner
         it('should assign deployer with owner role', async function () {

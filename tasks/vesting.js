@@ -3,7 +3,7 @@ const { ethers } = require("ethers");
 const prompt = require("prompt-sync")({ sigint: true });
 
 
-task("vesting:latestBlock")
+task("network:latestBlock")
     .setAction(async () => {
         const latestBlock = await hre.ethers.provider.getBlockNumber();
         const latestBlockData = await hre.ethers.provider.getBlock(latestBlock);
@@ -39,6 +39,141 @@ task("vesting:deployFactory")
             console.log("Stoping deployment")
             return false;
         }
+    });
+
+
+
+task("vesting:createVestingFromCSV")
+    .addPositionalParam("vestingFactory")
+    // arg will be path to csv file
+    .setAction(async (args) => {
+        if (!hre.ethers.utils.isAddress(args.vestingFactory)) {
+            console.log(`[ERROR]: invalid address for vestingFactory`)
+            return;
+        }
+        const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
+        const vestingFactory = await VestingFactory.attach(args.vestingFactory);
+
+        const fs = require('fs')
+        const inputPath = "./vestingSchedules.csv";
+        const textByLine = fs.readFileSync(inputPath).toString().split("\n");
+
+        let output = "recipientAddress,vestingAmount,vestingBegin,vestingCliff,vestingEnd,vestingAddress\n"
+
+        // let i = 1 to skip headings
+        for (let i = 1; i < textByLine.length; i++) {
+            const row = textByLine[i].split(",")
+ 
+            // recipient address
+            if (!hre.ethers.utils.isAddress(row[0])) {
+                console.log(`[ERROR]: recipient address is invalid for data in row ${i + 1}`)
+                continue;
+            }
+            
+            const vestingBegin = 1640995200;
+            const vestingCliff = parseInt(row[2]);
+            const vestingEnd = parseInt(row[3]);
+            
+            // vestingAmount
+            if (
+                isNaN(parseInt(row[1]))
+            ) {
+                console.log(`[ERROR]: invalid value for vestingAmount in row ${i + 1}`);
+                continue;
+            }
+            // vestingCliff
+            if (
+                !(
+                    !isNaN(vestingCliff) && 
+                    vestingCliff > Math.floor(Date.now() / 1000) && 
+                    vestingCliff >= vestingBegin
+                )
+            ) {
+                console.log(`[ERROR]: invalid value for vestingCliff in row ${i + 1}`);
+                continue;
+            }
+            // vestingEnd
+            if (
+                !(
+                    !isNaN(vestingEnd) && 
+                    vestingEnd > Math.floor(Date.now() / 1000) && 
+                    vestingEnd > vestingCliff
+                )
+            ) {
+                console.log(`[ERROR]: invalid value for vestingEnd in row ${i + 1}`);
+                continue;
+            }
+
+            // check if vesting data is unique and no contract exists
+            // todo try catch for alll static and calls
+            const vestingDataHash = await vestingFactory.hashVestingData(
+                row[0],
+                parseEther(row[1].toString()),
+                vestingBegin,
+                vestingCliff,
+                vestingEnd
+            );
+
+            const vestingContractExists = hre.ethers.utils.isAddress(await vestingFactory.vestingData(vestingDataHash));
+            if (vestingContractExists) {
+                console.log(`[SKIPPING]: vesting contract already exists for vesting data in row ${i + 1}`);
+                continue;
+            }
+
+            // testing tx here to save gas if tx reverts
+            let isValid = false;
+
+            let signers = await hre.ethers.getSigners();
+            let signer = signers[0];
+            try {
+                let estimateGasResult = await vestingFactory.connect(signer).estimateGas['createVestingContract'].apply(null, 
+                    row[0],
+                    parseEther(row[1].toString()),
+                    vestingBegin,
+                    vestingCliff,
+                    vestingEnd,
+                );
+                    
+                await instance.methods['createVestingContract(address,uint256,uint256,uint256,uint256)'].call(
+                    row[0],
+                    parseEther(row[1].toString()),
+                    vestingBegin,
+                    vestingCliff,
+                    vestingEnd,
+                    {
+                        gasLimit: Math.floor(estimateGasResult * 1.01 + 1000)
+                    }
+                )
+                isValid = true;
+            } catch {
+                console.log(`[SKIPPING]: row ${i + 1} as transaction will fail with error: ${e}`);
+            }
+                
+            if (isValid) {
+                try {
+                        const tx = await vestingFactory.createVestingContract(
+                            row[0],
+                            parseEther(row[1].toString()),
+                            vestingBegin,
+                            vestingCliff,
+                            vestingEnd
+                        );
+                        console.log(`Vesting Deployment Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+                        let result = await tx.wait();
+                        console.log(`Mined. Status: ${result.status}`);
+                        console.log(`Vesting Contract Address: ${result.events[1].args.vestingContract}`);
+                        console.log(`Vesting Contract Index: ${result.events[1].args.index}`);
+                        console.log(`Vesting Contract Recipient: ${result.events[1].args.recipient}`);
+                        
+                        output += `${row},${result.events[1].args.vestingContract},\n`;
+                } catch (e) {
+                    console.log(`[SKIPPING]: row ${i + 1} as transaction failed with error: ${e}`);
+                }
+            }
+        }
+        // todo write all data to csv file. replace missing address with 0x0
+        console.log("\nDONE\n");
+        console.log(output);
     });
 
 
