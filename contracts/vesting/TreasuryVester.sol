@@ -56,6 +56,11 @@ contract TreasuryVester is Initializable {
         IERC20Votes(eul).transfer(recipient, amount);
     }
 
+    /**
+     * @notice Delegates the vested tokens to a delegate address to be used for governance.
+     * Only callable by the recipient.
+     * @param delegatee_ The address to serve as the delegate
+     */
     function delegate(address delegatee_) public {
         require(msg.sender == recipient, 'TreasuryVester::delegate: unauthorized');
         IERC20Votes(eul).delegate(delegatee_);
