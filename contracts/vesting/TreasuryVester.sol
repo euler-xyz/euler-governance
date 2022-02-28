@@ -44,6 +44,16 @@ contract TreasuryVester is Initializable {
         recipient = recipient_;
     }
 
+    /**
+     * @notice Claim an amount of the vested tokens.
+     * The claimed amount if any based on the vesting schedule, 
+     * will be transferred to the recipient address.
+     * If the vesting end timestamp has elapsed, all the vested funds are claimed.
+     * Otherwise, the amount to claim, computed based on time delta considering
+     * the time difference between current block timestamp and last update
+     * divided by the vesting duration (vesting end - vesting begin)
+     * Can be called by anyone but funds will only go to the vesting recipient.
+     */
     function claim() public {
         require(block.timestamp >= vestingCliff, 'TreasuryVester::claim: not time yet');
         uint amount;
