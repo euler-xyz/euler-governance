@@ -15,6 +15,7 @@ contract TreasuryVester is Initializable {
 
     uint public lastUpdate;
 
+    /// constructor replacement, executed only once, upon deployment.
     function initialize(
         address eul_,
         address recipient_,
