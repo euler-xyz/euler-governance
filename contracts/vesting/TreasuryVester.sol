@@ -39,6 +39,11 @@ contract TreasuryVester is Initializable {
         lastUpdate = vestingBegin_;
     }
 
+    /**
+     * @notice Sets a recipient address. 
+     * Callable by the current recipient only.
+     * @param recipient_ The recipient of the vested funds
+     */
     function setRecipient(address recipient_) public {
         require(msg.sender == recipient, 'TreasuryVester::setRecipient: unauthorized');
         recipient = recipient_;
