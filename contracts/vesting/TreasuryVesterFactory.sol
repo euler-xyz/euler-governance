@@ -62,6 +62,14 @@ contract TreasuryVesterFactory is AccessControl {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+    /**
+     * @notice Creates a hash of the vesting contract parameters.
+     * @param recipient The address for which the vesting contract is created
+     * @param vestingAmount The vested amount
+     * @param vestingBegin The start timestamp of vesting
+     * @param vestingCliff Timestamp of vesting cliff when withdrawal of vested tokens can begin
+     * @param vestingEnd The timestamp when the vesting ends
+     */
     function hashVestingData(
         address recipient,
         uint256 vestingAmount,
