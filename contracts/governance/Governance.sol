@@ -2,16 +2,19 @@
 
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorProposalThreshold.sol";
 
-contract Governance is GovernorTimelockControl, GovernorProposalThreshold, GovernorVotesQuorumFraction, GovernorCountingSimple {
-    uint256 immutable _votingDelay;
-    uint256 immutable _votingPeriod;
-    uint256 immutable _proposalThreshold;
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
+contract Governance is 
+GovernorSettings, 
+GovernorTimelockControl, 
+GovernorCountingSimple,
+GovernorVotesQuorumFraction
+{
     constructor(
         string memory name_,
         ERC20Votes token_,
@@ -25,11 +28,8 @@ contract Governance is GovernorTimelockControl, GovernorProposalThreshold, Gover
         GovernorTimelockControl(timelock_)
         GovernorVotes(token_)
         GovernorVotesQuorumFraction(quorumNumerator_)
-    {
-        _votingDelay = votingDelay_;
-        _votingPeriod = votingPeriod_;
-        _proposalThreshold = proposalThreshold_;
-    }
+        GovernorSettings(votingDelay_, votingPeriod_, proposalThreshold_)
+    {}
 
     function supportsInterface(bytes4 interfaceId)
         public
@@ -39,14 +39,6 @@ contract Governance is GovernorTimelockControl, GovernorProposalThreshold, Gover
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
-    }
-
-    function votingDelay() public view override returns (uint256) {
-        return _votingDelay;
-    }
-
-    function votingPeriod() public view override returns (uint256) {
-        return _votingPeriod;
     }
 
     function quorum(uint256 blockNumber)
@@ -70,8 +62,9 @@ contract Governance is GovernorTimelockControl, GovernorProposalThreshold, Gover
     /**
      * Overriden functions
      */
-    function proposalThreshold() public view virtual override returns (uint256) {
-        return _proposalThreshold;
+
+    function proposalThreshold() public view virtual override(Governor, GovernorSettings) returns (uint256) {
+        return super.proposalThreshold();
     }
 
     function propose(
@@ -79,7 +72,7 @@ contract Governance is GovernorTimelockControl, GovernorProposalThreshold, Gover
         uint256[] memory values,
         bytes[] memory calldatas,
         string memory description
-    ) public virtual override(IGovernor, Governor, GovernorProposalThreshold) returns (uint256) {
+    ) public virtual override(IGovernor, Governor) returns (uint256) {
         return super.propose(targets, values, calldatas, description);
     }
 
@@ -110,16 +103,6 @@ contract Governance is GovernorTimelockControl, GovernorProposalThreshold, Gover
         bytes32 descriptionHash
     ) internal virtual override(Governor, GovernorTimelockControl) returns (uint256 proposalId) {
         return super._cancel(targets, values, calldatas, descriptionHash);
-    }
-
-    function getVotes(address account, uint256 blockNumber)
-        public
-        view
-        virtual
-        override(IGovernor, GovernorVotes)
-        returns (uint256)
-    {
-        return super.getVotes(account, blockNumber);
     }
 
     function _executor() internal view virtual override(Governor, GovernorTimelockControl) returns (address) {
