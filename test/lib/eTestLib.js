@@ -9,7 +9,7 @@ const util = require("util");
 
 const contractNames = [
     'Governance',
-    'Timelock',
+    'TimelockController',
     'Eul',
     'TreasuryVester'
 ]
@@ -23,13 +23,17 @@ function writeAddressManifestToFile(ctx, filename) {
 async function deployGovernanceContracts(provider, wallets, tokenSetupName) {
     let ctx = await buildContext(provider, wallets, tokenSetupName);
     
+    const root = wallets[0];
+
+    console.log("Deployer", root.address);
+
     const name = "Euler Governor"
 
     const tokenName = 'Eul';
     const tokenSymbol = 'EUL';
     const totalSupply = web3.utils.toWei('27182818.284590452353602874');
 
-    const minDelay = 120; // 3600; // execution delay in seconds
+    const minDelay = 300; // 3600; // execution delay in seconds
 
     const votingDelay = 1; // 10; // blocks
     // voting period 10 blocks on ropsten and 50 on rinkeby
@@ -37,13 +41,46 @@ async function deployGovernanceContracts(provider, wallets, tokenSetupName) {
     const quorumNumerator = 4; // 4% quorum, denominator = 100
     const proposalThreshold = web3.utils.toWei('100');
 
-    ctx.contracts.timelock = await (await ctx.factories.Timelock.deploy(minDelay, [], [])).deployed();
-    ctx.contracts.eul = await (await ctx.factories.Eul.deploy(tokenName, tokenSymbol, totalSupply, Date.now() + 1000, wallets[0].address)).deployed();
+    ctx.contracts.timelock = await (
+        await ctx.factories.TimelockController.deploy(minDelay, [], [])
+    ).deployed();
+        
+    let eul_token_address = '0x0';
+    if (tokenSetupName == 'rinkeby') {
+        eul_token_address = '0xe013C993A77Cdd1aC0d8c1B15a6eFf95EB36c8c6';
+    } else {
+        ctx.contracts.eul = await (await ctx.factories.Eul.deploy(
+            tokenName, tokenSymbol, 
+            totalSupply, Date.now() + 1000,
+            wallets[0].address
+        )).deployed();
+
+        eul_token_address = ctx.contracts.eul.address;
+    }
+
+    ctx.contracts.eul = await ctx.factories.Eul.attach(eul_token_address);
+    
     ctx.contracts.governance = await (await ctx.factories.Governance.deploy(
-        name, ctx.contracts.eul.address, votingDelay, 
-        votingPeriod, ctx.contracts.timelock.address, 
-        quorumNumerator, proposalThreshold
+        name, 
+        eul_token_address, 
+        votingDelay, // blocks
+        votingPeriod, // blocks
+        ctx.contracts.timelock.address, 
+        quorumNumerator, 
+        proposalThreshold // token amount, i.e., the number of votes required in order for a voter to become a proposer
     )).deployed();
+
+    console.log(
+        `Timelock contract: ${ctx.contracts.timelock.address}`
+    );
+
+    console.log(
+        `Eul token contract: ${eul_token_address}`
+    );
+
+    console.log(
+        `Governance contract: ${ctx.contracts.governance.address}`
+    );
 
     // Proposer role - governor instance 
     const proposerRoleTx = await ctx.contracts.timelock.grantRole(await ctx.contracts.timelock.PROPOSER_ROLE(), ctx.contracts.governance.address);
@@ -56,10 +93,17 @@ async function deployGovernanceContracts(provider, wallets, tokenSetupName) {
     console.log(`Executor Role Transaction: ${executorRoleTx.hash}`);
     result = await executorRoleTx.wait();
     console.log(`Mined. Status: ${result.status}`);
+
     // Admin role - deployer and timelock instance itself <address(this)> 
-    // deployer can give up the role
+    // deployer can give up the timelock admin role
     // await ctx.contracts.timelock.revokeRole(await ctx.contracts.timelock.TIMELOCK_ADMIN_ROLE(), root.address); 
-    
+        
+    // Canceller role - admin user
+    const cancellerRoleTx = await ctx.contracts.timelock.grantRole(await ctx.contracts.timelock.CANCELLER_ROLE(), root.address);
+    console.log(`Canceller Role Transaction: ${cancellerRoleTx.hash}`);
+    result = await cancellerRoleTx.wait();
+    console.log(`Mined. Status: ${result.status}`);
+
     return ctx;
 } 
 
@@ -82,7 +126,11 @@ async function buildContext(provider, wallets, tokenSetupName) {
     ctx.factories = {};
 
     for (let c of contractNames) {
-        ctx.factories[c] = await ethers.getContractFactory(c);
+        if (c === 'TimelockController') {
+            ctx.factories[c] = await ethers.getContractFactory('contracts/governance/TimelockController.sol:TimelockController');
+        } else {
+            ctx.factories[c] = await ethers.getContractFactory(c);
+        }
     }
 
     // Time routines
