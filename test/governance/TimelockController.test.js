@@ -7,7 +7,7 @@ const {
   shouldSupportInterfaces,
 } = require('../utils/introspection/SupportsInterface.behavior');
 
-const TimelockController = artifacts.require('contracts/governance/TimelockController.sol:TimelockController');
+const TimelockController = artifacts.require('@openzeppelin/contracts/governance/TimelockController.sol:TimelockController');
 const CallReceiverMock = artifacts.require('CallReceiverMock');
 const Implementation2 = artifacts.require('Implementation2');
 const ERC721Mock = artifacts.require('ERC721Mock');

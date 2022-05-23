@@ -8,7 +8,7 @@ const {
 } = require('../../utils/introspection/SupportsInterface.behavior');
 
 const Token = artifacts.require('ERC20VotesMock');
-const Timelock = artifacts.require('contracts/governance/TimelockController.sol:TimelockController');
+const Timelock = artifacts.require('@openzeppelin/contracts/governance/TimelockController.sol:TimelockController');
 const Governor = artifacts.require('GovernorTimelockControlMock');
 const CallReceiver = artifacts.require('CallReceiverMock');
 

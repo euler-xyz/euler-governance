@@ -104,6 +104,12 @@ async function deployGovernanceContracts(provider, wallets, tokenSetupName) {
     result = await cancellerRoleTx.wait();
     console.log(`Mined. Status: ${result.status}`);
 
+    // on mainnet, only admin / multisig can cancel proposals
+    /* const cancellerRoleGovTx = await ctx.contracts.timelock.grantRole(await ctx.contracts.timelock.CANCELLER_ROLE(), ctx.contracts.governance.address);
+    console.log(`Canceller Role Transaction: ${cancellerRoleGovTx.hash}`);
+    result = await cancellerRoleGovTx.wait();
+    console.log(`Mined. Status: ${result.status}`); */
+
     return ctx;
 } 
 

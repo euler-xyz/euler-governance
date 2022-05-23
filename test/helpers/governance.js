@@ -164,6 +164,7 @@ class GovernorHelper {
       .map(hexs => concatHex(...hexs));
 
     const descriptionHash = web3.utils.keccak256(description);
+    // console.log(descriptionHash, description)
 
     // condensed version for queueing end executing
     const shortProposal = [
