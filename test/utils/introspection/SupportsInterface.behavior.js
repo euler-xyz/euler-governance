@@ -106,7 +106,7 @@ function shouldSupportInterfaces (interfaces = []) {
             });
           }
         });
-        console.log('interaces k', INTERFACES[k])
+        // console.log('interaces k', INTERFACES[k])
         
         if (INTERFACES[k] !== undefined) {
           for (const fnName of INTERFACES[k]) {

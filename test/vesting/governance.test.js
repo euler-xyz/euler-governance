@@ -19,7 +19,7 @@ contract('TreasuryVester: governance', function (accounts) {
     const vestingAmount = new BN(15);
     let now, vestingBegin, vestingCliff, vestingEnd;
 
-    const Timelock = artifacts.require('TimelockController');
+    const Timelock = artifacts.require('contracts/governance/TimelockController.sol:TimelockController');
     const Governor = artifacts.require('Governance');
     const CallReceiver = artifacts.require('CallReceiverMock');
 
@@ -67,6 +67,7 @@ contract('TreasuryVester: governance', function (accounts) {
             ]
             
             const descriptionHash = web3.utils.keccak256(proposal.slice(-1).find(Boolean));
+            console.log('desription hash', descriptionHash)
             const id = await this.mock.hashProposal(...proposal.slice(0, -1), descriptionHash);
 
             // this will fail if owner has no self delegated
