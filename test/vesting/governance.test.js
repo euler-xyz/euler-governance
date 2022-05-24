@@ -75,7 +75,7 @@ contract('TreasuryVester: governance', function (accounts) {
                 this.mock.methods['propose(address[],uint256[],bytes[],string)'](
                 ...proposal,
                 { from: owner }),
-                'GovernorCompatibilityBravo: proposer votes below proposal threshold'
+                'Governor: proposer votes below proposal threshold'
             );
             
             await this.token.delegate(owner, {from: owner});
@@ -95,7 +95,7 @@ contract('TreasuryVester: governance', function (accounts) {
             expectBignumberEqual(await this.mock.state(id), 0);
             let snapshot = await this.mock.proposalSnapshot(id);
             // move to active state
-            await time.advanceBlockTo(snapshot);
+            await time.advanceBlockTo(parseInt(snapshot.toString()) + 1);
             // 1 = active
             expectBignumberEqual(await this.mock.state(id), 1);
 
@@ -134,7 +134,7 @@ contract('TreasuryVester: governance', function (accounts) {
                 this.mock.methods['propose(address[],uint256[],bytes[],string)'](
                 ...proposal,
                 { from: owner }),
-                'GovernorCompatibilityBravo: proposer votes below proposal threshold'
+                'Governor: proposer votes below proposal threshold'
             );
             
             await this.token.delegate(owner, {from: owner});
@@ -154,7 +154,7 @@ contract('TreasuryVester: governance', function (accounts) {
             expectBignumberEqual(await this.mock.state(id), 0);
             let snapshot = await this.mock.proposalSnapshot(id);
             // move to active state
-            await time.advanceBlockTo(snapshot);
+            await time.advanceBlockTo(parseInt(snapshot.toString()) + 1);
             // 1 = active
             expectBignumberEqual(await this.mock.state(id), 1);
 
@@ -220,7 +220,7 @@ contract('TreasuryVester: governance', function (accounts) {
                 this.mock.methods['propose(address[],uint256[],bytes[],string)'](
                 ...proposal,
                 { from: recipient }),
-                'GovernorCompatibilityBravo: proposer votes below proposal threshold'
+                'Governor: proposer votes below proposal threshold'
             );
         });
     });

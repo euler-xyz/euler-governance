@@ -2,40 +2,37 @@
 
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/governance/extensions/GovernorTimelockCompound.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
-
-contract Governance is 
-GovernorSettings, 
-GovernorTimelockControl, 
-GovernorCountingSimple,
-GovernorVotesQuorumFraction
+contract GovernorTimelockCompoundMock is
+    GovernorSettings,
+    GovernorTimelockCompound,
+    GovernorVotesQuorumFraction,
+    GovernorCountingSimple
 {
     constructor(
         string memory name_,
-        ERC20Votes token_,
+        IVotes token_,
         uint256 votingDelay_,
         uint256 votingPeriod_,
-        TimelockController timelock_,
-        uint256 quorumNumerator_,
-        uint256 proposalThreshold_
+        ICompoundTimelock timelock_,
+        uint256 quorumNumerator_
     )
         Governor(name_)
-        GovernorTimelockControl(timelock_)
+        GovernorTimelockCompound(timelock_)
+        GovernorSettings(votingDelay_, votingPeriod_, 0)
         GovernorVotes(token_)
         GovernorVotesQuorumFraction(quorumNumerator_)
-        GovernorSettings(votingDelay_, votingPeriod_, proposalThreshold_)
     {}
 
     function supportsInterface(bytes4 interfaceId)
         public
         view
         virtual
-        override(Governor, GovernorTimelockControl)
+        override(Governor, GovernorTimelockCompound)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
@@ -50,31 +47,30 @@ GovernorVotesQuorumFraction
         return super.quorum(blockNumber);
     }
 
-    /**
-     * Overriden functions
-     */
-
-    function proposalThreshold() public view virtual override(Governor, GovernorSettings) returns (uint256) {
-        return super.proposalThreshold();
-    }
-
-    function propose(
+    function cancel(
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        string memory description
-    ) public virtual override(IGovernor, Governor) returns (uint256) {
-        return super.propose(targets, values, calldatas, description);
+        bytes32 salt
+    ) public returns (uint256 proposalId) {
+        return _cancel(targets, values, calldatas, salt);
     }
 
+    /**
+     * Overriding nightmare
+     */
     function state(uint256 proposalId)
         public
         view
         virtual
-        override(Governor, GovernorTimelockControl)
+        override(Governor, GovernorTimelockCompound)
         returns (ProposalState)
     {
         return super.state(proposalId);
+    }
+
+    function proposalThreshold() public view override(Governor, GovernorSettings) returns (uint256) {
+        return super.proposalThreshold();
     }
 
     function _execute(
@@ -83,7 +79,7 @@ GovernorVotesQuorumFraction
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 descriptionHash
-    ) internal virtual override(Governor, GovernorTimelockControl) {
+    ) internal virtual override(Governor, GovernorTimelockCompound) {
         super._execute(proposalId, targets, values, calldatas, descriptionHash);
     }
 
@@ -91,12 +87,12 @@ GovernorVotesQuorumFraction
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash
-    ) internal virtual override(Governor, GovernorTimelockControl) returns (uint256 proposalId) {
-        return super._cancel(targets, values, calldatas, descriptionHash);
+        bytes32 salt
+    ) internal virtual override(Governor, GovernorTimelockCompound) returns (uint256 proposalId) {
+        return super._cancel(targets, values, calldatas, salt);
     }
-    
-    function _executor() internal view virtual override(Governor, GovernorTimelockControl) returns (address) {
+
+    function _executor() internal view virtual override(Governor, GovernorTimelockCompound) returns (address) {
         return super._executor();
     }
 }
