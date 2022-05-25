@@ -4,14 +4,14 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract GovernanceStub {
+contract MockGovernance {
 
-    event ProposalExecuted(string indexed description, bytes indexed proposalData);
+    event ProposalExecuted(string description, bytes proposalData);
 
     address public immutable governor;
 
     modifier onlyGovernor() {
-        require(msg.sender == governor, "only governor can call");
+        require(msg.sender == governor, "GovernanceStub: only governor can call");
         _;
     }
 
