@@ -6,7 +6,7 @@ task("gov:deployGovernanceContracts")
     .addPositionalParam("votingDelay", "number of blocks between proposal creation and voting start")
     .addPositionalParam("votingPeriod", "number of blocks for voting period, assuming 13.14 seconds per block")
     .addPositionalParam("quorumNumerator", "numerator for percentage of total supply to form quorum, e.g., 4 for 4% quorum while denominator is 100")
-    .addPositionalParam("proposalThreshold", "amount of tokens or voting power required for a user to have in order to create a proposal")
+    .addPositionalParam("proposalThreshold", "amount of tokens or voting power required for a user to have in order to create a proposal, e.g., 1000")
     .setAction(async (args) => {
         try {
             const TIMELOCKCONTROLLER = await hre.ethers.getContractFactory("contracts/governance/TimelockController.sol:TimelockController");
@@ -39,13 +39,13 @@ task("gov:deployGovernanceContracts")
 
             console.log(`Governance Contract Address: ${governanceContract.address}`);
 
-            // Proposer role - governor instance 
+            // Proposer role - governor contract 
             const proposerRoleTx = await timelockContract.grantRole(await timelockContract.PROPOSER_ROLE(), governanceContract.address);
             console.log(`Proposer Role Transaction: ${proposerRoleTx.hash}`);
             let result = await proposerRoleTx.wait();
             console.log(`Mined. Status: ${result.status}`);
 
-            // Executor role - assigned governance contract
+            // Executor role - governance contract
             const executorRoleTx = await timelockContract.grantRole(await timelockContract.EXECUTOR_ROLE(), governanceContract.address);
             console.log(`Executor Role Transaction: ${executorRoleTx.hash}`);
             result = await executorRoleTx.wait();
@@ -55,13 +55,13 @@ task("gov:deployGovernanceContracts")
             // deployer can give up the timelock admin role as well
             // await timelockContract.revokeRole(await timelockContract.TIMELOCK_ADMIN_ROLE(), deployerAddress); 
 
-            // Canceller role - admin user
+            // Canceller role - admin user/multisig
             const cancellerRoleTx = await timelockContract.grantRole(await timelockContract.CANCELLER_ROLE(), args.multisig);
             console.log(`Canceller Role Transaction: ${cancellerRoleTx.hash}`);
             result = await cancellerRoleTx.wait();
             console.log(`Mined. Status: ${result.status}`);
         } catch (e) {
-
+            console.log(e.message);
         }
     });
 

@@ -71,3 +71,25 @@ The csv file should have the following headings:
 and sample data:
 
 `0x5a45ede034c66766ACb2590F96C5bC6D1D922520,200,1643673600,1767225600`
+
+
+## Deploy governance and timelockController smart contracts 
+
+The following parameters are required when deploying the governance and timelockController smart contracts:
+* Eul token address
+* Gnosis multisig address - to be assigned Proposal Canceller role in the timelock contract
+* governorName - a string which is the name of the governance smart contract, e.g., Euler DAO v1.0
+* minDelay - in seconds, the duration between queuing a successful proposal and the execution time / eta
+* votingDelay - as number of blocks, between proposal creation and voting period starting
+* votingPeriod - as number of blocks, for duration voting will go on for
+* quorumNumerator - whole number, e.g., 4 which will be 4% quorum before a proposal can reach quorum. For, and abstain votes will be counted towards quorum
+* proposalThreshold - the amount of tokens required to create a proposal in human readable units, e.g., 5000. Will be converted to 1e18 precision.
+
+Example command - `NODE_ENV=rivet npx hardhat --network rinkeby gov:deployGovernanceContracts 0x681E9cf95e26c6C2cEF09fdc476C7f8De6AFf2D5 0x13214Af5a958E47D0FA1366fC3D36dC3Fa46E80f "Euler Governor 1.0" 300 1 50 4 100`
+
+After deployment, the contract addresses for governance and timelockController will be displayed on the console. 
+
+The contracts can then be verified as follows:
+* Governance contract verification on rinkeby example (with proposal threshold in 1e18 precision) - `NODE_ENV=rivet npx hardhat verify --network rinkeby 0x681E9cf95e26c6C2cEF09fdc476C7f8De6AFf2D5 "Euler Governor v1.0" "0xe013C993A77Cdd1aC0d8c1B15a6eFf95EB36c8c6" "1" "50" "0x16fBC769237cE17830799e6faD9d53536c3B8389" "4" "100000000000000000000"`
+
+* Timelockcontroller contract verification on rinkeby example using `arguments.js` script as the contract constructor takes in two arrays / tuples as constructor arguments - `NODE_ENV=rivet npx hardhat verify --network rinkeby --constructor-args arguments.js 0x16fBC769237cE17830799e6faD9d53536c3B8389`
