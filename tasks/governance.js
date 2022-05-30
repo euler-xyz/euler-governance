@@ -12,17 +12,21 @@ task("gov:deployGovernanceContracts")
             const TIMELOCKCONTROLLER = await hre.ethers.getContractFactory("contracts/governance/TimelockController.sol:TimelockController");
             const GOVERNANCE = await hre.ethers.getContractFactory("Governance");
 
+            // minimum delay, [proposers + cancellers], [executors]
             const timelockController = await TIMELOCKCONTROLLER.deploy(
-                args.minDelay, [], []
+                args.minDelay, [args.multisig], []
             );
-            
-            console.log(`Deployer Address ${timelockController.deployTransaction.from}`);
+                
+            const deployer = timelockController.deployTransaction.from;
+            console.log(`Deployer Address ${deployer}`);
 
             console.log(`TimelockController Deployment Transaction Hash: ${timelockController.deployTransaction.hash} (on ${hre.network.name})`);
 
             let timelockContract = await timelockController.deployed();
             console.log(`TimelockController Contract Address: ${timelockContract.address}`);
 
+            // governor contract name, voting token, voting delay, voting period,
+            // timelockController address, quorumNumerator, proposalThreshold
             const governance = await GOVERNANCE.deploy(
                 args.governorName,
                 args.eul,
@@ -51,24 +55,31 @@ task("gov:deployGovernanceContracts")
             result = await executorRoleTx.wait();
             console.log(`Mined. Status: ${result.status}`);
 
-            // Admin role - is by default assigned to deployer and timelock instance itself <address(this)> 
+            const timelockCancellerRole = await timelockContract.CANCELLER_ROLE();
+            console.log(`Multisig is assigned Canceller Role? ${await timelockContract.hasRole(timelockCancellerRole, args.multisig)}`);
+
+            const timelockExecutorRole = await timelockContract.EXECUTOR_ROLE();
+            console.log(`Governance contract is assigned Executor Role? ${await timelockContract.hasRole(timelockExecutorRole, governanceContract.address)}`);
+
+            const timelockProposerRole = await timelockContract.PROPOSER_ROLE();
+            console.log(`Multisig is assigned Proposer Role? ${await timelockContract.hasRole(timelockProposerRole, args.multisig)}`);
+            console.log(`Governance contract is assigned Proposer Role? ${await timelockContract.hasRole(timelockProposerRole, governanceContract.address)}`);
+
+            const timelockAdminRole = await timelockContract.TIMELOCK_ADMIN_ROLE();
+            console.log(`Deployer is assigned Timelock Admin Role? ${await timelockContract.hasRole(timelockAdminRole, deployer)}`);
+            console.log(`Timelock itself is assigned Timelock Admin Role? ${await timelockContract.hasRole(timelockAdminRole, timelockContract.address)}`);
+
+
+            // Admin role - is by default assigned to deployer (_msgSender()) and timelock instance itself, i.e., <address(this)> 
             // deployer can give up the timelock admin role as well
             // await timelockContract.revokeRole(await timelockContract.TIMELOCK_ADMIN_ROLE(), deployerAddress); 
 
             // Canceller role - admin user/multisig
-            const cancellerRoleTx = await timelockContract.grantRole(await timelockContract.CANCELLER_ROLE(), args.multisig);
-            console.log(`Canceller Role Transaction: ${cancellerRoleTx.hash}`);
-            result = await cancellerRoleTx.wait();
-            console.log(`Mined. Status: ${result.status}`);
+            // const cancellerRoleTx = await timelockContract.grantRole(await timelockContract.CANCELLER_ROLE(), args.multisig);
+            // console.log(`Canceller Role Transaction: ${cancellerRoleTx.hash}`);
+            // result = await cancellerRoleTx.wait();
+            // console.log(`Mined. Status: ${result.status}`);
         } catch (e) {
             console.log(e.message);
         }
     });
-
-// example usage: NODE_ENV=rivet npx hardhat --network hardhat gov:deployGovernanceContracts 0x681E9cf95e26c6C2cEF09fdc476C7f8De6AFf2D5 0x13214Af5a958E47D0FA1366fC3D36dC3Fa46E80f "Euler Governor 1.0" 300 1 50 4 100
-
-// verify governance contract on rinkeby example
-// NODE_ENV=rivet npx hardhat verify --network rinkeby 0x681E9cf95e26c6C2cEF09fdc476C7f8De6AFf2D5 "Euler Governor" "0xe013C993A77Cdd1aC0d8c1B15a6eFf95EB36c8c6" "1" "50" "0x16fBC769237cE17830799e6faD9d53536c3B8389" "4" "100000000000000000000"
-
-// verify timelockcontroller contract on rinkeby example with arguments script as it takes in an array / tuple as constructor argument
-// NODE_ENV=rivet npx hardhat verify --network rinkeby --constructor-args arguments.js 0x16fBC769237cE17830799e6faD9d53536c3B8389
