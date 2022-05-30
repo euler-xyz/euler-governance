@@ -89,6 +89,8 @@ Example command - `NODE_ENV=rivet npx hardhat --network rinkeby gov:deployGovern
 
 After deployment, the contract addresses for governance and timelockController will be displayed on the console. 
 
+Some Role checks are also performed after deployment and logged onto the console.
+
 The contracts can then be verified as follows:
 * Governance contract verification on rinkeby example (with proposal threshold in 1e18 precision) - `NODE_ENV=rivet npx hardhat verify --network rinkeby 0x681E9cf95e26c6C2cEF09fdc476C7f8De6AFf2D5 "Euler Governor v1.0" "0xe013C993A77Cdd1aC0d8c1B15a6eFf95EB36c8c6" "1" "50" "0x16fBC769237cE17830799e6faD9d53536c3B8389" "4" "100000000000000000000"`
 
