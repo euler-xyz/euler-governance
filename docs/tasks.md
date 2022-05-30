@@ -82,7 +82,7 @@ The following parameters are required when deploying the governance and timelock
 * minDelay - in seconds, the duration between queuing a successful proposal and the execution time / eta
 * votingDelay - as number of blocks, between proposal creation and voting period starting
 * votingPeriod - as number of blocks, for duration voting will go on for
-* quorumNumerator - whole number, e.g., 4 which will be 4% quorum before a proposal can reach quorum. For, and abstain votes will be counted towards quorum
+* quorumNumerator - whole number, e.g., 4 which will be 4% quorum before a proposal can reach quorum. For, and abstain votes will be counted towards quorum. Once the voting period is over, if quorum was reached (enough voting power participated) and the majority voted in favor, the proposal is considered successful and can proceed to be executed.
 * proposalThreshold - the amount of tokens required to create a proposal in human readable units, e.g., 5000. Will be converted to 1e18 precision.
 
 Example command - `NODE_ENV=rivet npx hardhat --network rinkeby gov:deployGovernanceContracts 0x681E9cf95e26c6C2cEF09fdc476C7f8De6AFf2D5 0x13214Af5a958E47D0FA1366fC3D36dC3Fa46E80f "Euler Governor 1.0" 300 1 50 4 100`
