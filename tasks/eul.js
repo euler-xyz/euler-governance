@@ -1,5 +1,6 @@
 const prompt = require("prompt-sync")({ sigint: true });
 
+
 task("eul:deploy")
     .addPositionalParam("treasury")
     .setAction(async (args) => {

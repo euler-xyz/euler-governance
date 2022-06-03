@@ -4,10 +4,10 @@ const { shouldFailWithMessage } = require('../../../helpers/utils');
 const { ZERO_ADDRESS } = constants;
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const VestingFactory = artifacts.require('TreasuryVesterFactory');
+const VestingFactory = artifacts.require('TreasuryVesterFactory'); // artifacts.require('TreasuryVesterFactory');
 
 contract('TreasuryVesterFactory: constructor', function (accounts) {
-  const [owner] = accounts;
+  const [owner, treasury] = accounts;
 
     const name = 'Euler';
     const symbol = 'EUL';
@@ -19,7 +19,7 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
           
           this.vestingFactory = await VestingFactory.new(
             this.token.address,
-            accounts[0]
+            treasury
           );
         });
 
@@ -35,11 +35,20 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
             expect(await this.vestingFactory.treasury()).to.not.equal(ZERO_ADDRESS);
         });
 
+        it('vesting contract implementation address is valid', async function () {
+          expect(await this.vestingFactory.vestingLogic()).to.not.equal(ZERO_ADDRESS);
+      });
+
         // role check for owner
         it('should assign deployer with owner role', async function () {
             let role = await this.vestingFactory.ADMIN_ROLE();
             expect(await this.vestingFactory.hasRole(role, owner)).to.equal(true);
         });
+
+        it('should assign treasury with overall/default admin role', async function () {
+          let role = await this.vestingFactory.DEFAULT_ADMIN_ROLE();
+          expect(await this.vestingFactory.hasRole(role, treasury)).to.equal(true);
+      });
 
       });
 

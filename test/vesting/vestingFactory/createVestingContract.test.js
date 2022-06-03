@@ -3,13 +3,14 @@ const { expectBignumberEqual, expect } = require('../../../helpers/index');
 const { findEventInTransaction } = require('../../../helpers/events');
 const { parseEther } = require('@ethersproject/units');
 const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants');
+const { ethers } = require('ethers');
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const VestingFactory = artifacts.require('TreasuryVesterFactory');
+const VestingFactory = artifacts.require('TreasuryVesterFactory'); // artifacts.require('TreasuryVesterFactory');
 const Vesting = artifacts.require('TreasuryVester');
 
 contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
-    const [owner, recipient] = accounts;
+    const [owner, treasury, recipient, otherAddress, recipient2] = accounts;
 
     const name = 'Euler';
     const symbol = 'EUL';
@@ -21,7 +22,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
         this.token = await ERC20VotesMock.new(name, symbol);
         this.vestingFactory = await VestingFactory.new(
             this.token.address, // token
-            accounts[1] // treasury
+            treasury // treasury
         );
 
         now = await latest();
@@ -40,7 +41,125 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
         uint vestingEnd - this is the unix timestamp of when the vesting period will end. After this timestamp, the recipient can withdraw or collect all of the remaining vested amount
      */
 
-    it('reverts if not called by owner', async function () {
+    it('create vesting contract and revoke admin role afterwards', async function () {
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount);
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
+        );
+
+        expect(await this.vestingFactory.getVestingContract(recipient, 0)).to.not.be.equal(ZERO_ADDRESS);
+
+        const adminRole = await this.vestingFactory.ADMIN_ROLE();
+        const defaultAdminRole = await this.vestingFactory.DEFAULT_ADMIN_ROLE();
+
+        // should revert with AccessControl: account 0x90f79bf6eb2c4f870365e785982e1f101e93b906 is missing role 0x0000000000000000000000000000000000000000000000000000000000000000
+        await shouldFailWithMessage(
+            this.vestingFactory.revokeRole(adminRole, owner, {from: otherAddress}),
+            // convert to non checksum address to prevent test failing
+            `AccessControl: account ${otherAddress.toString().toLowerCase()} is missing role ${defaultAdminRole}`
+        );
+
+        await this.vestingFactory.revokeRole(adminRole, owner, {from: treasury});
+
+        await shouldFailWithMessage(
+            this.vestingFactory.createVestingContract(
+                recipient,
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd,
+                {from: owner}
+            ), 
+            'Caller does not have the ADMIN_ROLE'
+        );
+    });
+
+    it('revoke admin role and reassign to another address and perform admin action', async function () {
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount);
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
+        );
+
+        expect(await this.vestingFactory.getVestingContract(recipient, 0)).to.not.be.equal(ZERO_ADDRESS);
+
+        const adminRole = await this.vestingFactory.ADMIN_ROLE();
+        const defaultAdminRole = await this.vestingFactory.DEFAULT_ADMIN_ROLE();
+
+        // should revert with AccessControl: account 0x90f79bf6eb2c4f870365e785982e1f101e93b906 is missing role 0x0000000000000000000000000000000000000000000000000000000000000000
+        await shouldFailWithMessage(
+            this.vestingFactory.revokeRole(adminRole, owner, {from: otherAddress}),
+            // convert to non checksum address to prevent test failing
+            `AccessControl: account ${otherAddress.toString().toLowerCase()} is missing role ${defaultAdminRole}`
+        );
+
+        await this.vestingFactory.revokeRole(adminRole, owner, {from: treasury});
+
+        await shouldFailWithMessage(
+            this.vestingFactory.createVestingContract(
+                recipient,
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd,
+                {from: owner}
+            ), 
+            'Caller does not have the ADMIN_ROLE'
+        );
+
+        await this.vestingFactory.grantRole(adminRole, otherAddress, {from: treasury});
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount);
+        
+        // console.log(vestingCliff + 2) appends 2 to BN
+        // console.log(vestingCliff.add(toBN(1)).toString()) adds 1 to BN
+
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff.add(toBN(1)),
+            vestingEnd,
+            {from: otherAddress}
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            2
+        );
+
+        expect(await this.vestingFactory.getVestingContract(recipient, 1)).to.not.be.equal(ZERO_ADDRESS);
+
+    });
+
+    it('reverts if not called by admin', async function () {
         vestingBegin = now.add(await duration.minutes(5));
         vestingCliff = now.add(await duration.minutes(15));
         vestingEnd = now.add(await duration.minutes(25));
@@ -108,7 +227,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
         expect(await this.vestingFactory.getVestingContract(recipient, 0)).to.not.be.equal(ZERO_ADDRESS);
     });
 
-    it('can create multiple vesting contracts for recipient', async function () {
+    it('can create multiple vesting contracts for single recipient', async function () {
         vestingBegin = now.add(await duration.minutes(5));
         vestingCliff = now.add(await duration.minutes(15));
         vestingEnd = now.add(await duration.minutes(25));
@@ -133,12 +252,109 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
             vestingAmount,
             vestingBegin,
             vestingCliff,
-            vestingEnd
+            vestingEnd.add(toBN(1))
         );
 
         expectBignumberEqual(
             (await this.vestingFactory.getVestingContracts(recipient)).length,
             2
+        );
+    });
+
+    it('can create multiple vesting contracts for multiple recipients', async function () {
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount.mul(4));
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+        
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
+        );
+
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd.add(toBN(1))
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            2
+        );
+
+        await this.vestingFactory.createVestingContract(
+            recipient2,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient2)).length,
+            1
+        );
+
+        await this.vestingFactory.createVestingContract(
+            recipient2,
+            vestingAmount,
+            vestingBegin.add(toBN(1)),
+            vestingCliff,
+            vestingEnd
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient2)).length,
+            2
+        );
+    });
+
+    it('reverts if the same data is used to create duplicate vesting contract', async function () {
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+
+        await this.token.transfer(this.vestingFactory.address, vestingAmount.mul(4));
+        
+        await this.vestingFactory.createVestingContract(
+            recipient,
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+        );
+        
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
+        );
+
+        await shouldFailWithMessage(
+            this.vestingFactory.createVestingContract(
+                recipient,
+                vestingAmount,
+                vestingBegin,
+                vestingCliff,
+                vestingEnd
+            ),
+            'vesting contract already exists'
+        );
+
+        expectBignumberEqual(
+            (await this.vestingFactory.getVestingContracts(recipient)).length,
+            1
         );
     });
 
@@ -312,10 +528,10 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
             vestingEnd
         );
 
-        let lastUpdate = vestingBegin;
+        // let lastUpdate = vestingBegin;
 
         const vestingContractAddress = await this.vestingFactory.getVestingContract(recipient, 0);
-        const vestingContractInstance = await Vesting.at(vestingContractAddress);
+        // const vestingContractInstance = await Vesting.at(vestingContractAddress);
         // created contract should receive vested tokens
         expectBignumberEqual(await this.token.balanceOf(vestingContractAddress), vestingAmount);
     });
@@ -335,7 +551,7 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
             vestingEnd
         );
 
-        let lastUpdate = vestingBegin;
+        // let lastUpdate = vestingBegin;
 
         const vestingContractAddress = await this.vestingFactory.getVestingContract(recipient, 0);
         const vestingContractInstance = await Vesting.at(vestingContractAddress);

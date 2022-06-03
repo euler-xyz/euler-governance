@@ -6,7 +6,7 @@ const { toBN, latest, shouldFailWithMessage } = require('../../helpers/utils');
 const { MAX_UINT256, ZERO_ADDRESS, ZERO_BYTES32 } = constants;
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const Vesting = artifacts.require('TreasuryVester');
+const Vesting = artifacts.require('MockTreasuryVester');
 
 contract('TreasuryVester: constructor', function (accounts) {
   const [owner, recipient] = accounts;
@@ -15,6 +15,42 @@ contract('TreasuryVester: constructor', function (accounts) {
     const symbol = 'EUL';
     const vestingAmount = new BN(15);
     let now, vestingBegin, vestingCliff, vestingEnd;
+
+    describe('initializable vesting contract', function () {
+      const Vesting = artifacts.require('TreasuryVester');
+
+      beforeEach(async function () {
+        this.token = await ERC20VotesMock.new(name, symbol);
+        now = await latest();
+        vestingBegin = now.add(await duration.minutes(5));
+        vestingCliff = now.add(await duration.minutes(15));
+        vestingEnd = now.add(await duration.minutes(25));
+        this.vesting = await Vesting.new();
+      });
+
+      it('should not initialize more than once', async function () {
+        const vestingSetupTx = await this.vesting.initialize(
+          this.token.address, 
+          recipient, 
+          vestingAmount,
+          vestingBegin,
+          vestingCliff,
+          vestingEnd
+        );
+
+        await shouldFailWithMessage(
+          this.vesting.initialize(
+            this.token.address, 
+            recipient, 
+            vestingAmount,
+            vestingBegin,
+            vestingCliff,
+            vestingEnd
+          ),
+          'Initializable: contract is already initialized'
+        );
+      })
+    })
 
     describe('deploy correctly and assign field variables', function () {
       beforeEach(async function () {

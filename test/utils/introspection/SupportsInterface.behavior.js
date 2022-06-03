@@ -96,23 +96,29 @@ function shouldSupportInterfaces (interfaces = []) {
       const interfaceId = INTERFACE_IDS[k];
       describe(k, function () {
         describe('ERC165\'s supportsInterface(bytes4)', function () {
-          it('uses less than 30k gas [skip-on-coverage]', async function () {
-            expect(await this.contractUnderTest.supportsInterface.estimateGas(interfaceId)).to.be.lte(30000);
-          });
-
-          it('claims support [skip-on-coverage]', async function () {
-            expect(await this.contractUnderTest.supportsInterface(interfaceId)).to.equal(true);
-          });
-        });
-
-        for (const fnName of INTERFACES[k]) {
-          const fnSig = FN_SIGNATURES[fnName];
-          describe(fnName, function () {
-            it('has to be implemented', function () {
-              expect(this.contractUnderTest.abi.filter(fn => fn.signature === fnSig).length).to.equal(1);
+          if (interfaceId !== undefined) {
+            it('uses less than 30k gas [skip-on-coverage]', async function () {
+              expect(await this.contractUnderTest.supportsInterface.estimateGas(interfaceId)).to.be.lte(30000);
             });
-          });
+
+            it('claims support [skip-on-coverage]', async function () {
+              expect(await this.contractUnderTest.supportsInterface(interfaceId)).to.equal(true);
+            });
+          }
+        });
+        // console.log('interaces k', INTERFACES[k])
+        
+        if (INTERFACES[k] !== undefined) {
+          for (const fnName of INTERFACES[k]) {
+            const fnSig = FN_SIGNATURES[fnName];
+            describe(fnName, function () {
+              it('has to be implemented', function () {
+                expect(this.contractUnderTest.abi.filter(fn => fn.signature === fnSig).length).to.equal(1);
+              });
+            });
+          } 
         }
+        
       });
     }
   });

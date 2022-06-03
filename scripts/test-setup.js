@@ -14,6 +14,7 @@ async function main() {
 
 }
 
-// sample usage: NETWORK_NAME=hardhat npx hardhat run scripts/setup.js 
+// sample usage hardhat: NETWORK_NAME=hardhat npx hardhat run scripts/test-setup.js 
+// sample usage rivet: NETWORK_NAME=rinkeby NODE_ENV=rivet npx hardhat run scripts/test-setup.js --network rinkeby
 
 main();

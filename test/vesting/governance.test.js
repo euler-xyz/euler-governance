@@ -8,7 +8,7 @@ const { web3 } = require('@openzeppelin/test-helpers/src/setup');
 const { MAX_UINT256, ZERO_ADDRESS, ZERO_BYTES32 } = constants;
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
-const Vesting = artifacts.require('TreasuryVester');
+const Vesting = artifacts.require('MockTreasuryVester');
 
 contract('TreasuryVester: governance', function (accounts) {
     const [owner, recipient, otherAccount] = accounts;
@@ -19,7 +19,7 @@ contract('TreasuryVester: governance', function (accounts) {
     const vestingAmount = new BN(15);
     let now, vestingBegin, vestingCliff, vestingEnd;
 
-    const Timelock = artifacts.require('TimelockController');
+    const Timelock = artifacts.require('contracts/governance/TimelockController.sol:TimelockController');
     const Governor = artifacts.require('Governance');
     const CallReceiver = artifacts.require('CallReceiverMock');
 
@@ -67,6 +67,7 @@ contract('TreasuryVester: governance', function (accounts) {
             ]
             
             const descriptionHash = web3.utils.keccak256(proposal.slice(-1).find(Boolean));
+            console.log('desription hash', descriptionHash)
             const id = await this.mock.hashProposal(...proposal.slice(0, -1), descriptionHash);
 
             // this will fail if owner has no self delegated
@@ -74,7 +75,7 @@ contract('TreasuryVester: governance', function (accounts) {
                 this.mock.methods['propose(address[],uint256[],bytes[],string)'](
                 ...proposal,
                 { from: owner }),
-                'GovernorCompatibilityBravo: proposer votes below proposal threshold'
+                'Governor: proposer votes below proposal threshold'
             );
             
             await this.token.delegate(owner, {from: owner});
@@ -94,7 +95,7 @@ contract('TreasuryVester: governance', function (accounts) {
             expectBignumberEqual(await this.mock.state(id), 0);
             let snapshot = await this.mock.proposalSnapshot(id);
             // move to active state
-            await time.advanceBlockTo(snapshot);
+            await time.advanceBlockTo(parseInt(snapshot.toString()) + 1);
             // 1 = active
             expectBignumberEqual(await this.mock.state(id), 1);
 
@@ -133,7 +134,7 @@ contract('TreasuryVester: governance', function (accounts) {
                 this.mock.methods['propose(address[],uint256[],bytes[],string)'](
                 ...proposal,
                 { from: owner }),
-                'GovernorCompatibilityBravo: proposer votes below proposal threshold'
+                'Governor: proposer votes below proposal threshold'
             );
             
             await this.token.delegate(owner, {from: owner});
@@ -153,7 +154,7 @@ contract('TreasuryVester: governance', function (accounts) {
             expectBignumberEqual(await this.mock.state(id), 0);
             let snapshot = await this.mock.proposalSnapshot(id);
             // move to active state
-            await time.advanceBlockTo(snapshot);
+            await time.advanceBlockTo(parseInt(snapshot.toString()) + 1);
             // 1 = active
             expectBignumberEqual(await this.mock.state(id), 1);
 
@@ -219,7 +220,7 @@ contract('TreasuryVester: governance', function (accounts) {
                 this.mock.methods['propose(address[],uint256[],bytes[],string)'](
                 ...proposal,
                 { from: recipient }),
-                'GovernorCompatibilityBravo: proposer votes below proposal threshold'
+                'Governor: proposer votes below proposal threshold'
             );
         });
     });
