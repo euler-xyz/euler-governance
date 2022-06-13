@@ -9,7 +9,7 @@ const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL_ROPSTE
 const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 const e = new Euler(signer, 3); // chainId = 3 for ropsten, default is 1 for mainnet
 
-const Stub = artifacts.require('MockEulerGovernance');
+const Stub = artifacts.require('StubEulerGovernance');
 // ropsten defender mock proposal data
 // Proposal Description:
 const proposalDescription = 'eIP 4: Update USDC collateral factor to 0.8';
@@ -45,8 +45,19 @@ contract('MockEulerGovernance', function (accounts) {
         );
         const executeEvent = executeTx.logs[0];
         expect(executeEvent.event).to.be.equal('ProposalExecuted');
-        expect(executeEvent.args[0]).to.be.equal(proposalDescription);
-        expect(executeEvent.args[1]).to.be.equal(proposalHexData);
+        expect(executeEvent.args[0].toString()).to.be.equal("1");
+        expect(executeEvent.args[1]).to.be.equal(proposalDescription);
+        expect(executeEvent.args[2]).to.be.equal(proposalHexData);
+
+
+        const executeTx2 = await this.stub.executeProposal(
+            proposalDescription, proposalHexData, {from: governor}
+        );
+        const executeEvent2 = executeTx2.logs[0];
+        expect(executeEvent2.event).to.be.equal('ProposalExecuted');
+        expect(executeEvent2.args[0].toString()).to.be.equal("2");
+        expect(executeEvent2.args[1]).to.be.equal(proposalDescription);
+        expect(executeEvent2.args[2]).to.be.equal(proposalHexData);
     });
 
     it('can correctly debug bytes from proposal executed event', async function () {
@@ -55,6 +66,7 @@ contract('MockEulerGovernance', function (accounts) {
         );
         const txReceipt = executeTx;
         // get batch items hex from tx receipt
+        // console.log("transaction receipt logs", txReceipt.receipt.logs);
         expect(txReceipt.receipt.logs[0].args.proposalData).to.be.equal(proposalHexData);
         // decode batch items hex using Euler SDK
         // await getContract('0x78eE171d6c8d3808B72dAb8CE647719dB3bb4cC9'); // testing getContract with ropsten governance address

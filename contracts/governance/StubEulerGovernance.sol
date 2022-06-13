@@ -2,11 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-contract MockEulerGovernance {
+contract StubEulerGovernance {
 
-    event ProposalExecuted(string description, bytes proposalData);
+    event ProposalExecuted(uint proposalCounter, string description, bytes proposalData);
 
     address public immutable governor;
+    uint public proposalCounter;
 
     modifier onlyGovernor() {
         require(msg.sender == governor, "GovernanceStub: only governor can call");
@@ -24,6 +25,7 @@ contract MockEulerGovernance {
     external 
     onlyGovernor 
     {
-        emit ProposalExecuted(description, proposalData);
+        proposalCounter = proposalCounter + 1;
+        emit ProposalExecuted(proposalCounter, description, proposalData);
     }
 }
