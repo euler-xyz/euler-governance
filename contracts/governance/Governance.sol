@@ -19,7 +19,7 @@ MultiGovernorVotesQuorumFraction
     constructor(
         string memory name_,
         ERC20Votes eul_,
-        ERC20Votes stEul_,
+        IVotes[] memory supportedTokens_,
         uint256 votingDelay_,
         uint256 votingPeriod_,
         TimelockController timelock_,
@@ -28,7 +28,7 @@ MultiGovernorVotesQuorumFraction
     )
         Governor(name_)
         GovernorTimelockControl(timelock_)
-        MultiGovernorVotes(eul_, stEul_)
+        MultiGovernorVotes(eul_, supportedTokens_)
         MultiGovernorVotesQuorumFraction(quorumNumerator_)
         GovernorSettings(votingDelay_, votingPeriod_, proposalThreshold_)
     {}

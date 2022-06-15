@@ -12,12 +12,15 @@ import "@openzeppelin/contracts/governance/utils/IVotes.sol";
  * _Available since v4.3._
  */
 abstract contract MultiGovernorVotes is Governor {
-    IVotes public eul;
-    IVotes public stEul;
+    IVotes public immutable eul;
+    IVotes[] public tokens;
 
-    constructor(IVotes eul_, IVotes stEul_) {
-        eul = eul_;
-        stEul = stEul_;
+    constructor(IVotes EUL, IVotes[] memory tokenAddresses) {
+        for (uint i = 0; i<tokenAddresses.length; i++) {
+            require(address(tokenAddresses[i]) != address(0), "Governor: zero address");
+        }
+        tokens = tokenAddresses;
+        eul = EUL;
     }
 
     /**
@@ -28,6 +31,17 @@ abstract contract MultiGovernorVotes is Governor {
         uint256 blockNumber,
         bytes memory /*params*/
     ) internal view virtual override returns (uint256) {
-        return eul.getPastVotes(account, blockNumber) + stEul.getPastVotes(account, blockNumber);
+        uint256 totalVotes = 0;
+        for (uint i = 0; i<tokens.length; i++) {
+            totalVotes += tokens[i].getPastVotes(account, blockNumber);
+        }
+        return totalVotes + eul.getPastVotes(account, blockNumber);
+    }
+
+    function setSupportedTokens(IVotes[] memory tokenAddresses) public virtual onlyGovernance {
+        for (uint i = 0; i<tokenAddresses.length; i++) {
+            require(address(tokenAddresses[i]) != address(0), "Governor: zero address");
+        }
+        tokens = tokenAddresses;
     }
 }
