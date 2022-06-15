@@ -3,13 +3,17 @@ const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants');
 const { expect } = require('chai');
 const { ethers, web3 } = require('hardhat');
 const { Euler } = require("@eulerxyz/euler-sdk");
-
+const { AdminClient } = require('defender-admin-client');
 require("dotenv").config();
+
 const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL_ROPSTEN);
 const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-const e = new Euler(signer, 3); // chainId = 3 for ropsten, default is 1 for mainnet
+const eulerSDK = new Euler(signer, 3); // chainId = 3 for ropsten, default is 1 for mainnet
+const DEFENDER_API_KEY = process.env.DEFENDER_API_KEY;
+const DEFENDER_API_SECRET = process.env.DEFENDER_API_SECRET;
 
-const Stub = artifacts.require('MockEulerGovernance');
+
+const Stub = artifacts.require('StubEulerGovernance');
 // ropsten defender mock proposal data
 // Proposal Description:
 const proposalDescription = 'eIP 4: Update USDC collateral factor to 0.8';
@@ -19,7 +23,7 @@ const proposalHexData = '0xeb937aeb000000000000000000000000000000000000000000000
 // e.g., const encodedBatchTxData = exec.interface.encodeFunctionData('batchDispatch', [batch, []]);
 
 contract('MockEulerGovernance', function (accounts) {
-    const [ owner, governor, user1, user2] = accounts;
+    const [owner, governor, user1, user2] = accounts;
 
     beforeEach(async function () {
         this.stub = await Stub.new(governor);
@@ -33,28 +37,40 @@ contract('MockEulerGovernance', function (accounts) {
     it('executeProposal reverts if not governor', async function () {
         await expectRevert(
             this.stub.executeProposal(
-                proposalDescription, proposalHexData, {from: user1}
-            ), 
+                proposalDescription, proposalHexData, { from: user1 }
+            ),
             'GovernanceStub: only governor can call'
         );
     });
 
     it('executeProposal emits correct event and event parameters', async function () {
         const executeTx = await this.stub.executeProposal(
-            proposalDescription, proposalHexData, {from: governor}
+            proposalDescription, proposalHexData, { from: governor }
         );
         const executeEvent = executeTx.logs[0];
         expect(executeEvent.event).to.be.equal('ProposalExecuted');
-        expect(executeEvent.args[0]).to.be.equal(proposalDescription);
-        expect(executeEvent.args[1]).to.be.equal(proposalHexData);
+        expect(executeEvent.args[0].toString()).to.be.equal("1");
+        expect(executeEvent.args[1]).to.be.equal(proposalDescription);
+        expect(executeEvent.args[2]).to.be.equal(proposalHexData);
+
+
+        const executeTx2 = await this.stub.executeProposal(
+            proposalDescription, proposalHexData, { from: governor }
+        );
+        const executeEvent2 = executeTx2.logs[0];
+        expect(executeEvent2.event).to.be.equal('ProposalExecuted');
+        expect(executeEvent2.args[0].toString()).to.be.equal("2");
+        expect(executeEvent2.args[1]).to.be.equal(proposalDescription);
+        expect(executeEvent2.args[2]).to.be.equal(proposalHexData);
     });
 
     it('can correctly debug bytes from proposal executed event', async function () {
         const executeTx = await this.stub.executeProposal(
-            proposalDescription, proposalHexData, {from: governor}
+            proposalDescription, proposalHexData, { from: governor }
         );
         const txReceipt = executeTx;
         // get batch items hex from tx receipt
+        // console.log("transaction receipt logs", txReceipt.receipt.logs);
         expect(txReceipt.receipt.logs[0].args.proposalData).to.be.equal(proposalHexData);
         // decode batch items hex using Euler SDK
         // await getContract('0x78eE171d6c8d3808B72dAb8CE647719dB3bb4cC9'); // testing getContract with ropsten governance address
@@ -65,7 +81,7 @@ contract('MockEulerGovernance', function (accounts) {
             : arg;
 
         const decodeBatchTxData = async () => {
-            const { fn, args, contractName, contract, symbol, decimals } = await decodeBatchItem(e.contracts.exec.address, proposalHexData.toString())
+            const { fn, args, contractName, contract, symbol, decimals } = await decodeBatchItem(eulerSDK.contracts.exec.address, proposalHexData.toString())
 
             console.log(`${contractName}.${fn.name} @ ${contract.address}`);
             if (symbol && decimals) {
@@ -104,6 +120,54 @@ contract('MockEulerGovernance', function (accounts) {
             }
             console.log('batch array for defender', batchArray);
             console.log('addresses to defer liquidity checks for', []);
+
+            // send proposal to defender
+
+            try {
+                if (DEFENDER_API_KEY && DEFENDER_API_SECRET) {
+                    // const client = new AdminClient({ apiKey: DEFENDER_API_KEY, apiSecret: DEFENDER_API_SECRET });
+                    const client = new AdminClient({ apiKey: DEFENDER_API_KEY, apiSecret: DEFENDER_API_SECRET });
+                    await client.createProposal({
+                        contract: { address: "0xF7B8611008Ed073Ef348FE130671688BBb20409d", network: 'ropsten' }, // Target contract - exec contract address on ropsten
+                        title: proposalDescription, // Title of the proposal
+                        description: proposalDescription, // Description of the proposal
+                        type: 'custom', // Use 'custom' for custom admin actions
+                        functionInterface: { // Function interface/ABI
+                            "name": "batchDispatch",
+                            "inputs": [
+                                {
+                                    "type": "tuple[]",
+                                    "name": "items",
+                                    "components": [{ "type": "bool", "name": "allowError" }, { "type": "address", "name": "proxyAddr" }, { "type": "bytes", "name": "data" }]
+                                },
+                                {
+                                    "type": "address[]",
+                                    "name": "deferLiquidityChecks"
+                                }
+                            ]
+                        },
+                        functionInputs: [
+                            batchArray,
+                            [] // addresses
+                        ], // Arguments to the function
+                        via: "0xD12b7f433e42b333D111033A374b780328eedfBD", // Multisig address for ropsten = 0xD12b7f433e42b333D111033A374b780328eedfBD
+                        viaType: 'Gnosis Safe', // Either Gnosis Safe or Gnosis Multisig
+                    });
+
+                    // console.log('New proposal created on OZ Defender!');
+                    console.log(
+                        "Proposal created on OpenZeppelin Defender " +
+                        "with the following data: \n", [batchArray, []]
+                    );
+                    
+                } else {
+                    console.log("Invalid API credentials");
+                }
+
+            } catch (e) {
+                throw("ERROR:", e.message);
+            }
+
         }
         await decodeBatchTxData();
     });
@@ -112,7 +176,7 @@ contract('MockEulerGovernance', function (accounts) {
 
 const decodeBatchItem = async (proxy, data) => {
     const { contract, contractName } = await getContract(proxy);
-    
+
     if (!contract) throw `Unrecognized contract at ${proxy}`
     // console.log(contract.interface)
     const fn = contract.interface.getFunction(data.slice(0, 10));
@@ -129,16 +193,16 @@ const decodeBatchItem = async (proxy, data) => {
 const getContract = async (proxy) => {
     const cache = {};
     if (!cache[proxy]) {
-        let [contractName, contract] = Object.entries(e.contracts)
-                                        .find(([, c]) => c.address === proxy) || [];
+        let [contractName, contract] = Object.entries(eulerSDK.contracts)
+            .find(([, c]) => c.address === proxy) || [];
         if (!contract) {
             let moduleId
             try {
-                moduleId = await e.contracts.exec.attach(proxy).moduleId();
+                moduleId = await eulerSDK.contracts.exec.attach(proxy).moduleId();
             } catch {
                 return {};
             }
-            contractName = {500_000: 'EToken', 500_001: 'DToken', 4: 'Governance'}[moduleId];
+            contractName = { 500_000: 'EToken', 500_001: 'DToken', 4: 'Governance' }[moduleId];
             if (!contractName) throw `Unrecognized moduleId! ${moduleId}`;
 
             // contract = await ethers.getContractAt(contractName, proxy);
@@ -147,7 +211,7 @@ const getContract = async (proxy) => {
             contractABI = require(`../../euler-contracts/artifacts/contracts/modules/${contractName}.sol/${contractName}.json`);
             contract = new ethers.Contract(proxy, contractABI.abi, signer)
         }
-        cache[proxy] = {contract, contractName};
+        cache[proxy] = { contract, contractName };
     }
     return cache[proxy];
 }
