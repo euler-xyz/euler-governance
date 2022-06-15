@@ -5,7 +5,8 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+// import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+import "./MultiGovernorVotesQuorumFraction.sol";
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
@@ -13,11 +14,12 @@ contract Governance is
 GovernorSettings, 
 GovernorTimelockControl, 
 GovernorCountingSimple,
-GovernorVotesQuorumFraction
+MultiGovernorVotesQuorumFraction
 {
     constructor(
         string memory name_,
-        ERC20Votes token_,
+        ERC20Votes eul_,
+        ERC20Votes stEul_,
         uint256 votingDelay_,
         uint256 votingPeriod_,
         TimelockController timelock_,
@@ -26,8 +28,8 @@ GovernorVotesQuorumFraction
     )
         Governor(name_)
         GovernorTimelockControl(timelock_)
-        GovernorVotes(token_)
-        GovernorVotesQuorumFraction(quorumNumerator_)
+        MultiGovernorVotes(eul_, stEul_)
+        MultiGovernorVotesQuorumFraction(quorumNumerator_)
         GovernorSettings(votingDelay_, votingPeriod_, proposalThreshold_)
     {}
 
@@ -44,7 +46,7 @@ GovernorVotesQuorumFraction
     function quorum(uint256 blockNumber)
         public
         view
-        override(IGovernor, GovernorVotesQuorumFraction)
+        override(IGovernor, MultiGovernorVotesQuorumFraction)
         returns (uint256)
     {
         return super.quorum(blockNumber);
