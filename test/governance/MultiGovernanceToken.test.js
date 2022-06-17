@@ -2,6 +2,7 @@ const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 const ethSigUtil = require('eth-sig-util');
 const Wallet = require('ethereumjs-wallet').default;
+const { toBN, latest, shouldFailWithMessage } = require('../../helpers/utils');
 const { fromRpcSig } = require('ethereumjs-util');
 const Enums = require('../helpers/enums');
 const { EIP712Domain } = require('../helpers/eip712');
@@ -91,7 +92,7 @@ contract('Governance', function (accounts) {
 
     });
 
-    it('voting power check for main and sub tokens', async function () {
+    it('voting power check for main and subset tokens', async function () {
         // check voting power for main token
         expect(await this.token.getVotes(voter1)).to.be.bignumber.equal(web3.utils.toWei('10'));
         expect(await this.token.getVotes(voter2)).to.be.bignumber.equal(web3.utils.toWei('5'));
@@ -320,7 +321,411 @@ contract('Governance', function (accounts) {
     });
 
     it('increasing subset token balance should allow proposal creation if threshold is met', async function () {
+        this.proposal = this.helper.setProposal([
+            {
+              target: this.receiver.address,
+              data: this.receiver.contract.methods.mockFunction().encodeABI(),
+              value: web3.utils.toWei('1'),
+            },
+          ], '<proposal description>');
+
+        // Run proposal
+        
+        // should fail because only eul token balance is not meeting proposal threshold
+        await shouldFailWithMessage(
+            this.helper.propose({ from: voter3}),
+            'Governor: proposer votes below proposal threshold'
+        );
+
+        await this.stToken.mint(voter3, web3.utils.toWei('10'));
+        await this.stToken.delegate(voter3, {from: voter3});
+
+        const txPropose = await this.helper.propose({ from: voter3 });
+
+        expectEvent(
+            txPropose,
+            'ProposalCreated',
+            {
+                proposalId: this.proposal.id,
+                proposer: voter3,
+                targets: this.proposal.targets,
+                // values: this.proposal.values,
+                signatures: this.proposal.signatures,
+                calldatas: this.proposal.data,
+                startBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay),
+                endBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+                description: this.proposal.description,
+            },
+        );
 
     });
+
+
+
+    it('should reduce future voting power if tokens array is replaced with empty array', async function () {
+        this.proposal = this.helper.setProposal([
+            {
+                target: this.mock.address,
+                data: this.mock.contract.methods.setSupportedTokens([]).encodeABI(),
+                value,
+            },
+        ], '<replace subset tokens array>');
+
+        // Before
+        expect(await this.mock.hasVoted(this.proposal.id, owner)).to.be.equal(false);
+        expect(await this.mock.hasVoted(this.proposal.id, voter1)).to.be.equal(false);
+        expect(await this.mock.hasVoted(this.proposal.id, voter2)).to.be.equal(false);
+        expect(await web3.eth.getBalance(this.mock.address)).to.be.bignumber.equal(value);
+
+        // mint subset token for voter2 before proposal so that their voting power at proposal block is updated
+        await this.stToken.mint(voter2, web3.utils.toWei('10'));
+        await this.stToken.delegate(voter2, {from: voter2});
+
+        // Run proposal
+        const txPropose = await this.helper.propose({ from: voter1 });
+
+        expectEvent(
+            txPropose,
+            'ProposalCreated',
+            {
+                proposalId: this.proposal.id,
+                proposer: voter1,
+                targets: this.proposal.targets,
+                // values: this.proposal.values,
+                signatures: this.proposal.signatures,
+                calldatas: this.proposal.data,
+                startBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay),
+                endBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+                description: this.proposal.description,
+            },
+        );
+
+        await this.helper.waitForSnapshot();
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For, reason: 'This is nice' }, { from: voter1 }),
+            'VoteCast',
+            {
+                voter: voter1,
+                support: Enums.VoteType.For,
+                reason: 'This is nice',
+                weight: web3.utils.toWei('10'),
+            },
+        );
+
+        // voter 2 should have both eul and stEul voting power
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),
+            'VoteCast',
+            {
+                voter: voter2,
+                support: Enums.VoteType.For,
+                weight: web3.utils.toWei('15'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Against }, { from: voter3 }),
+            'VoteCast',
+            {
+                voter: voter3,
+                support: Enums.VoteType.Against,
+                weight: web3.utils.toWei('4'),
+            },
+        );
+
+        // minting subset token for voter4 after proposal will not update their voting power at proposal block
+        await this.stToken.mint(voter4, web3.utils.toWei('10'));
+        await this.stToken.delegate(voter4, {from: voter2});
+        
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Abstain }, { from: voter4 }),
+            'VoteCast',
+            {
+                voter: voter4,
+                support: Enums.VoteType.Abstain,
+                weight: web3.utils.toWei('3'),
+            },
+        );
+
+        await this.helper.waitForDeadline();
+
+        await this.helper.queue();
+
+        await this.helper.waitForEta();
+
+        const txExecute = await this.helper.execute();
+
+        expectEvent(
+            txExecute,
+            'ProposalExecuted',
+            { proposalId: this.proposal.id },
+        );
+
+        // After
+        expect(await this.mock.hasVoted(this.proposal.id, owner)).to.be.equal(false);
+        expect(await this.mock.hasVoted(this.proposal.id, voter1)).to.be.equal(true);
+        expect(await this.mock.hasVoted(this.proposal.id, voter2)).to.be.equal(true);
+        expect(await web3.eth.getBalance(this.mock.address)).to.be.bignumber.equal(value);
+
+        expect(await this.mock.getSupportedTokens()).to.deep.equal([]);
+
+        // second proposal
+        this.proposal = this.helper.setProposal([
+            {
+              target: this.receiver.address,
+              data: this.receiver.contract.methods.mockFunction().encodeABI(),
+              value: web3.utils.toWei('1'),
+            },
+        ], '<proposal description>');
+
+        const txSecondPropose = await this.helper.propose({ from: voter1 });
+
+        expectEvent(
+            txSecondPropose,
+            'ProposalCreated',
+            {
+                proposalId: this.proposal.id,
+                proposer: voter1,
+                targets: this.proposal.targets,
+                // values: this.proposal.values,
+                signatures: this.proposal.signatures,
+                calldatas: this.proposal.data,
+                startBlock: new BN(txSecondPropose.receipt.blockNumber).add(votingDelay),
+                endBlock: new BN(txSecondPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+                description: this.proposal.description,
+            },
+        );
+
+        await this.helper.waitForSnapshot();
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For, reason: 'This is nice' }, { from: voter1 }),
+            'VoteCast',
+            {
+                voter: voter1,
+                support: Enums.VoteType.For,
+                reason: 'This is nice',
+                weight: web3.utils.toWei('10'),
+            },
+        );
+
+        // voter 2 should have only eul voting power as subset token array is empty
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),
+            'VoteCast',
+            {
+                voter: voter2,
+                support: Enums.VoteType.For,
+                weight: web3.utils.toWei('5'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Against }, { from: voter3 }),
+            'VoteCast',
+            {
+                voter: voter3,
+                support: Enums.VoteType.Against,
+                weight: web3.utils.toWei('4'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Abstain }, { from: voter4 }),
+            'VoteCast',
+            {
+                voter: voter4,
+                support: Enums.VoteType.Abstain,
+                weight: web3.utils.toWei('3'),
+            },
+        );
+        
+    });
+
+
+    it('should reduce future voting power if tokens in tokens array is changed', async function () {
+        const newToken = await Token.new("temp", "temp");
+        const newTokenSubset = [newToken.address];
+        this.proposal = this.helper.setProposal([
+            {
+                target: this.mock.address,
+                data: this.mock.contract.methods.setSupportedTokens(newTokenSubset).encodeABI(),
+                value,
+            },
+        ], '<replace subset tokens array>');
+
+        // Before
+        expect(await this.mock.hasVoted(this.proposal.id, owner)).to.be.equal(false);
+        expect(await this.mock.hasVoted(this.proposal.id, voter1)).to.be.equal(false);
+        expect(await this.mock.hasVoted(this.proposal.id, voter2)).to.be.equal(false);
+        expect(await web3.eth.getBalance(this.mock.address)).to.be.bignumber.equal(value);
+
+        // mint subset token for voter2 before proposal so that their voting power at proposal block is updated
+        await this.stToken.mint(voter2, web3.utils.toWei('10'));
+        await this.stToken.delegate(voter2, {from: voter2});
+
+        // Run proposal
+        const txPropose = await this.helper.propose({ from: voter1 });
+
+        expectEvent(
+            txPropose,
+            'ProposalCreated',
+            {
+                proposalId: this.proposal.id,
+                proposer: voter1,
+                targets: this.proposal.targets,
+                // values: this.proposal.values,
+                signatures: this.proposal.signatures,
+                calldatas: this.proposal.data,
+                startBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay),
+                endBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+                description: this.proposal.description,
+            },
+        );
+
+        await this.helper.waitForSnapshot();
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For, reason: 'This is nice' }, { from: voter1 }),
+            'VoteCast',
+            {
+                voter: voter1,
+                support: Enums.VoteType.For,
+                reason: 'This is nice',
+                weight: web3.utils.toWei('10'),
+            },
+        );
+
+        // voter 2 should have both eul and stEul voting power
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),
+            'VoteCast',
+            {
+                voter: voter2,
+                support: Enums.VoteType.For,
+                weight: web3.utils.toWei('15'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Against }, { from: voter3 }),
+            'VoteCast',
+            {
+                voter: voter3,
+                support: Enums.VoteType.Against,
+                weight: web3.utils.toWei('4'),
+            },
+        );
+
+        // minting subset token for voter4 after proposal will not update their voting power at proposal block
+        await this.stToken.mint(voter4, web3.utils.toWei('10'));
+        await this.stToken.delegate(voter4, {from: voter2});
+        
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Abstain }, { from: voter4 }),
+            'VoteCast',
+            {
+                voter: voter4,
+                support: Enums.VoteType.Abstain,
+                weight: web3.utils.toWei('3'),
+            },
+        );
+
+        await this.helper.waitForDeadline();
+
+        await this.helper.queue();
+
+        await this.helper.waitForEta();
+
+        const txExecute = await this.helper.execute({value: web3.utils.toWei('1')});
+
+        expectEvent(
+            txExecute,
+            'ProposalExecuted',
+            { proposalId: this.proposal.id },
+        );
+
+        // After
+        expect(await this.mock.hasVoted(this.proposal.id, owner)).to.be.equal(false);
+        expect(await this.mock.hasVoted(this.proposal.id, voter1)).to.be.equal(true);
+        expect(await this.mock.hasVoted(this.proposal.id, voter2)).to.be.equal(true);
+        expect(await web3.eth.getBalance(this.mock.address)).to.be.bignumber.equal(value);
+
+        expect(await this.mock.getSupportedTokens()).to.deep.equal(newTokenSubset);
+
+        // second proposal
+        this.proposal = this.helper.setProposal([
+            {
+              target: this.receiver.address,
+              data: this.receiver.contract.methods.mockFunction().encodeABI(),
+              value: web3.utils.toWei('1'),
+            },
+        ], '<proposal description>');
+
+        const txSecondPropose = await this.helper.propose({ from: voter1 });
+
+        expectEvent(
+            txSecondPropose,
+            'ProposalCreated',
+            {
+                proposalId: this.proposal.id,
+                proposer: voter1,
+                targets: this.proposal.targets,
+                // values: this.proposal.values,
+                signatures: this.proposal.signatures,
+                calldatas: this.proposal.data,
+                startBlock: new BN(txSecondPropose.receipt.blockNumber).add(votingDelay),
+                endBlock: new BN(txSecondPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+                description: this.proposal.description,
+            },
+        );
+
+        await this.helper.waitForSnapshot();
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For, reason: 'This is nice' }, { from: voter1 }),
+            'VoteCast',
+            {
+                voter: voter1,
+                support: Enums.VoteType.For,
+                reason: 'This is nice',
+                weight: web3.utils.toWei('10'),
+            },
+        );
+
+        // voter 2 should have only eul voting power as subset token array is now changed but not empty
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),
+            'VoteCast',
+            {
+                voter: voter2,
+                support: Enums.VoteType.For,
+                weight: web3.utils.toWei('5'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Against }, { from: voter3 }),
+            'VoteCast',
+            {
+                voter: voter3,
+                support: Enums.VoteType.Against,
+                weight: web3.utils.toWei('4'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Abstain }, { from: voter4 }),
+            'VoteCast',
+            {
+                voter: voter4,
+                support: Enums.VoteType.Abstain,
+                weight: web3.utils.toWei('3'),
+            },
+        );
+        
+    });
+
 
 });
