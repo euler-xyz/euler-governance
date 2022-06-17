@@ -28,7 +28,7 @@ contract('Governance', function (accounts) {
     const votingDelay = new BN(4);
     const votingPeriod = new BN(16);
     const quorumNumerator = new BN(4);
-    const value = 0; // web3.utils.toWei('1');
+    const value = web3.utils.toWei('0');
     const proposalThreshold = web3.utils.toWei('10');
 
     const stTokenName = 'MockStToken';
@@ -56,25 +56,15 @@ contract('Governance', function (accounts) {
 
         this.helper = new GovernorHelper(this.mock);
 
-        // only timelock can send eth to governance contract in receive function
-        // but timelock controller can receive eth
-        // await web3.eth.sendTransaction({ from: owner, to: this.mock.address, value });
-
         await this.token.mint(owner, tokenSupply);
         await this.helper.delegate({ token: this.token, to: voter1, value: web3.utils.toWei('10') }, { from: owner });
         await this.helper.delegate({ token: this.token, to: voter2, value: web3.utils.toWei('5') }, { from: owner });
         await this.helper.delegate({ token: this.token, to: voter3, value: web3.utils.toWei('4') }, { from: owner });
         await this.helper.delegate({ token: this.token, to: voter4, value: web3.utils.toWei('3') }, { from: owner });
 
-        this.proposal = this.helper.setProposal([
-            {
-                target: this.receiver.address,
-                // use non payable version
-                // data: this.receiver.contract.methods.mockFunction().encodeABI(),
-                data: this.receiver.contract.methods.mockFunctionNonPayable().encodeABI(),
-                value,
-            },
-        ], '<proposal description>');
+         
+        await this.timelock.grantRole(await this.timelock.PROPOSER_ROLE(), this.mock.address);
+        await this.timelock.grantRole(await this.timelock.EXECUTOR_ROLE(), this.mock.address);
 
     });
 
@@ -116,7 +106,112 @@ contract('Governance', function (accounts) {
     });
 
     it('tokens array can be replaced through governance', async function () {
+        const newToken = await Token.new("temp", "temp");
+        const newTokenSubset = [newToken.address];
 
+        this.proposal = this.helper.setProposal([
+            {
+                target: this.mock.address,
+                data: this.mock.contract.methods.setSupportedTokens(newTokenSubset).encodeABI(),
+                value,
+            },
+        ], '<replace subset tokens array>');
+        
+        // Before
+        expect(await this.mock.hasVoted(this.proposal.id, owner)).to.be.equal(false);
+        expect(await this.mock.hasVoted(this.proposal.id, voter1)).to.be.equal(false);
+        expect(await this.mock.hasVoted(this.proposal.id, voter2)).to.be.equal(false);
+        expect(await web3.eth.getBalance(this.mock.address)).to.be.bignumber.equal(value);
+
+        // Run proposal
+        const txPropose = await this.helper.propose({ from: voter1 });
+
+        expectEvent(
+            txPropose,
+            'ProposalCreated',
+            {
+              proposalId: this.proposal.id,
+              proposer: voter1,
+              targets: this.proposal.targets,
+              // values: this.proposal.values,
+              signatures: this.proposal.signatures,
+              calldatas: this.proposal.data,
+              startBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay),
+              endBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+              description: this.proposal.description,
+            },
+          );
+
+          await this.helper.waitForSnapshot();
+
+          expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For, reason: 'This is nice' }, { from: voter1 }),
+            'VoteCast',
+            {
+              voter: voter1,
+              support: Enums.VoteType.For,
+              reason: 'This is nice',
+              weight: web3.utils.toWei('10'),
+            },
+          );
+
+          expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),
+            'VoteCast',
+            {
+              voter: voter2,
+              support: Enums.VoteType.For,
+              weight: web3.utils.toWei('5'),
+            },
+          );
+      
+          expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Against }, { from: voter3 }),
+            'VoteCast',
+            {
+              voter: voter3,
+              support: Enums.VoteType.Against,
+              weight: web3.utils.toWei('4'),
+            },
+          );
+      
+          expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Abstain }, { from: voter4 }),
+            'VoteCast',
+            {
+              voter: voter4,
+              support: Enums.VoteType.Abstain,
+              weight: web3.utils.toWei('3'),
+            },
+          );
+      
+          await this.helper.waitForDeadline();
+        
+          await this.helper.queue();
+
+          await this.helper.waitForEta();
+
+          const txExecute = await this.helper.execute();
+      
+          expectEvent(
+            txExecute,
+            'ProposalExecuted',
+            { proposalId: this.proposal.id },
+          );
+      
+          /* await expectEvent.inTransaction(
+            txExecute.tx,
+            this.receiver,
+            'MockFunctionCalled',
+          ); */
+
+          // After
+        expect(await this.mock.hasVoted(this.proposal.id, owner)).to.be.equal(false);
+        expect(await this.mock.hasVoted(this.proposal.id, voter1)).to.be.equal(true);
+        expect(await this.mock.hasVoted(this.proposal.id, voter2)).to.be.equal(true);
+        expect(await web3.eth.getBalance(this.mock.address)).to.be.bignumber.equal(value);
+
+        expect(await this.mock.getSupportedTokens()).to.deep.equal(newTokenSubset);
     });
 
     it('decreasing subset token balance should decrease voting power', async function () {
@@ -131,7 +226,7 @@ contract('Governance', function (accounts) {
 
     });
 
-    it('increasing subset token balance should allow proposal creation if threshold is met', async function () {
+    it('decreasing subset token balance should not allow proposal creation if threshold is not met', async function () {
 
     });
     
