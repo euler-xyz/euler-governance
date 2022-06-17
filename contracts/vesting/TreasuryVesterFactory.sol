@@ -60,6 +60,7 @@ contract TreasuryVesterFactory is AccessControl {
 
         _setupRole(DEFAULT_ADMIN_ROLE, treasury);
         _setupRole(ADMIN_ROLE, msg.sender);
+        _setupRole(ADMIN_ROLE, treasury);
     }
 
     /**
