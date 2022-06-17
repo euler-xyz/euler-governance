@@ -12,6 +12,7 @@ const {
     shouldSupportInterfaces,
 } = require('../utils/introspection/SupportsInterface.behavior');
 const { web3 } = require('hardhat');
+const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants');
 
 const Token = artifacts.require('ERC20VotesMock');
 const Timelock = artifacts.require('contracts/governance/TimelockController.sol:TimelockController');
@@ -728,4 +729,229 @@ contract('Governance', function (accounts) {
     });
 
 
+    it('tokens array cannot be replaced with array containing zero address', async function () {
+        const newToken = await Token.new("temp", "temp");
+        const newTokenSubset = [newToken.address, ZERO_ADDRESS];
+        this.proposal = this.helper.setProposal([
+            {
+                target: this.mock.address,
+                data: this.mock.contract.methods.setSupportedTokens(newTokenSubset).encodeABI(),
+                value,
+            },
+        ], '<replace subset tokens array>');
+
+        // Run proposal
+        const txPropose = await this.helper.propose({ from: voter1 });
+
+        expectEvent(
+            txPropose,
+            'ProposalCreated',
+            {
+                proposalId: this.proposal.id,
+                proposer: voter1,
+                targets: this.proposal.targets,
+                // values: this.proposal.values,
+                signatures: this.proposal.signatures,
+                calldatas: this.proposal.data,
+                startBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay),
+                endBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+                description: this.proposal.description,
+            },
+        );
+
+        await this.helper.waitForSnapshot();
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For, reason: 'This is nice' }, { from: voter1 }),
+            'VoteCast',
+            {
+                voter: voter1,
+                support: Enums.VoteType.For,
+                reason: 'This is nice',
+                weight: web3.utils.toWei('10'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),
+            'VoteCast',
+            {
+                voter: voter2,
+                support: Enums.VoteType.For,
+                weight: web3.utils.toWei('5'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Against }, { from: voter3 }),
+            'VoteCast',
+            {
+                voter: voter3,
+                support: Enums.VoteType.Against,
+                weight: web3.utils.toWei('4'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Abstain }, { from: voter4 }),
+            'VoteCast',
+            {
+                voter: voter4,
+                support: Enums.VoteType.Abstain,
+                weight: web3.utils.toWei('3'),
+            },
+        );
+
+        await this.helper.waitForDeadline();
+
+        await this.helper.queue();
+
+        await this.helper.waitForEta();
+        
+        await shouldFailWithMessage(
+            this.helper.execute(),
+            'TimelockController: underlying transaction reverted'
+        );
+
+        expect(await this.mock.getSupportedTokens()).to.deep.equal([this.stToken.address]);
+    });
+
+    it('can deploy governance with empty subset token array', async function () {
+        this.mock = await Governor.new(
+            name,
+            this.token.address,
+            [],
+            votingDelay,
+            votingPeriod,
+            this.timelock.address,
+            quorumNumerator,
+            proposalThreshold
+        );
+
+        expect(this.mock.address).to.be.not.equal(ZERO_ADDRESS);
+        expect(await this.mock.getSupportedTokens()).to.deep.equal([]);
+
+    });
+
+
+    it('cannot deploy governance with subset token array containing a zero address', async function () {
+        await shouldFailWithMessage(
+             Governor.new(
+                name,
+                this.token.address,
+                [ZERO_ADDRESS, this.stToken.address],
+                votingDelay,
+                votingPeriod,
+                this.timelock.address,
+                quorumNumerator,
+                proposalThreshold
+            ),
+            'Governor: cannot set zero address'
+        );
+
+    });
+
+    it('cannot deploy governance with subset token array containing base eul token', async function () {
+        await shouldFailWithMessage(
+             Governor.new(
+                name,
+                this.token.address,
+                [this.token.address, this.stToken.address],
+                votingDelay,
+                votingPeriod,
+                this.timelock.address,
+                quorumNumerator,
+                proposalThreshold
+            ),
+            'Governor: cannot set eul in subset list'
+        );
+
+    });
+
+    it('tokens array cannot be replaced with array containing eul token address', async function () {
+        const newToken = await Token.new("temp", "temp");
+        const newTokenSubset = [newToken.address, this.token.address];
+        this.proposal = this.helper.setProposal([
+            {
+                target: this.mock.address,
+                data: this.mock.contract.methods.setSupportedTokens(newTokenSubset).encodeABI(),
+                value,
+            },
+        ], '<replace subset tokens array>');
+
+        // Run proposal
+        const txPropose = await this.helper.propose({ from: voter1 });
+
+        expectEvent(
+            txPropose,
+            'ProposalCreated',
+            {
+                proposalId: this.proposal.id,
+                proposer: voter1,
+                targets: this.proposal.targets,
+                // values: this.proposal.values,
+                signatures: this.proposal.signatures,
+                calldatas: this.proposal.data,
+                startBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay),
+                endBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+                description: this.proposal.description,
+            },
+        );
+
+        await this.helper.waitForSnapshot();
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For, reason: 'This is nice' }, { from: voter1 }),
+            'VoteCast',
+            {
+                voter: voter1,
+                support: Enums.VoteType.For,
+                reason: 'This is nice',
+                weight: web3.utils.toWei('10'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),
+            'VoteCast',
+            {
+                voter: voter2,
+                support: Enums.VoteType.For,
+                weight: web3.utils.toWei('5'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Against }, { from: voter3 }),
+            'VoteCast',
+            {
+                voter: voter3,
+                support: Enums.VoteType.Against,
+                weight: web3.utils.toWei('4'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Abstain }, { from: voter4 }),
+            'VoteCast',
+            {
+                voter: voter4,
+                support: Enums.VoteType.Abstain,
+                weight: web3.utils.toWei('3'),
+            },
+        );
+
+        await this.helper.waitForDeadline();
+
+        await this.helper.queue();
+
+        await this.helper.waitForEta();
+        
+        await shouldFailWithMessage(
+            this.helper.execute(),
+            'TimelockController: underlying transaction reverted'
+        );
+
+        expect(await this.mock.getSupportedTokens()).to.deep.equal([this.stToken.address]);
+    });
 });

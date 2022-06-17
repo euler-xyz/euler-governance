@@ -17,7 +17,8 @@ abstract contract MultiGovernorVotes is Governor {
 
     constructor(IVotes EUL, IVotes[] memory tokenAddresses) {
         for (uint i = 0; i<tokenAddresses.length; i++) {
-            require(address(tokenAddresses[i]) != address(0), "Governor: zero address");
+            require(address(tokenAddresses[i]) != address(0), "Governor: cannot set zero address");
+            require(address(tokenAddresses[i]) != address(EUL), "Governor: cannot set eul in subset list");
         }
         tokens = tokenAddresses;
         eul = EUL;
@@ -42,7 +43,8 @@ abstract contract MultiGovernorVotes is Governor {
 
     function setSupportedTokens(IVotes[] memory tokenAddresses) external virtual onlyGovernance {
         for (uint i = 0; i<tokenAddresses.length; i++) {
-            require(address(tokenAddresses[i]) != address(0), "Governor: zero address");
+            require(address(tokenAddresses[i]) != address(0), "Governor: cannot set zero address");
+            require(address(tokenAddresses[i]) != address(eul), "Governor: cannot set eul in subset list");
         }
         tokens = tokenAddresses;
     }
