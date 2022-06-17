@@ -32,8 +32,10 @@ abstract contract MultiGovernorVotes is Governor {
         bytes memory /*params*/
     ) internal view virtual override returns (uint256) {
         uint256 totalVotes = 0;
-        for (uint i = 0; i<tokens.length; i++) {
-            totalVotes += tokens[i].getPastVotes(account, blockNumber);
+        if (tokens.length > 0) {
+            for (uint i = 0; i < tokens.length; i++) {
+                totalVotes += tokens[i].getPastVotes(account, blockNumber);
+            }
         }
         return totalVotes + eul.getPastVotes(account, blockNumber);
     }

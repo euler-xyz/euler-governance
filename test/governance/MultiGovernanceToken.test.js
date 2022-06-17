@@ -29,7 +29,7 @@ contract('Governance', function (accounts) {
     const votingPeriod = new BN(16);
     const quorumNumerator = new BN(4);
     const value = 0; // web3.utils.toWei('1');
-    const proposalThreshold = web3.utils.toWei('100');
+    const proposalThreshold = web3.utils.toWei('10');
 
     const stTokenName = 'MockStToken';
     const stTokenSymbol = 'MSTN';
@@ -62,9 +62,9 @@ contract('Governance', function (accounts) {
 
         await this.token.mint(owner, tokenSupply);
         await this.helper.delegate({ token: this.token, to: voter1, value: web3.utils.toWei('10') }, { from: owner });
-        await this.helper.delegate({ token: this.token, to: voter2, value: web3.utils.toWei('7') }, { from: owner });
-        await this.helper.delegate({ token: this.token, to: voter3, value: web3.utils.toWei('5') }, { from: owner });
-        await this.helper.delegate({ token: this.token, to: voter4, value: web3.utils.toWei('2') }, { from: owner });
+        await this.helper.delegate({ token: this.token, to: voter2, value: web3.utils.toWei('5') }, { from: owner });
+        await this.helper.delegate({ token: this.token, to: voter3, value: web3.utils.toWei('4') }, { from: owner });
+        await this.helper.delegate({ token: this.token, to: voter4, value: web3.utils.toWei('3') }, { from: owner });
 
         this.proposal = this.helper.setProposal([
             {
@@ -97,5 +97,42 @@ contract('Governance', function (accounts) {
         expect(await this.mock.proposalThreshold()).to.be.bignumber.equal(proposalThreshold);
         expect(await this.mock.timelock()).to.be.equal(this.timelock.address);
         expect(await this.mock.getSupportedTokens()).to.deep.equal([this.stToken.address]);
+
     });
+
+    it('voting power check for main and sub tokens', async function () {
+        // check voting power for main token
+        expect(await this.token.getVotes(voter1)).to.be.bignumber.equal(web3.utils.toWei('10'));
+        expect(await this.token.getVotes(voter2)).to.be.bignumber.equal(web3.utils.toWei('5'));
+        expect(await this.token.getVotes(voter3)).to.be.bignumber.equal(web3.utils.toWei('4'));
+        expect(await this.token.getVotes(voter4)).to.be.bignumber.equal(web3.utils.toWei('3'));
+
+        // check voting power for sub token
+        expect(await this.stToken.getVotes(voter1)).to.be.bignumber.equal(web3.utils.toWei('0'));
+        expect(await this.stToken.getVotes(voter2)).to.be.bignumber.equal(web3.utils.toWei('0'));
+        expect(await this.stToken.getVotes(voter3)).to.be.bignumber.equal(web3.utils.toWei('0'));
+        expect(await this.stToken.getVotes(voter4)).to.be.bignumber.equal(web3.utils.toWei('0'));
+    
+    });
+
+    it('tokens array can be replaced through governance', async function () {
+
+    });
+
+    it('decreasing subset token balance should decrease voting power', async function () {
+        
+    });
+
+    it('removing all tokens from subset token array should decrease voting power', async function () {
+        
+    });
+
+    it('increasing subset token balance should increase voting power', async function () {
+
+    });
+
+    it('increasing subset token balance should allow proposal creation if threshold is met', async function () {
+
+    });
+    
 });
