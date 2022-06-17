@@ -10,6 +10,7 @@ const { GovernorHelper } = require('../helpers/governance');
 const {
     shouldSupportInterfaces,
 } = require('../utils/introspection/SupportsInterface.behavior');
+const { web3 } = require('hardhat');
 
 const Token = artifacts.require('ERC20VotesMock');
 const Timelock = artifacts.require('contracts/governance/TimelockController.sol:TimelockController');
@@ -62,7 +63,7 @@ contract('Governance', function (accounts) {
         await this.helper.delegate({ token: this.token, to: voter3, value: web3.utils.toWei('4') }, { from: owner });
         await this.helper.delegate({ token: this.token, to: voter4, value: web3.utils.toWei('3') }, { from: owner });
 
-         
+
         await this.timelock.grantRole(await this.timelock.PROPOSER_ROLE(), this.mock.address);
         await this.timelock.grantRole(await this.timelock.EXECUTOR_ROLE(), this.mock.address);
 
@@ -102,7 +103,7 @@ contract('Governance', function (accounts) {
         expect(await this.stToken.getVotes(voter2)).to.be.bignumber.equal(web3.utils.toWei('0'));
         expect(await this.stToken.getVotes(voter3)).to.be.bignumber.equal(web3.utils.toWei('0'));
         expect(await this.stToken.getVotes(voter4)).to.be.bignumber.equal(web3.utils.toWei('0'));
-    
+
     });
 
     it('tokens array can be replaced through governance', async function () {
@@ -116,7 +117,7 @@ contract('Governance', function (accounts) {
                 value,
             },
         ], '<replace subset tokens array>');
-        
+
         // Before
         expect(await this.mock.hasVoted(this.proposal.id, owner)).to.be.equal(false);
         expect(await this.mock.hasVoted(this.proposal.id, voter1)).to.be.equal(false);
@@ -130,82 +131,76 @@ contract('Governance', function (accounts) {
             txPropose,
             'ProposalCreated',
             {
-              proposalId: this.proposal.id,
-              proposer: voter1,
-              targets: this.proposal.targets,
-              // values: this.proposal.values,
-              signatures: this.proposal.signatures,
-              calldatas: this.proposal.data,
-              startBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay),
-              endBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
-              description: this.proposal.description,
+                proposalId: this.proposal.id,
+                proposer: voter1,
+                targets: this.proposal.targets,
+                // values: this.proposal.values,
+                signatures: this.proposal.signatures,
+                calldatas: this.proposal.data,
+                startBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay),
+                endBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+                description: this.proposal.description,
             },
-          );
+        );
 
-          await this.helper.waitForSnapshot();
+        await this.helper.waitForSnapshot();
 
-          expectEvent(
+        expectEvent(
             await this.helper.vote({ support: Enums.VoteType.For, reason: 'This is nice' }, { from: voter1 }),
             'VoteCast',
             {
-              voter: voter1,
-              support: Enums.VoteType.For,
-              reason: 'This is nice',
-              weight: web3.utils.toWei('10'),
+                voter: voter1,
+                support: Enums.VoteType.For,
+                reason: 'This is nice',
+                weight: web3.utils.toWei('10'),
             },
-          );
+        );
 
-          expectEvent(
+        expectEvent(
             await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),
             'VoteCast',
             {
-              voter: voter2,
-              support: Enums.VoteType.For,
-              weight: web3.utils.toWei('5'),
+                voter: voter2,
+                support: Enums.VoteType.For,
+                weight: web3.utils.toWei('5'),
             },
-          );
-      
-          expectEvent(
+        );
+
+        expectEvent(
             await this.helper.vote({ support: Enums.VoteType.Against }, { from: voter3 }),
             'VoteCast',
             {
-              voter: voter3,
-              support: Enums.VoteType.Against,
-              weight: web3.utils.toWei('4'),
+                voter: voter3,
+                support: Enums.VoteType.Against,
+                weight: web3.utils.toWei('4'),
             },
-          );
-      
-          expectEvent(
+        );
+
+        expectEvent(
             await this.helper.vote({ support: Enums.VoteType.Abstain }, { from: voter4 }),
             'VoteCast',
             {
-              voter: voter4,
-              support: Enums.VoteType.Abstain,
-              weight: web3.utils.toWei('3'),
+                voter: voter4,
+                support: Enums.VoteType.Abstain,
+                weight: web3.utils.toWei('3'),
             },
-          );
-      
-          await this.helper.waitForDeadline();
-        
-          await this.helper.queue();
+        );
 
-          await this.helper.waitForEta();
+        await this.helper.waitForDeadline();
 
-          const txExecute = await this.helper.execute();
-      
-          expectEvent(
+        await this.helper.queue();
+
+        await this.helper.waitForEta();
+
+        const txExecute = await this.helper.execute();
+
+        expectEvent(
             txExecute,
             'ProposalExecuted',
             { proposalId: this.proposal.id },
-          );
-      
-          /* await expectEvent.inTransaction(
-            txExecute.tx,
-            this.receiver,
-            'MockFunctionCalled',
-          ); */
+        );
 
-          // After
+        // After
         expect(await this.mock.hasVoted(this.proposal.id, owner)).to.be.equal(false);
         expect(await this.mock.hasVoted(this.proposal.id, voter1)).to.be.equal(true);
         expect(await this.mock.hasVoted(this.proposal.id, voter2)).to.be.equal(true);
@@ -214,20 +209,118 @@ contract('Governance', function (accounts) {
         expect(await this.mock.getSupportedTokens()).to.deep.equal(newTokenSubset);
     });
 
-    it('decreasing subset token balance should decrease voting power', async function () {
+    it('subset token balance should update voting power', async function () {
+        // check voting power for main token
+        expect(await this.token.getVotes(voter1)).to.be.bignumber.equal(web3.utils.toWei('10'));
+        expect(await this.token.getVotes(voter2)).to.be.bignumber.equal(web3.utils.toWei('5'));
+        expect(await this.token.getVotes(voter3)).to.be.bignumber.equal(web3.utils.toWei('4'));
+        expect(await this.token.getVotes(voter4)).to.be.bignumber.equal(web3.utils.toWei('3'));
+
         
+        await this.stToken.mint(voter2, web3.utils.toWei('10'));
+        await this.stToken.delegate(voter2, {from: voter2});
+
+        // check voting power for sub token
+        expect(await this.stToken.getVotes(voter1)).to.be.bignumber.equal(web3.utils.toWei('0'));
+        expect(await this.stToken.getVotes(voter2)).to.be.bignumber.equal(web3.utils.toWei('10'));
+        expect(await this.stToken.getVotes(voter3)).to.be.bignumber.equal(web3.utils.toWei('0'));
+        expect(await this.stToken.getVotes(voter4)).to.be.bignumber.equal(web3.utils.toWei('0'));
+
+        this.proposal = this.helper.setProposal([
+            {
+              target: this.receiver.address,
+              data: this.receiver.contract.methods.mockFunction().encodeABI(),
+              value: web3.utils.toWei('1'),
+            },
+          ], '<proposal description>');
+
+        // Run proposal
+        const txPropose = await this.helper.propose({ from: voter1});
+
+        expectEvent(
+            txPropose,
+            'ProposalCreated',
+            {
+                proposalId: this.proposal.id,
+                proposer: voter1,
+                targets: this.proposal.targets,
+                // values: this.proposal.values,
+                signatures: this.proposal.signatures,
+                calldatas: this.proposal.data,
+                startBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay),
+                endBlock: new BN(txPropose.receipt.blockNumber).add(votingDelay).add(votingPeriod),
+                description: this.proposal.description,
+            },
+        );
+
+        await this.helper.waitForSnapshot();
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For, reason: 'This is nice' }, { from: voter1 }),
+            'VoteCast',
+            {
+                voter: voter1,
+                support: Enums.VoteType.For,
+                reason: 'This is nice',
+                weight: web3.utils.toWei('10'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),
+            'VoteCast',
+            {
+                voter: voter2,
+                support: Enums.VoteType.For,
+                // Voter 2 voting power should be updated with subset token
+                weight: web3.utils.toWei('15'), 
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Against }, { from: voter3 }),
+            'VoteCast',
+            {
+                voter: voter3,
+                support: Enums.VoteType.Against,
+                weight: web3.utils.toWei('4'),
+            },
+        );
+
+        expectEvent(
+            await this.helper.vote({ support: Enums.VoteType.Abstain }, { from: voter4 }),
+            'VoteCast',
+            {
+                voter: voter4,
+                support: Enums.VoteType.Abstain,
+                weight: web3.utils.toWei('3'),
+            },
+        );
+
+        await this.helper.waitForDeadline();
+
+        await this.helper.queue();
+
+        await this.helper.waitForEta();
+
+        const txExecute = await this.helper.execute({value: web3.utils.toWei('1')});
+
+        expectEvent(
+            txExecute,
+            'ProposalExecuted',
+            { proposalId: this.proposal.id },
+        );
+
+        await expectEvent.inTransaction(
+            txExecute.tx,
+            this.receiver,
+            'MockFunctionCalled',
+          );
+
     });
 
-    it('removing all tokens from subset token array should decrease voting power', async function () {
-        
-    });
-
-    it('increasing subset token balance should increase voting power', async function () {
+    it('increasing subset token balance should allow proposal creation if threshold is met', async function () {
 
     });
 
-    it('decreasing subset token balance should not allow proposal creation if threshold is not met', async function () {
-
-    });
-    
 });
