@@ -38,10 +38,14 @@ abstract contract MultiGovernorVotes is Governor {
         return totalVotes + eul.getPastVotes(account, blockNumber);
     }
 
-    function setSupportedTokens(IVotes[] memory tokenAddresses) public virtual onlyGovernance {
+    function setSupportedTokens(IVotes[] memory tokenAddresses) external virtual onlyGovernance {
         for (uint i = 0; i<tokenAddresses.length; i++) {
             require(address(tokenAddresses[i]) != address(0), "Governor: zero address");
         }
         tokens = tokenAddresses;
+    }
+
+    function getSupportedTokens() external view virtual returns(IVotes[] memory) {
+        return tokens;
     }
 }
