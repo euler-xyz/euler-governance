@@ -161,11 +161,12 @@ task("vesting:createVestingFromCSV")
                         console.log(`Vesting Deployment Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
                         let result = await tx.wait();
                         console.log(`Mined. Status: ${result.status}`);
-                        console.log(`Vesting Contract Address: ${result.events[1].args.vestingContract}`);
-                        console.log(`Vesting Contract Index: ${result.events[1].args.index}`);
-                        console.log(`Vesting Contract Recipient: ${result.events[1].args.recipient}`);
-                        
-                        output += `${row},${result.events[1].args.vestingContract},\n`;
+                        const event = result.events.find(event => event.event === 'VestingContract');
+                        const [recipient, vestingContract, index] = event.args;
+                        console.log(`Vesting Contract Address: ${vestingContract}`);
+                        console.log(`Vesting Contract Index: ${index.toString()}`);
+                        console.log(`Vesting Contract Recipient: ${recipient}`);
+                        output += `${row},${vestingContract},\n`;
                 } catch (e) {
                     console.log(`[SKIPPING]: row ${i + 1} as transaction failed with error: ${e}`);
                 }
@@ -181,7 +182,7 @@ task("vesting:createVestingFromCSV")
 task("vesting:createVesting")
     .addPositionalParam("vestingFactory")
     .addPositionalParam("recipient")
-    .addPositionalParam("vestingAmount")
+    .addPositionalParam("vestingAmount", "In normal decimal units. Will be converted by hardhat task")
     .addPositionalParam("vestingBegin")
     .addPositionalParam("vestingCliff")
     .addPositionalParam("vestingEnd")
@@ -215,9 +216,11 @@ task("vesting:createVesting")
             console.log(`Vesting Deployment Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
             let result = await tx.wait();
             console.log(`Mined. Status: ${result.status}`);
-            console.log(`Vesting Contract Address: ${result.events[1].args.vestingContract}`);
-            console.log(`Vesting Contract Index: ${result.events[1].args.index}`);
-            console.log(`Vesting Contract Recipient: ${result.events[1].args.recipient}`);
+            const event = result.events.find(event => event.event === 'VestingContract');
+            const [recipient, vestingContract, index] = event.args;
+            console.log(`Vesting Contract Address: ${vestingContract}`);
+            console.log(`Vesting Contract Index: ${index.toString()}`);
+            console.log(`Vesting Contract Recipient: ${recipient}`);
         } else {
             console.log("Stoping deployment")
             return false;
