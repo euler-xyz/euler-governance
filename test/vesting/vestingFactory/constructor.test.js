@@ -5,21 +5,27 @@ const { ZERO_ADDRESS } = constants;
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
 const VestingFactory = artifacts.require('TreasuryVesterFactory'); // artifacts.require('TreasuryVesterFactory');
+const Vesting = artifacts.require('TreasuryVester');
 
 contract('TreasuryVesterFactory: constructor', function (accounts) {
   const [owner, treasury] = accounts;
+  let vesting;
 
     const name = 'Euler';
     const symbol = 'EUL';
     const initialSupply = new BN(200);
 
+    before(async function () {
+      vesting = await Vesting.new();
+    });
+
     describe('deploy correctly and assign field variables', function () {
       beforeEach(async function () {
           this.token = await ERC20VotesMock.new(name, symbol);
-          
           this.vestingFactory = await VestingFactory.new(
             this.token.address,
-            treasury
+            treasury,
+            vesting.address
           );
         });
 
@@ -61,7 +67,8 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
               await shouldFailWithMessage(
                 VestingFactory.new(
                     ZERO_ADDRESS,
-                    accounts[0]
+                    accounts[0],
+                    vesting.address
                 ),
                 "cannot set zero address as euler token"
               );
@@ -71,9 +78,10 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
             await shouldFailWithMessage(
               VestingFactory.new(
                   this.token.address,
-                  ZERO_ADDRESS
+                  ZERO_ADDRESS,
+                  vesting.address
               ),
-              "cannot set zero address as treasuty"
+              "cannot set zero address as treasury"
             );
         });
 
@@ -81,7 +89,8 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
             await shouldFailWithMessage(
               VestingFactory.new(
                   accounts[0],
-                  accounts[1]
+                  accounts[1],
+                  vesting.address
               ),
               "euler token must be a smart contract"
             );

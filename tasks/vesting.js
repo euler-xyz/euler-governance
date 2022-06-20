@@ -18,18 +18,20 @@ task("network:latestBlock")
 task("vesting:deployFactory")
     .addPositionalParam("eul")
     .addPositionalParam("treasury")
+    .addPositionalParam("treasuryVester")
     .setAction(async (args) => {
         const userInput = prompt(
             "The following data will be used to deploy the vesting factory contract.\n" +
             `Euler token: ${args.eul}\n` +
             `Treasury: ${args.treasury}\n` +
+            `Treasury Vester: ${args.treasuryVester}\n` +
             "\nPlease confirm with y or n: "
         );
 
         if (userInput == "y" || userInput == "yes") {
             const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
             const vestingFactory = await VestingFactory.deploy(
-                args.eul, args.treasury
+                args.eul, args.treasury, args.treasuryVester
             );
             console.log(`Vesting Factory Deployment Transaction Hash: ${vestingFactory.deployTransaction.hash} (on ${hre.network.name})`);
 
@@ -42,6 +44,16 @@ task("vesting:deployFactory")
     });
 
 
+task("vesting:deployVester")
+.setAction(async () => {
+        const Vester = await hre.ethers.getContractFactory("TreasuryVester");
+        const vester = await Vester.deploy();
+        console.log(`Vester Deployment Transaction Hash: ${vester.deployTransaction.hash} (on ${hre.network.name})`);
+
+        let result = await vester.deployed();
+        console.log(`Vester Contract Address: ${result.address}`);
+    
+});
 
 task("vesting:createVestingFromCSV")
     .addPositionalParam("vestingFactory")
