@@ -74,8 +74,9 @@ contract TreasuryVester is Initializable {
      * @return amount The amount that can be claimed from the vesting contract
      */
     function getAmountToClaim() public view returns(uint amount) {
-        amount = 0;
-        if (block.timestamp >= vestingEnd) {
+        if (block.timestamp < vestingCliff) {
+            amount = 0;
+        } else if (block.timestamp >= vestingEnd) {
             amount = IERC20Votes(eul).balanceOf(address(this));
         } else {
             amount = vestingAmount * (block.timestamp - lastUpdate) / (vestingEnd - vestingBegin);

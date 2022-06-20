@@ -129,4 +129,26 @@ contract('TreasuryVester: getAmountToClaim', function (accounts) {
 
     });
 
+
+    it('should return zero for amount to claim before vesting cliff', async function () {
+        let now = await latest();
+        
+        expect(now).to.be.bignumber.lessThan(vestingEnd);
+
+        await increaseTo(vestingCliff - 10);
+
+        now = await latest();
+
+        // vesting end timestamp has passed at this point
+        expect(now).to.be.bignumber.lessThan(vestingEnd);
+
+        await this.token.mint(this.vesting.address, vestingAmount);
+
+        expectBignumberEqual(
+            await this.vesting.getAmountToClaim(),
+            0
+        );
+
+    });
+
 });
