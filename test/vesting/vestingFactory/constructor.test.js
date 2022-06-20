@@ -74,6 +74,28 @@ contract('TreasuryVesterFactory: constructor', function (accounts) {
               );
           });
 
+          it('revert if zero address passed as treasury vester implementation', async function () {
+            await shouldFailWithMessage(
+              VestingFactory.new(
+                  this.token.address,
+                  accounts[0],
+                  ZERO_ADDRESS
+              ),
+              "cannot set zero address as treasury vester"
+            );
+        });
+
+        it('revert if treasury vester is not a contract', async function () {
+          await shouldFailWithMessage(
+            VestingFactory.new(
+                this.token.address,
+                accounts[0],
+                accounts[1]
+            ),
+            "treasury vester must be a smart contract"
+          );
+      });
+
           it('revert if zero address passed as treasury', async function () {
             await shouldFailWithMessage(
               VestingFactory.new(
