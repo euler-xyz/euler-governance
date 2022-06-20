@@ -653,7 +653,13 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
 
         const vestingContractAddress = await this.vestingFactory.getVestingContract(recipient, 0);
         const vestingContractInstance = await Vesting.at(vestingContractAddress);
-       
+        
+        // zero claimable before vesting cliff
+        expectBignumberEqual(
+            await vestingContractInstance.getAmountToClaim(),
+            0
+        );
+
         // created contract should have correct variables set
         expect(await vestingContractInstance.recipient()).to.be.equal(recipient);
         expect(await vestingContractInstance.eul()).to.be.equal(this.token.address);
