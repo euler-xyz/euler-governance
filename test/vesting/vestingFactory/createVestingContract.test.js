@@ -11,6 +11,7 @@ const Vesting = artifacts.require('TreasuryVester');
 
 contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
     const [owner, treasury, recipient, otherAddress, recipient2] = accounts;
+    let vesting;
 
     const name = 'Euler';
     const symbol = 'EUL';
@@ -18,11 +19,16 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
     const vestingAmount = parseEther("100");
     let now, vestingBegin, vestingCliff, vestingEnd;
 
+    before(async function () {
+       vesting = await Vesting.new();
+    });
+
     beforeEach(async function () {
         this.token = await ERC20VotesMock.new(name, symbol);
         this.vestingFactory = await VestingFactory.new(
             this.token.address, // token
-            treasury // treasury
+            treasury, // treasury
+            vesting.address
         );
 
         now = await latest();
