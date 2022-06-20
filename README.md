@@ -36,6 +36,8 @@ npx hardhat test
 
 EUL ERC20Votes token - `0xd9Fcd98c322942075A5C3860693e9f4f03AAE07b`
 
+Vesting Factory - `0x54ECC8a84A7Bd810Ff376B7C50BdF7F7819CaF80`
+
 
 ### Ropsten 
 
@@ -45,6 +47,7 @@ Governance - `0xFc1B796bA567c50B1f00e6fbbbA3A26A85D4C39b`
 
 Timelock - `0x34Ab2a4648b914390151FCd71a7BBf72Be9aD56C`
 
+Vesting Factory - `0x51ab1a5A46EB2140AFcFb43ebd042C80193e0b78`
 
 ### Rinkeby
 
