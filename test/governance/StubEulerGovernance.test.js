@@ -22,7 +22,7 @@ const proposalHexData = '0xeb937aeb000000000000000000000000000000000000000000000
 // batch items tx hex data is encoded batch items array and address array, 
 // e.g., const encodedBatchTxData = exec.interface.encodeFunctionData('batchDispatch', [batch, []]);
 
-contract('MockEulerGovernance', function (accounts) {
+contract('StubEulerGovernance', function (accounts) {
     const [owner, governor, user1, user2] = accounts;
 
     beforeEach(async function () {
