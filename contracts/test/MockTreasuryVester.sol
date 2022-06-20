@@ -37,24 +37,30 @@ contract MockTreasuryVester {
         lastUpdate = vestingBegin_;
     }
 
-    function setRecipient(address recipient_) public {
+    function setRecipient(address recipient_) external {
         require(msg.sender == recipient, 'TreasuryVester::setRecipient: unauthorized');
         recipient = recipient_;
     }
 
-    function claim() public {
+    function claim() external {
         require(block.timestamp >= vestingCliff, 'TreasuryVester::claim: not time yet');
-        uint amount;
+        uint amount = getAmountToClaim();
+        if (amount > 0) {
+            lastUpdate = block.timestamp;
+            IERC20Votes(eul).transfer(recipient, amount);
+        }
+    }
+
+    function getAmountToClaim() public view returns(uint amount) {
+        amount = 0;
         if (block.timestamp >= vestingEnd) {
             amount = IERC20Votes(eul).balanceOf(address(this));
         } else {
             amount = vestingAmount * (block.timestamp - lastUpdate) / (vestingEnd - vestingBegin);
-            lastUpdate = block.timestamp;
         }
-        IERC20Votes(eul).transfer(recipient, amount);
     }
 
-    function delegate(address delegatee_) public {
+    function delegate(address delegatee_) external {
         require(msg.sender == recipient, 'TreasuryVester::delegate: unauthorized');
         IERC20Votes(eul).delegate(delegatee_);
     }
