@@ -199,8 +199,8 @@ task("vesting:createVesting")
     .addPositionalParam("vestingCliff")
     .addPositionalParam("vestingEnd")
     .setAction(async (args) => {
-        if (parseInt(args.vestingBegin) < 1640995200 || parseInt(args.vestingCliff) < 1640995200) {
-            console.log("Vesting begin and cliff must be equal to or greater than 1st of January, 2022. ie., 1640995200 in unix timestamp ");
+        if (parseInt(args.vestingBegin) != 1640995200 || parseInt(args.vestingCliff) != 1640995200) {
+            console.log("Vesting begin and cliff must be equal to 1st of January, 2022. ie., 1640995200 in unix timestamp ");
             return false;
         }
 
