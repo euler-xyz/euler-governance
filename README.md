@@ -36,7 +36,9 @@ npx hardhat test
 
 EUL ERC20Votes token - `0xd9Fcd98c322942075A5C3860693e9f4f03AAE07b`
 
-Vesting Factory - `0x54ECC8a84A7Bd810Ff376B7C50BdF7F7819CaF80`
+Treasury Vester Factory - `0x2EeB5af890F370ae711F99Aaec0166728c40cF9D`
+
+Treasury Vester Implementation - `0x8Ade79814A455179836637604c51e37e7b819BBB`
 
 
 ### Ropsten 
@@ -47,7 +49,8 @@ Governance - `0xFc1B796bA567c50B1f00e6fbbbA3A26A85D4C39b`
 
 Timelock - `0x34Ab2a4648b914390151FCd71a7BBf72Be9aD56C`
 
-Vesting Factory - `0x51ab1a5A46EB2140AFcFb43ebd042C80193e0b78`
+Treasury Vester Factory - `0x51ab1a5A46EB2140AFcFb43ebd042C80193e0b78`
+
 
 ### Rinkeby
 
@@ -56,3 +59,7 @@ EUL ERC20Votes token - `0xe013C993A77Cdd1aC0d8c1B15a6eFf95EB36c8c6`
 Governance - `0x681E9cf95e26c6C2cEF09fdc476C7f8De6AFf2D5`
 
 TimelockController - `0x16fBC769237cE17830799e6faD9d53536c3B8389`
+
+Treasury Vester Implementation - `0x90E644678b43399659010DD07259ED61E372ddb5`
+
+Treasury Vester Factory - `0xE392Ee380A9917D08B521E9488a66C83364678d2`

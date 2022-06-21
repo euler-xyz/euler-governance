@@ -18,18 +18,20 @@ task("network:latestBlock")
 task("vesting:deployFactory")
     .addPositionalParam("eul")
     .addPositionalParam("treasury")
+    .addPositionalParam("treasuryVester")
     .setAction(async (args) => {
         const userInput = prompt(
             "The following data will be used to deploy the vesting factory contract.\n" +
             `Euler token: ${args.eul}\n` +
             `Treasury: ${args.treasury}\n` +
+            `Treasury Vester: ${args.treasuryVester}\n` +
             "\nPlease confirm with y or n: "
         );
 
         if (userInput == "y" || userInput == "yes") {
             const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
             const vestingFactory = await VestingFactory.deploy(
-                args.eul, args.treasury
+                args.eul, args.treasury, args.treasuryVester
             );
             console.log(`Vesting Factory Deployment Transaction Hash: ${vestingFactory.deployTransaction.hash} (on ${hre.network.name})`);
 
@@ -42,6 +44,16 @@ task("vesting:deployFactory")
     });
 
 
+task("vesting:deployVester")
+.setAction(async () => {
+        const Vester = await hre.ethers.getContractFactory("TreasuryVester");
+        const vester = await Vester.deploy();
+        console.log(`Vester Deployment Transaction Hash: ${vester.deployTransaction.hash} (on ${hre.network.name})`);
+
+        let result = await vester.deployed();
+        console.log(`Vester Contract Address: ${result.address}`);
+    
+});
 
 task("vesting:createVestingFromCSV")
     .addPositionalParam("vestingFactory")
@@ -71,7 +83,7 @@ task("vesting:createVestingFromCSV")
             }
             
             const vestingBegin = 1640995200;
-            const vestingCliff = parseInt(row[2]);
+            const vestingCliff = vestingBegin; // parseInt(row[2]);
             const vestingEnd = parseInt(row[3]);
             
             // vestingAmount
@@ -84,7 +96,7 @@ task("vesting:createVestingFromCSV")
             // vestingCliff
             if (
                 !(
-                    !isNaN(vestingCliff) && 
+                    // !isNaN(vestingCliff) && 
                     vestingCliff > Math.floor(Date.now() / 1000) && 
                     vestingCliff >= vestingBegin
                 )
@@ -161,11 +173,12 @@ task("vesting:createVestingFromCSV")
                         console.log(`Vesting Deployment Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
                         let result = await tx.wait();
                         console.log(`Mined. Status: ${result.status}`);
-                        console.log(`Vesting Contract Address: ${result.events[1].args.vestingContract}`);
-                        console.log(`Vesting Contract Index: ${result.events[1].args.index}`);
-                        console.log(`Vesting Contract Recipient: ${result.events[1].args.recipient}`);
-                        
-                        output += `${row},${result.events[1].args.vestingContract},\n`;
+                        const event = result.events.find(event => event.event === 'VestingContract');
+                        const [recipient, vestingContract, index] = event.args;
+                        console.log(`Vesting Contract Address: ${vestingContract}`);
+                        console.log(`Vesting Contract Index: ${index.toString()}`);
+                        console.log(`Vesting Contract Recipient: ${recipient}`);
+                        output += `${row},${vestingContract},\n`;
                 } catch (e) {
                     console.log(`[SKIPPING]: row ${i + 1} as transaction failed with error: ${e}`);
                 }
@@ -181,13 +194,13 @@ task("vesting:createVestingFromCSV")
 task("vesting:createVesting")
     .addPositionalParam("vestingFactory")
     .addPositionalParam("recipient")
-    .addPositionalParam("vestingAmount")
+    .addPositionalParam("vestingAmount", "In normal decimal units. Will be converted by hardhat task")
     .addPositionalParam("vestingBegin")
     .addPositionalParam("vestingCliff")
     .addPositionalParam("vestingEnd")
     .setAction(async (args) => {
-        if (parseInt(args.vestingBegin) < 1640995200) {
-            console.log("Vesting begin must be equal to or greater than 1st of January, 2022. ie., 1640995200 in unix timestamp ");
+        if (parseInt(args.vestingBegin) < 1640995200 || parseInt(args.vestingCliff) < 1640995200) {
+            console.log("Vesting begin and cliff must be equal to or greater than 1st of January, 2022. ie., 1640995200 in unix timestamp ");
             return false;
         }
 
@@ -215,9 +228,11 @@ task("vesting:createVesting")
             console.log(`Vesting Deployment Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
             let result = await tx.wait();
             console.log(`Mined. Status: ${result.status}`);
-            console.log(`Vesting Contract Address: ${result.events[1].args.vestingContract}`);
-            console.log(`Vesting Contract Index: ${result.events[1].args.index}`);
-            console.log(`Vesting Contract Recipient: ${result.events[1].args.recipient}`);
+            const event = result.events.find(event => event.event === 'VestingContract');
+            const [recipient, vestingContract, index] = event.args;
+            console.log(`Vesting Contract Address: ${vestingContract}`);
+            console.log(`Vesting Contract Index: ${index.toString()}`);
+            console.log(`Vesting Contract Recipient: ${recipient}`);
         } else {
             console.log("Stoping deployment")
             return false;

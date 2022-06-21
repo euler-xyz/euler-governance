@@ -6,12 +6,18 @@ const { findEventInTransaction } = require('../../../helpers/events');
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
 const VestingFactory = artifacts.require('TreasuryVesterFactory'); // artifacts.require('TreasuryVesterFactory');
+const Vesting = artifacts.require('TreasuryVester');
 
 contract('TreasuryVesterFactory: updateTreasury()', function (accounts) {
   const [owner] = accounts;
+  let vesting;
 
     const name = 'Euler';
     const symbol = 'EUL';
+
+    before(async function () {
+      vesting = await Vesting.new();
+   });
 
     describe('deploy correctly and assign field variables', function () {
       beforeEach(async function () {
@@ -19,7 +25,8 @@ contract('TreasuryVesterFactory: updateTreasury()', function (accounts) {
           
           this.vestingFactory = await VestingFactory.new(
             this.token.address,
-            accounts[0]
+            accounts[0],
+            vesting.address
           );
         });
 

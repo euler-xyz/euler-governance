@@ -268,8 +268,9 @@ contract('Governance', function (accounts) {
             },
         );
 
-        const proposalStartBlock = new BN(txPropose.receipt.blockNumber).add(votingDelay);
-        expect(await this.mock.getVotes(voter2, proposalStartBlock, ZERO_BYTES32)).to.be.bignumber.equal(web3.utils.toWei('15'));
+        // Voter 2 voting power should be updated at proposal start with subset token
+        const proposalStartBlock = new BN(txPropose.receipt.blockNumber).add(votingDelay); 
+        expect(await this.mock.getVotes(voter2, proposalStartBlock)).to.be.bignumber.equal(web3.utils.toWei('15'));
 
         expectEvent(
             await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),

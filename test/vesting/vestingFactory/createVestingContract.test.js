@@ -11,6 +11,7 @@ const Vesting = artifacts.require('TreasuryVester');
 
 contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
     const [owner, treasury, recipient, otherAddress, recipient2] = accounts;
+    let vesting;
 
     const name = 'Euler';
     const symbol = 'EUL';
@@ -18,11 +19,16 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
     const vestingAmount = parseEther("100");
     let now, vestingBegin, vestingCliff, vestingEnd;
 
+    before(async function () {
+       vesting = await Vesting.new();
+    });
+
     beforeEach(async function () {
         this.token = await ERC20VotesMock.new(name, symbol);
         this.vestingFactory = await VestingFactory.new(
             this.token.address, // token
-            treasury // treasury
+            treasury, // treasury
+            vesting.address
         );
 
         now = await latest();
@@ -647,7 +653,13 @@ contract('TreasuryVesterFactory: createVestingContract()', function (accounts) {
 
         const vestingContractAddress = await this.vestingFactory.getVestingContract(recipient, 0);
         const vestingContractInstance = await Vesting.at(vestingContractAddress);
-       
+        
+        // zero claimable before vesting cliff
+        expectBignumberEqual(
+            await vestingContractInstance.getAmountToClaim(),
+            0
+        );
+
         // created contract should have correct variables set
         expect(await vestingContractInstance.recipient()).to.be.equal(recipient);
         expect(await vestingContractInstance.eul()).to.be.equal(this.token.address);
