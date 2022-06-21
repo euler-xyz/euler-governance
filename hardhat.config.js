@@ -5,6 +5,7 @@ require("solidity-coverage");
 require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
 require('@openzeppelin/hardhat-upgrades');
+require("@xyrusworx/hardhat-solidity-json");
 
 // Load tasks
 
