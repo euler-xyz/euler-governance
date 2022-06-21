@@ -49,12 +49,8 @@ Governance - `0xFc1B796bA567c50B1f00e6fbbbA3A26A85D4C39b`
 
 Timelock - `0x34Ab2a4648b914390151FCd71a7BBf72Be9aD56C`
 
-<<<<<<< HEAD
-Vesting Factory - `0x51ab1a5A46EB2140AFcFb43ebd042C80193e0b78`
-=======
 Treasury Vester Factory - `0x51ab1a5A46EB2140AFcFb43ebd042C80193e0b78`
 
->>>>>>> master
 
 ### Rinkeby
 
