@@ -48,15 +48,17 @@ contract TreasuryVesterFactory is AccessControl {
         uint256 index
     );
 
-    constructor(address eul_, address treasury_) {
+    constructor(address eul_, address treasury_, address treasuryVesterImplementation_) {
         require(eul_ != address(0), "cannot set zero address as euler token");
         require(eul_.isContract(), "euler token must be a smart contract");
         EUL = IERC20(eul_);
 
-        require(treasury_ != address(0), "cannot set zero address as treasuty");
+        require(treasury_ != address(0), "cannot set zero address as treasury");
         treasury = treasury_;
 
-        vestingLogic = new TreasuryVester();
+        require(treasuryVesterImplementation_ != address(0), "cannot set zero address as treasury vester");
+        require(treasuryVesterImplementation_.isContract(), "treasury vester must be a smart contract");
+        vestingLogic = TreasuryVester(treasuryVesterImplementation_);
 
         _setupRole(DEFAULT_ADMIN_ROLE, treasury);
         _setupRole(ADMIN_ROLE, msg.sender);

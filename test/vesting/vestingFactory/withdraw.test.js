@@ -4,20 +4,31 @@ const { parseEther } = require('@ethersproject/units');
 
 const ERC20VotesMock = artifacts.require('ERC20VotesMock');
 const VestingFactory = artifacts.require('TreasuryVesterFactory'); // artifacts.require('TreasuryVesterFactory');
+const Vesting = artifacts.require('TreasuryVester');
 
 contract('TreasuryVesterFactory: withdraw()', function (accounts) {
     const [owner] = accounts;
+    let vesting;
 
     const amountToMint = parseEther("100");
     const name = 'Euler';
     const symbol = 'EUL';
+
+    before(async function () {
+      vesting = await Vesting.new();
+   });
 
     beforeEach(async function () {
         this.token = await ERC20VotesMock.new(name, symbol);
         
         this.vestingFactory = await VestingFactory.new(
             this.token.address,
+<<<<<<< HEAD
             accounts[1]
+=======
+            accounts[1],
+            vesting.address
+>>>>>>> master
         );
 
         // mint to owner
@@ -25,7 +36,11 @@ contract('TreasuryVesterFactory: withdraw()', function (accounts) {
     });
 
     // role check for admin
+<<<<<<< HEAD
     it('revert if non admin', async function () {
+=======
+    it('revert if non deployer or treasury', async function () {
+>>>>>>> master
         const amount = parseEther("50");
         await this.token.transfer(this.vestingFactory.address, amount);
 
@@ -59,6 +74,20 @@ contract('TreasuryVesterFactory: withdraw()', function (accounts) {
         expectBignumberEqual(await this.token.balanceOf(treasury), 0);
 
         await this.vestingFactory.withdraw(amount);
+            
+        expectBignumberEqual(await this.token.balanceOf(accounts[0]), amountToMint.sub(amount));
+        expectBignumberEqual(await this.token.balanceOf(treasury), amount);
+    });
+
+    it('treasury can withdraw and funds only go to treasury', async function () {
+        const amount = parseEther("50");
+        const treasury = accounts[1];
+        await this.token.transfer(this.vestingFactory.address, amount);
+
+        expectBignumberEqual(await this.token.balanceOf(accounts[0]), amountToMint.sub(amount));
+        expectBignumberEqual(await this.token.balanceOf(treasury), 0);
+
+        await this.vestingFactory.withdraw(amount, {from: treasury});
             
         expectBignumberEqual(await this.token.balanceOf(accounts[0]), amountToMint.sub(amount));
         expectBignumberEqual(await this.token.balanceOf(treasury), amount);

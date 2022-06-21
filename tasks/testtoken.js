@@ -45,6 +45,20 @@ task("testtoken:transfer")
         console.log(`Mined. Status: ${result.status}`);
     });
 
+task("testtoken:delegate")
+    .addPositionalParam("token")
+    .addPositionalParam("delegate")
+    .setAction(async (args) => {
+        const Token = await hre.ethers.getContractFactory("ERC20VotesMock");
+        const token = await Token.attach(args.token);
+        
+        const tx = await token.delegate(args.delegate);
+
+        console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+        let result = await tx.wait();
+        console.log(`Mined. Status: ${result.status}`);
+    });
+
 task("testtoken:balanceOf")
     .addPositionalParam("token")
     .addPositionalParam("who")

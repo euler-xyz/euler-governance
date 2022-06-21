@@ -45,7 +45,7 @@ contract TreasuryVester is Initializable {
      * Callable by the current recipient only.
      * @param recipient_ The recipient of the vested funds
      */
-    function setRecipient(address recipient_) public {
+    function setRecipient(address recipient_) external {
         require(msg.sender == recipient, 'TreasuryVester::setRecipient: unauthorized');
         recipient = recipient_;
     }
@@ -60,16 +60,27 @@ contract TreasuryVester is Initializable {
      * divided by the vesting duration (vesting end - vesting begin)
      * Can be called by anyone but funds will only go to the vesting recipient.
      */
-    function claim() public {
+    function claim() external {
         require(block.timestamp >= vestingCliff, 'TreasuryVester::claim: not time yet');
-        uint amount;
-        if (block.timestamp >= vestingEnd) {
+        uint amount = getAmountToClaim();
+        if (amount > 0) {
+            lastUpdate = block.timestamp;
+            IERC20Votes(eul).transfer(recipient, amount);
+        }
+    }
+
+    /**
+     * @notice Returns the amount of vested tokens that can be claimed using the claim function.
+     * @return amount The amount that can be claimed from the vesting contract
+     */
+    function getAmountToClaim() public view returns(uint amount) {
+        if (block.timestamp < vestingCliff) {
+            amount = 0;
+        } else if (block.timestamp >= vestingEnd) {
             amount = IERC20Votes(eul).balanceOf(address(this));
         } else {
             amount = vestingAmount * (block.timestamp - lastUpdate) / (vestingEnd - vestingBegin);
-            lastUpdate = block.timestamp;
         }
-        IERC20Votes(eul).transfer(recipient, amount);
     }
 
     /**
@@ -77,7 +88,7 @@ contract TreasuryVester is Initializable {
      * Only callable by the recipient.
      * @param delegatee_ The address to serve as the delegate
      */
-    function delegate(address delegatee_) public {
+    function delegate(address delegatee_) external {
         require(msg.sender == recipient, 'TreasuryVester::delegate: unauthorized');
         IERC20Votes(eul).delegate(delegatee_);
     }
