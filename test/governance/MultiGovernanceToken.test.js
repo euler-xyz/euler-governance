@@ -12,7 +12,7 @@ const {
     shouldSupportInterfaces,
 } = require('../utils/introspection/SupportsInterface.behavior');
 const { web3 } = require('hardhat');
-const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants');
+const { ZERO_ADDRESS, ZERO_BYTES32 } = require('@openzeppelin/test-helpers/src/constants');
 
 const Token = artifacts.require('ERC20VotesMock');
 const Timelock = artifacts.require('contracts/governance/TimelockController.sol:TimelockController');
@@ -254,7 +254,7 @@ contract('Governance', function (accounts) {
                 description: this.proposal.description,
             },
         );
-
+        
         await this.helper.waitForSnapshot();
 
         expectEvent(
@@ -267,6 +267,9 @@ contract('Governance', function (accounts) {
                 weight: web3.utils.toWei('10'),
             },
         );
+
+        const proposalStartBlock = new BN(txPropose.receipt.blockNumber).add(votingDelay);
+        expect(await this.mock.getVotes(voter2, proposalStartBlock, ZERO_BYTES32)).to.be.bignumber.equal(web3.utils.toWei('15'));
 
         expectEvent(
             await this.helper.vote({ support: Enums.VoteType.For }, { from: voter2 }),

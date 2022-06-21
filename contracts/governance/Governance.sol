@@ -79,6 +79,14 @@ MultiGovernorVotesQuorumFraction
         return super.state(proposalId);
     }
 
+    function getVotes(
+        address account,
+        uint256 blockNumber,
+        bytes memory params
+    ) external view returns (uint256) {
+        return super._getVotes(account, blockNumber, params);
+    }
+
     function _execute(
         uint256 proposalId,
         address[] memory targets,
