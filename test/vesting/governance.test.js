@@ -25,6 +25,7 @@ contract('TreasuryVester: governance', function (accounts) {
 
     beforeEach(async function () {
         this.token = await ERC20VotesMock.new(name, symbol);
+        this.stoken = await ERC20VotesMock.new("stEUL", "stEUL");
         now = await latest();
         vestingBegin = now.add(await duration.minutes(5));
         vestingCliff = now.add(await duration.minutes(15));
@@ -40,7 +41,7 @@ contract('TreasuryVester: governance', function (accounts) {
 
         this.timelock = await Timelock.new(3600, [], []);
         let proposalThreshold = vestingAmount;
-        this.mock = await Governor.new("Euler-Governance", this.token.address, 4, 16, this.timelock.address, 4, proposalThreshold);
+        this.mock = await Governor.new("Euler-Governance", this.token.address, [this.stoken.address], 4, 16, this.timelock.address, 4, proposalThreshold);
         this.receiver = await CallReceiver.new();
         // normal setup: governor is proposer, everyone is executor, timelock is its own admin
         await this.timelock.grantRole(await this.timelock.PROPOSER_ROLE(), this.mock.address);
