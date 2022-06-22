@@ -1,6 +1,7 @@
 *.txt
 .DS_Store
 *.csv 
+arguments.js
 
 # Logs
 logs
