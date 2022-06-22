@@ -26,9 +26,8 @@ The modifications made to the [OZ GovernorVotes](https://github.com/OpenZeppelin
 
 
 
+### OpenZeppelin GovernorVotesQuorumFraction => MultiGovernorVotesQuorumFraction
 
-
-### OpenZeppelin GovernorVotesQuorumFraction => MultiGovernorVotesQuorumFraction
 
 The modifications made to the [OZ GovernorVotesQuorumFraction](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/governance/extensions/GovernorVotesQuorumFraction.sol) smart contract to derive our [MultiGovernorVotesQuorumFraction](https://github.com/euler-xyz/euler-governance/blob/multiple-tokens-array/contracts/governance/MultiGovernorVotesQuorumFraction.sol) smart contract are described below.
 
