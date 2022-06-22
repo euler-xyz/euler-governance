@@ -40,6 +40,11 @@ Treasury Vester Factory - `0x2EeB5af890F370ae711F99Aaec0166728c40cF9D`
 
 Treasury Vester Implementation - `0x8Ade79814A455179836637604c51e37e7b819BBB`
 
+Timelock Controller - `0xd4Ee8939a537D943a4E46E7Ae04069C9451d724F`
+
+Governance - `0xd8E2114f6bCbaee83CDEB1bD6650a28BBcF144D5`
+
+Governance Stub Target - `0x8233f21dda26229c8b0586c3c2521be5da0e6328`
 
 ### Ropsten 
 
