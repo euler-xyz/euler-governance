@@ -45,15 +45,15 @@ task("vesting:deployFactory")
 
 
 task("vesting:deployVester")
-.setAction(async () => {
+    .setAction(async () => {
         const Vester = await hre.ethers.getContractFactory("TreasuryVester");
         const vester = await Vester.deploy();
         console.log(`Vester Deployment Transaction Hash: ${vester.deployTransaction.hash} (on ${hre.network.name})`);
 
         let result = await vester.deployed();
         console.log(`Vester Contract Address: ${result.address}`);
-    
-});
+
+    });
 
 task("vesting:createVestingFromCSV")
     .addPositionalParam("vestingFactory")
@@ -75,17 +75,17 @@ task("vesting:createVestingFromCSV")
         // let i = 1 to skip headings
         for (let i = 1; i < textByLine.length; i++) {
             const row = textByLine[i].split(",")
- 
+
             // recipient address
             if (!hre.ethers.utils.isAddress(row[0])) {
                 console.log(`[ERROR]: recipient address is invalid for data in row ${i + 1}`)
                 continue;
             }
-            
+
             const vestingBegin = 1640995200;
             const vestingCliff = vestingBegin; // parseInt(row[2]);
             const vestingEnd = parseInt(row[3]);
-            
+
             // vestingAmount
             if (
                 isNaN(parseInt(row[1]))
@@ -97,7 +97,7 @@ task("vesting:createVestingFromCSV")
             if (
                 !(
                     // !isNaN(vestingCliff) && 
-                    vestingCliff > Math.floor(Date.now() / 1000) && 
+                    vestingCliff > Math.floor(Date.now() / 1000) &&
                     vestingCliff >= vestingBegin
                 )
             ) {
@@ -107,8 +107,8 @@ task("vesting:createVestingFromCSV")
             // vestingEnd
             if (
                 !(
-                    !isNaN(vestingEnd) && 
-                    vestingEnd > Math.floor(Date.now() / 1000) && 
+                    !isNaN(vestingEnd) &&
+                    vestingEnd > Math.floor(Date.now() / 1000) &&
                     vestingEnd > vestingCliff
                 )
             ) {
@@ -138,14 +138,14 @@ task("vesting:createVestingFromCSV")
             let signers = await hre.ethers.getSigners();
             let signer = signers[0];
             try {
-                let estimateGasResult = await vestingFactory.connect(signer).estimateGas['createVestingContract'].apply(null, 
+                let estimateGasResult = await vestingFactory.connect(signer).estimateGas['createVestingContract'].apply(null,
                     row[0],
                     parseEther(row[1].toString()),
                     vestingBegin,
                     vestingCliff,
                     vestingEnd,
                 );
-                    
+
                 await instance.methods['createVestingContract(address,uint256,uint256,uint256,uint256)'].call(
                     row[0],
                     parseEther(row[1].toString()),
@@ -160,25 +160,25 @@ task("vesting:createVestingFromCSV")
             } catch {
                 console.log(`[SKIPPING]: row ${i + 1} as transaction will fail with error: ${e}`);
             }
-                
+
             if (isValid) {
                 try {
-                        const tx = await vestingFactory.createVestingContract(
-                            row[0],
-                            parseEther(row[1].toString()),
-                            vestingBegin,
-                            vestingCliff,
-                            vestingEnd
-                        );
-                        console.log(`Vesting Deployment Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
-                        let result = await tx.wait();
-                        console.log(`Mined. Status: ${result.status}`);
-                        const event = result.events.find(event => event.event === 'VestingContract');
-                        const [recipient, vestingContract, index] = event.args;
-                        console.log(`Vesting Contract Address: ${vestingContract}`);
-                        console.log(`Vesting Contract Index: ${index.toString()}`);
-                        console.log(`Vesting Contract Recipient: ${recipient}`);
-                        output += `${row},${vestingContract},\n`;
+                    const tx = await vestingFactory.createVestingContract(
+                        row[0],
+                        parseEther(row[1].toString()),
+                        vestingBegin,
+                        vestingCliff,
+                        vestingEnd
+                    );
+                    console.log(`Vesting Deployment Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+                    let result = await tx.wait();
+                    console.log(`Mined. Status: ${result.status}`);
+                    const event = result.events.find(event => event.event === 'VestingContract');
+                    const [recipient, vestingContract, index] = event.args;
+                    console.log(`Vesting Contract Address: ${vestingContract}`);
+                    console.log(`Vesting Contract Index: ${index.toString()}`);
+                    console.log(`Vesting Contract Recipient: ${recipient}`);
+                    output += `${row},${vestingContract},\n`;
                 } catch (e) {
                     console.log(`[SKIPPING]: row ${i + 1} as transaction failed with error: ${e}`);
                 }
@@ -239,6 +239,48 @@ task("vesting:createVesting")
         }
     });
 
+
+task("vesting:createVestingMainnet")
+    .addPositionalParam("vestingFactory")
+    .addPositionalParam("recipient")
+    .addPositionalParam("vestingAmount", "In normal decimal units. Will be converted by hardhat task")
+    .addPositionalParam("vestingEnd")
+    .setAction(async (args) => {
+        const userInput = prompt(
+            "The following data will be used to deploy the vesting contract.\n" +
+            "Ensure that vestingCliff >= vestingBegin and vestingEnd > vestingCliff\n" +
+            `TreasuryVesterFactory: 0x2EeB5af890F370ae711F99Aaec0166728c40cF9D` +
+            `Recipient: ${args.recipient}\n` +
+            `Vesting Amount: ${args.vestingAmount}\n` +
+            `Vesting Begin: 1640995200\n` +
+            `Vesting Cliff: 1640995200\n` +
+            `Vesting End: ${args.vestingEnd}\n` +
+            "\nPlease confirm with y or n: "
+        );
+
+        if (userInput == "y" || userInput == "yes") {
+            const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
+            const vestingFactory = await VestingFactory.attach("0x2EeB5af890F370ae711F99Aaec0166728c40cF9D");
+            const tx = await vestingFactory.createVestingContract(
+                args.recipient,
+                parseEther(args.vestingAmount.toString()),
+                1640995200, // vestingBegin
+                1640995200, // vestingCliff
+                parseInt(args.vestingEnd)
+            );
+            console.log(`Vesting Deployment Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+            let result = await tx.wait();
+            console.log(`Mined. Status: ${result.status}`);
+            const event = result.events.find(event => event.event === 'VestingContract');
+            const [recipient, vestingContract, index] = event.args;
+            console.log(`Vesting Contract Address: ${vestingContract}`);
+            console.log(`Vesting Contract Index: ${index.toString()}`);
+            console.log(`Vesting Contract Recipient: ${recipient}`);
+        } else {
+            console.log("Stoping deployment")
+            return false;
+        }
+    });
 
 
 task("vesting:withdraw")

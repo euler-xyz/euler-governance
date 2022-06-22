@@ -94,7 +94,7 @@ task("gov:deployGovernanceContracts")
             // console.log(`Mined. Status: ${result.status}`);
 
             const stub = await STUB.deploy(
-                governanceContract.address
+                timelockContract.address
             );
 
             console.log(`Stub Contract Deployment Transaction Hash: ${stub.deployTransaction.hash} (on ${hre.network.name})`);
