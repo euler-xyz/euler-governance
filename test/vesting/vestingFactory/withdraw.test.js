@@ -23,12 +23,8 @@ contract('TreasuryVesterFactory: withdraw()', function (accounts) {
         
         this.vestingFactory = await VestingFactory.new(
             this.token.address,
-<<<<<<< HEAD
-            accounts[1]
-=======
             accounts[1],
             vesting.address
->>>>>>> master
         );
 
         // mint to owner
@@ -36,11 +32,7 @@ contract('TreasuryVesterFactory: withdraw()', function (accounts) {
     });
 
     // role check for admin
-<<<<<<< HEAD
-    it('revert if non admin', async function () {
-=======
     it('revert if non deployer or treasury', async function () {
->>>>>>> master
         const amount = parseEther("50");
         await this.token.transfer(this.vestingFactory.address, amount);
 
