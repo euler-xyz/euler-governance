@@ -11,6 +11,7 @@ task("gov:deployGovernanceContracts")
         try {
             const TIMELOCKCONTROLLER = await hre.ethers.getContractFactory("contracts/governance/TimelockController.sol:TimelockController");
             const GOVERNANCE = await hre.ethers.getContractFactory("Governance");
+            const STUB = await hre.ethers.getContractFactory("StubEulerGovernance");
 
             // minimum delay, [proposers + cancellers], [executors]
             const timelockController = await TIMELOCKCONTROLLER.deploy(
@@ -51,6 +52,12 @@ task("gov:deployGovernanceContracts")
             let result = await proposerRoleTx.wait();
             console.log(`Mined. Status: ${result.status}`);
 
+            // Timelock admin role - multisig 
+            const timelockRoleTx = await timelockContract.grantRole(await timelockContract.TIMELOCK_ADMIN_ROLE(), args.multisig);
+            console.log(`Timelock Admin Role Transaction: ${timelockRoleTx.hash}`);
+            result = await timelockRoleTx.wait();
+            console.log(`Mined. Status: ${result.status}`);
+
             // Executor role - governance contract
             const executorRoleTx = await timelockContract.grantRole(await timelockContract.EXECUTOR_ROLE(), governanceContract.address);
             console.log(`Executor Role Transaction: ${executorRoleTx.hash}`);
@@ -69,18 +76,33 @@ task("gov:deployGovernanceContracts")
 
             const timelockAdminRole = await timelockContract.TIMELOCK_ADMIN_ROLE();
             console.log(`Deployer is assigned Timelock Admin Role? ${await timelockContract.hasRole(timelockAdminRole, deployer)}`);
+            console.log(`Multisig is assigned Timelock Admin Role? ${await timelockContract.hasRole(timelockAdminRole, args.multisig)}`);
             console.log(`Timelock itself is assigned Timelock Admin Role? ${await timelockContract.hasRole(timelockAdminRole, timelockContract.address)}`);
-
 
             // Admin role - is by default assigned to deployer (_msgSender()) and timelock instance itself, i.e., <address(this)> 
             // deployer can give up the timelock admin role as well
-            // await timelockContract.revokeRole(await timelockContract.TIMELOCK_ADMIN_ROLE(), deployerAddress); 
-
+            const revokeTimelockAdminRoleTx = await timelockContract.revokeRole(await timelockContract.TIMELOCK_ADMIN_ROLE(), deployer); 
+            console.log(`Timelock Admin Role Revoke Transaction: ${revokeTimelockAdminRoleTx.hash}`);
+            result = await revokeTimelockAdminRoleTx.wait();
+            console.log(`Mined. Status: ${result.status}`);
+            console.log(`Deployer is assigned Timelock Admin Role after giving up role? ${await timelockContract.hasRole(timelockAdminRole, deployer)}`);
+            
             // Canceller role - admin user/multisig
             // const cancellerRoleTx = await timelockContract.grantRole(await timelockContract.CANCELLER_ROLE(), args.multisig);
             // console.log(`Canceller Role Transaction: ${cancellerRoleTx.hash}`);
             // result = await cancellerRoleTx.wait();
             // console.log(`Mined. Status: ${result.status}`);
+
+            const stub = await STUB.deploy(
+                governanceContract.address
+            );
+
+            console.log(`Stub Contract Deployment Transaction Hash: ${stub.deployTransaction.hash} (on ${hre.network.name})`);
+
+            let stubContract = await stub.deployed();
+            console.log(`Stub Contract Address: ${stubContract.address}`);
+
+            
         } catch (e) {
             console.log(e.message);
         }
