@@ -25,8 +25,10 @@ task("gov:deployGovernanceContracts")
             let timelockContract = await timelockController.deployed();
             console.log(`TimelockController Contract Address: ${timelockContract.address}`);
 
-            // governor contract name, voting token, voting delay, voting period,
-            // timelockController address, quorumNumerator, proposalThreshold
+            // governor contract name, voting token, 
+            // voting delay, voting period,
+            // timelockController address, quorumNumerator, 
+            // proposalThreshold
             const governance = await GOVERNANCE.deploy(
                 args.governorName,
                 args.eul,
