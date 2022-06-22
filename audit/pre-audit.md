@@ -9,7 +9,9 @@ We have also covered the changes with additional tests to make sure all possible
 
 ## Modified Smart Contracts 
 
-### OpenZeppelin GovernorVotes => MultiGovernorVotes
+
+### OpenZeppelin GovernorVotes => MultiGovernorVotes
+
 The modifications made to the [OZ GovernorVotes](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/governance/extensions/GovernorVotes.sol) smart contract to derive our [MultiGovernorVotes](https://github.com/euler-xyz/euler-governance/blob/multiple-tokens-array/contracts/governance/MultiGovernorVotes.sol) smart contract are described below.
 
 * [L15 - L16](https://github.com/euler-xyz/euler-governance/blob/a059037d6ce91191a8896df1ea5055292f4aa017/contracts/governance/MultiGovernorVotes.sol#L15-L16) - We added an IVotes token array in line 16 and renamed token in line 15 to eul (representing the base governance token EUL from which token subsets will be derived, e.g., stEUL).
@@ -21,6 +23,8 @@ The modifications made to the [OZ GovernorVotes](https://github.com/OpenZeppelin
 * [L44 - L50](https://github.com/euler-xyz/euler-governance/blob/a059037d6ce91191a8896df1ea5055292f4aa017/contracts/governance/MultiGovernorVotes.sol#L44-L50) - here we have added a setter for the sub tokens array and it can only be changed via a governance proposal, voting, and executing the successful proposal. It has some similarities with the constructor, however it can only be called via governance so it's not used within the constructor.
 
 * [L52 - 54](https://github.com/euler-xyz/euler-governance/blob/a059037d6ce91191a8896df1ea5055292f4aa017/contracts/governance/MultiGovernorVotes.sol#L52-L54) - we have added a getter to return the present state of the sub tokens array.
+
+
 
 
 
