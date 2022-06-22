@@ -6,7 +6,7 @@ task("gov:deployGovernanceContracts")
     .addPositionalParam("votingDelay", "number of blocks between proposal creation and voting start")
     .addPositionalParam("votingPeriod", "number of blocks for voting period, assuming 13.14 seconds per block")
     .addPositionalParam("quorumNumerator", "numerator for percentage of total supply to form quorum, e.g., 4 for 4% quorum while denominator is 100")
-    .addPositionalParam("proposalThreshold", "amount of tokens or voting power required for a user to have in order to create a proposal, e.g., 1000")
+    .addPositionalParam("proposalThreshold", "amount of tokens or voting power required for a user to have in order to create a proposal in decimal units, e.g., 1000")
     .setAction(async (args) => {
         try {
             const TIMELOCKCONTROLLER = await hre.ethers.getContractFactory("contracts/governance/TimelockController.sol:TimelockController");
