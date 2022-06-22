@@ -246,26 +246,29 @@ task("vesting:createVestingMainnet")
     .addPositionalParam("vestingAmount", "In normal decimal units. Will be converted by hardhat task")
     .addPositionalParam("vestingEnd")
     .setAction(async (args) => {
+        const vesterFactory = "0x2EeB5af890F370ae711F99Aaec0166728c40cF9D";
+        const vestingBegin = 1640995200;
+        const vestingCliff = 1640995200;
         const userInput = prompt(
             "The following data will be used to deploy the vesting contract.\n" +
             "Ensure that vestingCliff >= vestingBegin and vestingEnd > vestingCliff\n" +
             `TreasuryVesterFactory: 0x2EeB5af890F370ae711F99Aaec0166728c40cF9D` +
             `Recipient: ${args.recipient}\n` +
             `Vesting Amount: ${args.vestingAmount}\n` +
-            `Vesting Begin: 1640995200\n` +
-            `Vesting Cliff: 1640995200\n` +
+            `Vesting Begin: ${vestingBegin}\n` +
+            `Vesting Cliff: ${vestingCliff}\n` +
             `Vesting End: ${args.vestingEnd}\n` +
             "\nPlease confirm with y or n: "
         );
 
         if (userInput == "y" || userInput == "yes") {
             const VestingFactory = await hre.ethers.getContractFactory("TreasuryVesterFactory");
-            const vestingFactory = await VestingFactory.attach("0x2EeB5af890F370ae711F99Aaec0166728c40cF9D");
+            const vestingFactory = await VestingFactory.attach(vesterFactory);
             const tx = await vestingFactory.createVestingContract(
                 args.recipient,
                 parseEther(args.vestingAmount.toString()),
-                1640995200, // vestingBegin
-                1640995200, // vestingCliff
+                vestingBegin,
+                vestingCliff,
                 parseInt(args.vestingEnd)
             );
             console.log(`Vesting Deployment Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
