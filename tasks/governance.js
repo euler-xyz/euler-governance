@@ -1,3 +1,23 @@
+task("gov:deployStubTarget")
+    .addPositionalParam("timelockController", "the address of the timelock controller contract")
+    .setAction(async (args) => {
+        try {
+            const STUB = await hre.ethers.getContractFactory("StubEulerGovernance");
+
+            const stub = await STUB.deploy(
+                args.timelockController
+            );
+
+            console.log(`Stub Contract Deployment Transaction Hash: ${stub.deployTransaction.hash} (on ${hre.network.name})`);
+
+            let stubContract = await stub.deployed();
+            console.log(`Stub Contract Address: ${stubContract.address}`);
+        } catch (e) {
+            console.log(e.message);
+        }
+    })
+
+
 task("gov:deployGovernanceContracts")
     .addPositionalParam("eul", "the address of the euler token")
     .addPositionalParam("multisig", "the address of the Euler multisig to assign canceller role")
