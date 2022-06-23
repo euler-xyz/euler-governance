@@ -251,7 +251,7 @@ task("vesting:createVestingMainnet")
         const userInput = prompt(
             "The following data will be used to deploy the vesting contract.\n" +
             "Ensure that vestingCliff >= vestingBegin and vestingEnd > vestingCliff\n" +
-            `TreasuryVesterFactory: ${vesterFactory}` +
+            `TreasuryVesterFactory: ${vesterFactory}\n` +
             `Recipient: ${args.recipient}\n` +
             `Vesting Amount: ${args.vestingAmount}\n` +
             `Vesting Begin: ${vestingBegin}\n` +
