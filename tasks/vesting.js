@@ -241,7 +241,6 @@ task("vesting:createVesting")
 
 
 task("vesting:createVestingMainnet")
-    .addPositionalParam("vestingFactory")
     .addPositionalParam("recipient")
     .addPositionalParam("vestingAmount", "In normal decimal units. Will be converted by hardhat task")
     .addPositionalParam("vestingEnd")
@@ -252,7 +251,7 @@ task("vesting:createVestingMainnet")
         const userInput = prompt(
             "The following data will be used to deploy the vesting contract.\n" +
             "Ensure that vestingCliff >= vestingBegin and vestingEnd > vestingCliff\n" +
-            `TreasuryVesterFactory: 0x2EeB5af890F370ae711F99Aaec0166728c40cF9D` +
+            `TreasuryVesterFactory: ${vesterFactory}` +
             `Recipient: ${args.recipient}\n` +
             `Vesting Amount: ${args.vestingAmount}\n` +
             `Vesting Begin: ${vestingBegin}\n` +
