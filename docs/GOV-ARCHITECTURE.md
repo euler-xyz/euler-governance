@@ -95,7 +95,7 @@ Delegate votes from the sender to the delegatee. Users can delegate to 1 address
 #### EUL
     function delegate(address delegatee)
 * ```delegatee```: The address in which the sender wishes to delegate their votes to.
-* ```msg.sender```: The address of the COMP token holder that is attempting to delegate their votes.
+* ```msg.sender```: The address of the EUL token holder that is attempting to delegate their votes.
 * ```RETURN```: No return, reverts on error.
 
 #### Solidity

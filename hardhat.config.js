@@ -110,7 +110,7 @@ for (let k in process.env) {
       module.exports.networks = {
           [networkName]: {
               url: `${process.env[k]}`,
-              accounts: [`0x${process.env.MAINNET_PRIVATE_KEY}`],
+              accounts: [`0x${process.env.PRIVATE_KEY}`],
           }
       }
   }

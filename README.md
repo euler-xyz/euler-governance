@@ -47,6 +47,11 @@ Treasury Vester Factory - `0x2EeB5af890F370ae711F99Aaec0166728c40cF9D`
 Treasury Vester Implementation - `0x8Ade79814A455179836637604c51e37e7b819BBB`
 
 
+### Goerli 
+
+EUL ERC20Votes token - `0x64f5d968e3D3162404067A0d15ba70d8dC6122E4`
+
+
 ### Ropsten 
 
 EUL ERC20Votes token - `0x2FEe9F774f8d963bF253D41111d03ae990B0834D`
