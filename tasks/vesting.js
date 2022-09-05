@@ -88,7 +88,7 @@ task("vesting:createVestingFromCSV")
 
             // vestingAmount
             if (
-                isNaN(parseInt(row[1]))
+                isNaN(parseFloat(row[1]))
             ) {
                 console.log(`[ERROR]: invalid value for vestingAmount in row ${i + 1}`);
                 continue;
@@ -239,7 +239,6 @@ task("vesting:createVesting")
         }
     });
 
-
 task("vesting:createVestingMainnet")
     .addPositionalParam("recipient")
     .addPositionalParam("vestingAmount", "In normal decimal units. Will be converted by hardhat task")
@@ -327,4 +326,86 @@ task("vesting:getVestingContracts")
             args.recipient
         );
         console.log(`Vesting Contract Count for recipient ${args.recipient}: ${vestingContractCount}`);
+    });
+
+
+task("vesting:createVestingTeam")
+    .addPositionalParam("token")
+    .addPositionalParam("recipient")
+    .addPositionalParam("vestingAmount", "In normal decimal units. Will be converted by hardhat task")
+    .setAction(async (args) => {
+        const userInput = prompt(
+            "The following data will be used to issue the vested tokens.\n" +
+            "Ensure that vested amount and recipients wallet address are correct\n" +
+            `Recipient: ${args.recipient}\n` +
+            `Vesting Amount: ${args.vestingAmount}\n` +
+            "\nPlease confirm with y or n: "
+        );
+
+        if (userInput == "y" || userInput == "yes") {
+            const Token = await hre.ethers.getContractFactory("ERC20VotesMock");
+            const token = await Token.attach(args.token);
+            const decimals = await token.decimals();
+
+            const tx = await token.transfer(args.recipient, ethers.utils.parseUnits(args.vestingAmount, decimals));
+
+            console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+            let result = await tx.wait();
+            console.log(`Mined. Status: ${result.status}`);
+
+        } else {
+            console.log("Stoping deployment")
+            return false;
+        }
+    });
+
+
+task("vesting:createVestingTeamFromCSV")
+    .addPositionalParam("token")
+    // arg will be path to csv file
+    .setAction(async (args) => {
+        const Token = await hre.ethers.getContractFactory("ERC20VotesMock");
+        const token = await Token.attach(args.token);
+        const decimals = await token.decimals();
+
+        const fs = require('fs')
+        const inputPath = "./vestingTeam.csv";
+        const textByLine = fs.readFileSync(inputPath).toString().split("\n");
+
+        let output = "recipientAddress,vestingAmount\n"
+
+        // let i = 1 to skip headings
+        for (let i = 1; i < textByLine.length; i++) {
+            const row = textByLine[i].split(",")
+
+            // recipient address
+            if (!hre.ethers.utils.isAddress(row[0])) {
+                console.log(`[ERROR]: recipient address is invalid for data in row ${i + 1}`)
+                continue;
+            }
+
+            // vestingAmount
+            if (
+                isNaN(parseFloat(row[1]))
+            ) {
+                console.log(`[ERROR]: invalid value for vestingAmount in row ${i + 1}`);
+                continue;
+            }
+
+            try {
+                // here, the token amout must be a String
+                const tx = await token.transfer(row[0], ethers.utils.parseUnits((row[1]).toString(), decimals));
+
+                console.log(`Transaction Hash: ${tx.hash} (on ${hre.network.name})`);
+                let result = await tx.wait();
+                console.log(`Mined. Status: ${result.status}`);
+                output += `${row},Sent,\n`;
+                console.log(`[PROCESSED]: row ${i + 1}`)
+            } catch (e) {
+                console.log(`[SKIPPING]: row ${i + 1} as transaction failed with error: ${e}`);
+            }
+        }
+
+        console.log("\nDONE\n");
+        console.log(output);
     });
