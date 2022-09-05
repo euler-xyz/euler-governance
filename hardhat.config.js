@@ -12,8 +12,8 @@ require('@openzeppelin/hardhat-upgrades');
 const files = fs.readdirSync('./tasks');
 
 for (let file of files) {
-    if (!file.endsWith('.js')) continue;
-    require(`./tasks/${file}`);
+  if (!file.endsWith('.js')) continue;
+  require(`./tasks/${file}`);
 }
 
 
@@ -56,7 +56,7 @@ for (let file of files) {
 module.exports = {
   networks: {
     hardhat: {
-        allowUnlimitedContractSize: true
+      allowUnlimitedContractSize: true
     },
   },
 
@@ -78,8 +78,8 @@ module.exports = {
         version: "0.8.4",
         settings: {
           optimizer: {
-              enabled: true,
-              runs: 1,
+            enabled: true,
+            runs: 1,
           },
         }
       }
@@ -97,7 +97,7 @@ module.exports = {
 
 if (process.env.NODE_ENV) {
   let path = `.env.${process.env.NODE_ENV}`;
-  if (!fs.existsSync(path)) throw(`unable to open env file: ${path}`);
+  if (!fs.existsSync(path)) throw (`unable to open env file: ${path}`);
   require("dotenv").config({ path, });
 } else if (fs.existsSync('./.env')) {
   require("dotenv").config();
@@ -105,17 +105,17 @@ if (process.env.NODE_ENV) {
 
 for (let k in process.env) {
   if (k.startsWith("RPC_URL_")) {
-      let networkName = k.slice(8).toLowerCase();
+    let networkName = k.slice(8).toLowerCase();
 
-      module.exports.networks = {
-          [networkName]: {
-              url: `${process.env[k]}`,
-              accounts: [`0x${process.env.PRIVATE_KEY}`],
-          }
+    module.exports.networks = {
+      [networkName]: {
+        url: `${process.env[k]}`,
+        accounts: [`0x${process.env.PRIVATE_KEY}`],
       }
+    }
   }
 
-  if (k == "ETHERSCAN_API_KEY") {
+  if (k === "ETHERSCAN_API_KEY") {
     module.exports.etherscan = {
       apiKey: process.env[k]
     }
