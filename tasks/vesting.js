@@ -57,7 +57,6 @@ task("vesting:deployVester")
 
 task("vesting:createVestingFromCSV")
     .addPositionalParam("vestingFactory")
-    // arg will be path to csv file
     .setAction(async (args) => {
         if (!hre.ethers.utils.isAddress(args.vestingFactory)) {
             console.log(`[ERROR]: invalid address for vestingFactory`)
@@ -362,7 +361,6 @@ task("vesting:createVestingTeam")
 
 task("vesting:createVestingTeamFromCSV")
     .addPositionalParam("token")
-    // arg will be path to csv file
     .setAction(async (args) => {
         const Token = await hre.ethers.getContractFactory("ERC20VotesMock");
         const token = await Token.attach(args.token);
